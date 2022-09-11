@@ -1,0 +1,11 @@
+*.o
+*.bin
+*.out
+
+.idea
+
+cmake-build-debug
+/Toolchain/**
+
+
+
