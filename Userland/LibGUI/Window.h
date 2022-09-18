@@ -4,17 +4,24 @@
 
 #pragma once
 
+#include "Painter.h"
+#include "Rect.h"
+
 namespace GUI {
 
 class Window final {
 public:
-
-    Window();
+    Window(Rect size);
     ~Window() = default;
 
+    inline void show() { m_isVisible = true; }
+    inline void hide() { m_isVisible = false; }
+
+    void render(Painter& painter);
+
 private:
-    int m_width = 0;
-    int m_height = 0;
+    bool m_isVisible = true;
+    Rect m_size;
     int m_position_x = 0;
     int m_position_y = 0;
 };

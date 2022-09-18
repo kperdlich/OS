@@ -22,4 +22,32 @@ inline void* memset(void* s, int c, size_t n)
 {
     return std::memset(s, c, n);
 }
+
+template<typename T>
+T abs(T value)
+{
+    return std::abs(value);
+}
+
+template<typename T>
+void swap(T& a, T& b) {
+    std::swap(a, b);
+}
+
+template<typename T>
+T min(T a, T b)
+{
+    if (a < b)
+        return a;
+    return b;
+}
+
+template<typename T>
+T max(T a, T b)
+{
+    if (a > b)
+        return a;
+    return b;
+}
+
 }

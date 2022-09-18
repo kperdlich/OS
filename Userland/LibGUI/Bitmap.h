@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "Rect.h"
 #include "Color.h"
+#include "Rect.h"
 
 namespace GUI {
 
@@ -19,8 +19,10 @@ public:
     static Bitmap* createFrom(BitmapFormat format, Rect size, char* data);
 
     inline char* data() { return m_data; }
+    inline Rect size() { return m_size; }
 
-    void setPixel(int x, int y, Gui::Color color);
+    void setPixel(int x, int y, GUI::Color color);
+    void clear(GUI::Color color);
 
 private:
     Bitmap(BitmapFormat format, Rect size, char* data);

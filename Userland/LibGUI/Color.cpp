@@ -4,7 +4,7 @@
 
 #include "Color.h"
 
-namespace Gui {
+namespace GUI {
 Color::Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
     : m_r(r)
     , m_g(g)
@@ -19,4 +19,4 @@ Color::Color(unsigned char value)
     , m_a(value)
 {
 }
-} // Gui
+} // GUI
