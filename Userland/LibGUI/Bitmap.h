@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Color.h"
-#include "Rect.h"
+#include "Size.h"
 
 namespace GUI {
 
@@ -16,19 +16,19 @@ enum class BitmapFormat {
 class Bitmap final {
 public:
     Bitmap() = default;
-    static Bitmap* createFrom(BitmapFormat format, Rect size, char* data);
+    static Bitmap* createFrom(BitmapFormat format, IntSize size, char* data);
 
     inline char* data() { return m_data; }
-    inline Rect size() { return m_size; }
+    inline IntSize size() { return m_size; }
 
     void setPixel(int x, int y, GUI::Color color);
     void clear(GUI::Color color);
 
 private:
-    Bitmap(BitmapFormat format, Rect size, char* data);
+    Bitmap(BitmapFormat format, IntSize size, char* data);
 
 private:
-    Rect m_size;
+    IntSize m_size;
     BitmapFormat m_format;
     char* m_data { nullptr };
 };

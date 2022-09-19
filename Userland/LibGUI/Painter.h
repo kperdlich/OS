@@ -14,7 +14,7 @@ class Painter {
 public:
     explicit Painter(Bitmap* target);
 
-    void drawRectangle(int x, int y, Rect size, GUI::Color color);
+    void drawRectangle(IntRect rect, GUI::Color color);
     void drawQuad(int x, int y, int size, GUI::Color color);
     void drawLine(int x0, int y0, int x1, int y1, GUI::Color color);
 

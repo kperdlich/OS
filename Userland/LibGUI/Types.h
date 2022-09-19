@@ -30,7 +30,8 @@ T abs(T value)
 }
 
 template<typename T>
-void swap(T& a, T& b) {
+void swap(T& a, T& b)
+{
     std::swap(a, b);
 }
 
