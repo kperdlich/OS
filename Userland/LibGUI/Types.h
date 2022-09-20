@@ -51,4 +51,10 @@ T max(T a, T b)
     return b;
 }
 
+template<typename T>
+T clamp(T value, T low, T high)
+{
+    return max(low, min(value, high));
+}
+
 }

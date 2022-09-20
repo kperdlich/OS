@@ -14,9 +14,10 @@ Painter::Painter(Bitmap* targetBuffer)
 
 void Painter::drawRectangle(IntRect rect, GUI::Color color)
 {
-    for (int i = 0; i < rect.width(); ++i) {
-        for (int j = 0; j < rect.height(); ++j) {
-            m_targetBuffer->setPixel(rect.x() + i, rect.y() + j, color);
+    const auto clippedRect = IntRect { 0, 0, m_targetBuffer->size().width(), m_targetBuffer->size().height() }.clip(rect);
+    for (int i = 0; i < clippedRect.width(); ++i) {
+        for (int j = 0; j < clippedRect.height(); ++j) {
+            m_targetBuffer->setPixel(clippedRect.x() + i, clippedRect.y() + j, color);
         }
     }
 }

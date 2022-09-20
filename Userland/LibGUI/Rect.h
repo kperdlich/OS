@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Types.h"
+
 namespace GUI {
 
 template<typename T>
@@ -17,11 +19,11 @@ public:
     {
     }
 
-    inline T width() { return m_width; }
-    inline T height() { return m_height; }
+    inline T width() const { return m_width; }
+    inline T height() const { return m_height; }
 
-    inline T x() { return m_x; }
-    inline T y() { return m_y; }
+    inline T x() const { return m_x; }
+    inline T y() const { return m_y; }
 
     inline void moveBy(T x, T y)
     {
@@ -29,11 +31,20 @@ public:
         m_y += y;
     }
 
-    bool isPointInside(T x, T y)
+    bool isPointInside(T x, T y) const
     {
         if (x > m_x && x < (m_x + m_width) && y > m_y && y < (m_y + m_height))
             return true;
         return false;
+    }
+
+    Rect<T> clip(Rect<T> clipInside) const
+    {
+        const T clippedX = ADS::clamp(clipInside.m_x, m_x, m_x + m_width);
+        const T clippedY = ADS::clamp(clipInside.m_y, m_y, m_y + m_height);
+        const T clippedWidth = ADS::min(clipInside.m_width - ADS::abs(clippedX - clipInside.m_x), m_width - clippedX);
+        const T clippedHeight = ADS::min(clipInside.m_height - ADS::abs(clippedY - clipInside.m_y), m_height - clippedY);
+        return Rect<T> { clippedX, clippedY, clippedWidth, clippedHeight };
     }
 
 private:
