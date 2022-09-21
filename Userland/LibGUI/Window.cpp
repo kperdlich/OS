@@ -48,5 +48,9 @@ void Window::onMouseDown(int key, int x, int y)
         m_isDragging = true;
     }
 }
+bool Window::hits(int x, int y)
+{
+    return m_rect.isPointInside(x, y);
+}
 
 } // GUI

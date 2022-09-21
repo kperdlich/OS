@@ -24,6 +24,8 @@ public:
 
     void render(Painter& painter);
 
+    bool hits(int x, int y);
+
 private:
     bool m_isVisible = true;
     IntRect m_rect;

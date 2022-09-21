@@ -7,11 +7,26 @@
 #include <cassert>
 #include <cstring>
 #include <iostream>
+#include <memory>
+#include <vector>
 
 #define ASSERT(X) assert(X)
 
 namespace ADS {
+
 using String = std::string;
+
+template<typename T>
+using WeakPtr = std::weak_ptr<T>;
+
+template<typename T>
+using SharedPtr = std::shared_ptr<T>;
+
+template<typename T>
+using UniquePtr = std::unique_ptr<T>;
+
+template<typename T>
+using Vector = std::vector<T>;
 
 inline void* memcpy(void* dest, const void* src, std::size_t count)
 {
