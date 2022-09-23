@@ -19,15 +19,20 @@ public:
     WindowStack() = default;
     ~WindowStack() = default;
 
+    static WindowStack& the() {
+        static WindowStack instance;
+        return instance;
+    }
+
     void add(Window* window);
     void makeActive(Window* window);
     void remove(Window* window);
 
     template<typename Callback>
-    void forEachWindowBackToFont(Callback callback);
+    void forEachVisibleWindowBackToFont(Callback callback);
 
     template<typename Callback>
-    void forEachWindowFontToBack(Callback callback);
+    void forEachVisibleWindowFontToBack(Callback callback);
 
     void onMouseMove(int x, int y);
     void onMouseDown(int key, int x, int y);
@@ -39,19 +44,23 @@ private:
 };
 
 template<typename Callback>
-inline void WindowStack::forEachWindowBackToFont(Callback callback)
+inline void WindowStack::forEachVisibleWindowBackToFont(Callback callback)
 {
-    for (auto& m_window : m_windows) {
-        const auto result = callback(*m_window);
+    for (auto& window : m_windows) {
+        if (!window->isVisible())
+            continue;
+        const auto result = callback(*window);
         if (result == IteratorResult::Break)
             break;
     }
 }
 
 template<typename Callback>
-inline void WindowStack::forEachWindowFontToBack(Callback callback)
+inline void WindowStack::forEachVisibleWindowFontToBack(Callback callback)
 {
     for (auto it = m_windows.rbegin(); it != m_windows.rend(); ++it) {
+        if (!(*it)->isVisible())
+            continue;
         const auto result = callback(**it);
         if (result == IteratorResult::Break)
             break;

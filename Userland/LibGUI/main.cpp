@@ -31,9 +31,8 @@ int main()
 
     auto painter = new GUI::Painter(framebufferBitmap);
 
-    auto windowStack = new GUI::WindowStack();
-    windowStack->add(new GUI::Window(GUI::IntRect { 10, 10, 800, 600 }));
-    windowStack->add(new GUI::Window(GUI::IntRect { 10, 10, 800, 600 }));
+    GUI::WindowStack::the().add(new GUI::Window(GUI::IntRect { 10, 10, 800, 600 }));
+    GUI::WindowStack::the().add(new GUI::Window(GUI::IntRect { 10, 10, 800, 600 }));
 
     bool leftMouseButtonDown = false;
 
@@ -43,7 +42,7 @@ int main()
     while (!quit) {
         framebufferBitmap->clear(GUI::Color { 255 });
 
-        windowStack->forEachWindowBackToFont([&](GUI::Window& window) -> GUI::IteratorResult {
+        GUI::WindowStack::the().forEachVisibleWindowBackToFont([&](GUI::Window& window) -> GUI::IteratorResult {
             window.render(*painter);
             return GUI::IteratorResult::Continue;
         });
@@ -57,14 +56,14 @@ int main()
                 quit = true;
                 break;
             case SDL_MOUSEBUTTONUP:
-                windowStack->onMouseUp(event.button.button, event.motion.x, event.motion.y);
+                GUI::WindowStack::the().onMouseUp(event.button.button, event.motion.x, event.motion.y);
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     leftMouseButtonDown = false;
                     painter->drawLine(startDownX, startDownY, event.motion.x, event.motion.y, GUI::Color { 0xff, 0, 0, 0xff });
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                windowStack->onMouseDown(event.button.button, event.motion.x, event.motion.y);
+                GUI::WindowStack::the().onMouseDown(event.button.button, event.motion.x, event.motion.y);
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     leftMouseButtonDown = true;
                     startDownX = event.motion.x;
@@ -73,7 +72,7 @@ int main()
             case SDL_MOUSEMOTION:
                 int mouseX = event.motion.x;
                 int mouseY = event.motion.y;
-                windowStack->onMouseMove(mouseX, mouseY);
+                GUI::WindowStack::the().onMouseMove(mouseX, mouseY);
                 if (leftMouseButtonDown) {
                     // framebufferBitmap->setPixel(mouseX, mouseY, GUI::Color { 0 });
                 }

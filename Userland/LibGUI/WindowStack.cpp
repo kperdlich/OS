@@ -11,6 +11,7 @@ void WindowStack::add(Window* window)
 {
     m_windows.emplace_back(window);
 }
+
 void WindowStack::remove(Window* window)
 {
     // This sucks!!!!
@@ -23,6 +24,7 @@ void WindowStack::remove(Window* window)
         }
     }
 }
+
 void WindowStack::makeActive(Window* window)
 {
     remove(window);
@@ -32,7 +34,7 @@ void WindowStack::makeActive(Window* window)
 
 void WindowStack::onMouseDown(int key, int x, int y)
 {
-    forEachWindowFontToBack([&](Window& window) -> IteratorResult {
+    forEachVisibleWindowFontToBack([&](Window& window) -> IteratorResult {
         if (window.hits(x, y)) {
             makeActive(&window);
             window.onMouseDown(key, x, y);
@@ -51,7 +53,7 @@ void WindowStack::onMouseMove(int x, int y)
 
 void WindowStack::onMouseUp(int key, int x, int y)
 {
-    forEachWindowFontToBack([&](Window& window) -> IteratorResult {
+    forEachVisibleWindowFontToBack([&](Window& window) -> IteratorResult {
         if (window.hits(x, y)) {
             window.onMouseUp(key, x, y);
             return IteratorResult::Break;
@@ -59,5 +61,6 @@ void WindowStack::onMouseUp(int key, int x, int y)
         return IteratorResult::Continue;
     });
 }
+
 
 } // GUI

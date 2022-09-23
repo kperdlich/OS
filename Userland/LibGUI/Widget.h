@@ -4,17 +4,20 @@
 
 #pragma once
 
+#include "Rect.h"
+
 namespace GUI {
 
 class Widget {
 public:
+    explicit Widget(Widget* parent);
 
+    virtual void onMouseMove(int x, int y) = 0;
+    virtual void onMouseDown(int key, int x, int y) = 0;
+    virtual void onMouseUp(int key, int x, int y) = 0;
 
-
-private:
+protected:
     class Widget* m_parent;
-    int m_position_x = 0;
-    int m_position_y = 0;
 };
 
 } // GUI
