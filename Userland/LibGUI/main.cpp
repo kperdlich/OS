@@ -1,17 +1,35 @@
 
+#include "Types.h"
 #include "Bitmap.h"
 #include "Painter.h"
 #include "Rect.h"
-#include "Types.h"
 #include "Window.h"
 #include "WindowStack.h"
 #include <SDL2/SDL.h>
 #include <string>
+#include "Vector.h"
 
 int main()
 {
     constexpr int width = 1024;
     constexpr int height = 720;
+
+    TEST::Vector<int> test;
+    test.pushBack(10);
+    test.pushBack(20);
+    test.pushBack(30);
+    test.pushBack(40);
+    test.popBack();
+    test.popBack();
+    test.pushBack(24);
+
+    for (auto it : test) {
+        std::cout << it << std::endl;
+    }
+
+    for (auto it = test.rbegin(); it != test.rend(); ++it) {
+        std::cout << *it << std::endl;
+    }
 
     const ADS::String title = "OS LibGui Emulator";
 
