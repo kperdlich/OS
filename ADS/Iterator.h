@@ -21,9 +21,9 @@ public:
         return *this;
     }
 
-    Iterator operator++(int index)
+    Iterator operator++(int)
     {
-        m_index += index;
+        ++m_index;
         return *this;
     }
 
@@ -33,9 +33,9 @@ public:
         return *this;
     }
 
-    Iterator operator--(int index)
+    Iterator operator--(int)
     {
-        m_index -= index;
+        --m_index;
         return *this;
     }
 
@@ -86,12 +86,10 @@ public:
 
     static Iterator end(Container& container)
     {
-        return { container, container.size() };
+        return { container, static_cast<size_t>(container.size()) };
     }
 
 private:
-    friend Container;
-
     Container& m_container;
     size_t m_index { 0 };
 };

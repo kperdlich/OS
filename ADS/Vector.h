@@ -7,6 +7,7 @@
 #include "Iterator.h"
 #include "ReverseIterator.h"
 #include "Types.h"
+#include "initializer_list"
 
 namespace TEST {
 
@@ -19,6 +20,13 @@ public:
     static constexpr size_t s_capacityIncrement = 5;
 
     Vector() = default;
+
+    Vector(std::initializer_list<T> list)
+    {
+        for (auto& it : list) {
+            pushBack(it);
+        }
+    };
 
     ~Vector()
     {
@@ -90,22 +98,22 @@ public:
         return Iterator::begin(*this);
     }
 
-    constexpr inline ReverseIterator rend()
+    inline ReverseIterator rend()
     {
         return ReverseIterator::end(*this);
     }
 
-    constexpr inline ReverseIterator rbegin()
+    inline ReverseIterator rbegin()
     {
         return ReverseIterator::begin(*this);
     }
 
-    constexpr inline const T& operator[](int index) const
+    inline const T& operator[](int index) const
     {
         return m_data[index];
     }
 
-    constexpr inline T& operator[](int index)
+    inline T& operator[](int index)
     {
         return m_data[index];
     }

@@ -21,9 +21,9 @@ public:
         return *this;
     }
 
-    ReverseIterator operator++(int index)
+    ReverseIterator operator++(int)
     {
-        m_index -= index;
+        --m_index;
         return *this;
     }
 
@@ -33,9 +33,9 @@ public:
         return *this;
     }
 
-    ReverseIterator operator--(int index)
+    ReverseIterator operator--(int)
     {
-        m_index += index;
+        ++m_index;
         return *this;
     }
 
@@ -90,8 +90,6 @@ public:
     }
 
 private:
-    friend Container;
-
     Container& m_container;
     int m_index { 0 };
 };

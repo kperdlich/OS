@@ -1,13 +1,15 @@
 
-#include "Types.h"
+#include <stddef.h>
+#include "Array.h"
 #include "Bitmap.h"
 #include "Painter.h"
 #include "Rect.h"
+#include "Types.h"
+#include "Vector.h"
 #include "Window.h"
 #include "WindowStack.h"
 #include <SDL2/SDL.h>
 #include <string>
-#include "Vector.h"
 
 int main()
 {
@@ -29,6 +31,16 @@ int main()
 
     for (auto it = test.rbegin(); it != test.rend(); ++it) {
         std::cout << *it << std::endl;
+    }
+
+    ADS::Array<int, 5> array = { 10, 20, 30, 40 } ;
+    for (auto it : array) {
+        std::cout << it << std::endl;
+    }
+
+    TEST::Vector<int> vector = { 10, 20, 30, 60 };
+    for (auto it : vector) {
+        std::cout << it << std::endl;
     }
 
     const ADS::String title = "OS LibGui Emulator";
