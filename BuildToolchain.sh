@@ -15,6 +15,7 @@ export ARTIFACTS="Artifacts"
 export BUILD_PATH="$BUILD/$ARCH"
 export ARTIFACTS_PATH="$ARTIFACTS/$ARCH"
 
+mkdir -p Toolchain
 cd Toolchain
 rm -f -d -r $ARTIFACTS
 rm -f -d -r $BUILD
