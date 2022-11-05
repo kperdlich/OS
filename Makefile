@@ -4,6 +4,7 @@ LD := $(TOOLCHAIN)/i686-elf-gcc
 BUILD_DIR := Build
 
 OBJ:=$(BUILD_DIR)/kernel.o \
+	$(BUILD_DIR)/gdt.o \
 
 all: clean
 	make -C ./Kernel
