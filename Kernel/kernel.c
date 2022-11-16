@@ -114,6 +114,7 @@ void kernel_main(void)
     init_descriptor_tables();
     terminal_writestring("GDT initialised!\n");
 
+    asm volatile ("int $0x13");
     asm volatile ("int $0x3");
 
     terminal_writestring("Bllaaaaaaaaaaaaa!\n");
