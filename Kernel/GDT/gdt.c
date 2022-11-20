@@ -3,26 +3,24 @@
 
 static void Hang()
 {
-    asm volatile("cli; hlt");
+    asm("cli; hlt");
 }
 
 typedef struct registers {
-    u32int gs, fs, es, ds;
-    u32int edi, esi, ebp, esp, ebx, edx, ecx, eax; // Pushed by pusha.
-    u32int int_no, err_code; // Interrupt number and error code (if applicable)
-    u32int eip, cs, eflags, useresp, ss; // Pushed by the processor automatically.
+   u32int ds;                  // Data segment selector
+   u32int edi, esi, ebp, esp, ebx, edx, ecx, eax; // Pushed by pusha.
+   u32int int_no, err_code;    // Interrupt number and error code (if applicable)
+   u32int eip, cs, eflags, useresp, ss; // Pushed by the processor automatically.
 } registers_t;
 
 #define NAKED __attribute__((naked))
 
-/*
 #define EXCEPTION_HANDLER(idx, msg)       \
     static void exception_handler_##idx() \
     {                                     \
         terminal_writestring(msg);        \
         Hang();                           \
     }
-*/
 
 #define ISR_HANDLER(idx, name)             \
     void name##_isr_handler(registers_t);  \
@@ -32,19 +30,23 @@ typedef struct registers {
             "cli\n"                        \
             "pushl $0x0\n"                 \
             "pushl $" #idx "\n"            \
-            "pusha\n"                      \
+            "pushad\n"                      \
+            "pushl %ds\n"                  \
+            "pushl %es\n"                  \
+            "pushl %fs\n"                  \
+            "pushl %gs\n"                  \
             "mov $0x10, %ax\n"             \
             "mov %ax, %ds\n"               \
             "mov %ax, %es\n"               \
             "mov %ax, %fs\n"               \
             "mov %ax, %gs\n"               \
             "call " #name "_isr_handler\n" \
-            "mov %ds, %ax\n"               \
-            "mov %es, %ax\n"               \
-            "mov %fs, %ax\n"               \
-            "mov %gs, %ax\n"               \
-            "popa\n"                       \
-            "addl $0x8, %esp\n"            \
+            "popl %gs\n"                    \
+            "popl %fs\n"                   \
+            "popl %es\n"                   \
+            "popl %ds\n"                   \
+            "popad\n"                       \
+            "addl $8, %esp\n" \
             "sti\n"                        \
             "iret\n");                     \
     }
@@ -53,25 +55,32 @@ typedef struct registers {
     void name##_isr_handler(registers_t);      \
     NAKED void name##_isr_asm_entry()          \
     {                                          \
-        asm(                                   \
-            "cli\n"                            \
-            "pushl $" #idx "\n"                \
-            "pusha\n"                          \
-            "mov $0x10, %ax\n"                 \
-            "mov %ax, %ds\n"                   \
-            "mov %ax, %es\n"                   \
-            "mov %ax, %fs\n"                   \
-            "mov %ax, %gs\n"                   \
-            "call " #name "_isr_handler\n"     \
-            "mov %ds, %ax\n"                   \
-            "mov %es, %ax\n"                   \
-            "mov %fs, %ax\n"                   \
-            "mov %gs, %ax\n"                   \
-            "popa\n"                           \
-            "addl $0x4, %esp\n"                \
-            "sti\n"                            \
-            "iret\n");                         \
+        asm(                               \
+            "cli\n"                        \
+            "pushl $" #idx "\n"            \
+            "pushad\n"                      \
+            "pushl %ds\n"                  \
+            "pushl %es\n"                  \
+            "pushl %fs\n"                  \
+            "pushl %gs\n"                  \
+            "mov $0x10, %ax\n"             \
+            "mov %ax, %ds\n"               \
+            "mov %ax, %es\n"               \
+            "mov %ax, %fs\n"               \
+            "mov %ax, %gs\n"               \
+            "call " #name "_isr_handler\n" \
+            "popl %gs\n"                    \
+            "popl %fs\n"                   \
+            "popl %es\n"                   \
+            "popl %ds\n"                   \
+            "popad\n"                       \
+            "addl $4, %esp\n" \
+            "sti\n"                        \
+            "iret\n");                     \
     }
+
+EXCEPTION_HANDLER(19_31, "Exception 19 - 31")
+
 /*
 EXCEPTION_HANDLER(0, "Division by zero")
 EXCEPTION_HANDLER(1, "Debug exception")
@@ -199,9 +208,9 @@ void stack_fault_isr_handler(registers_t reg)
 ISR_HANDLER_WITH_ERROR_CODE(13, general_protection_fault)
 void general_protection_fault_isr_handler(registers_t reg)
 {
-    if (reg.int_no == 13) {
-        terminal_writestring("general_protection_fault_isr_handler");
-    }
+    // if (reg.int_no == 13) {
+    terminal_writestring("general_protection_fault_isr_handler");
+    //}
 }
 
 ISR_HANDLER_WITH_ERROR_CODE(14, page_fault)
@@ -292,6 +301,10 @@ static void init_idt()
     idt_set_gate(16, coprocessor_segment_overrun_isr_asm_entry, 0x08, 0x8E);
     idt_set_gate(17, alignment_check_exception_isr_asm_entry, 0x08, 0x8E);
     idt_set_gate(18, machine_check_exception_isr_asm_entry, 0x08, 0x8E);
+
+    for (int i = 19; i <= 31; ++i) {
+        idt_set_gate(i, exception_handler_19_31, 0x08, 0x8E);
+    }
 
     asm volatile("lidt %0" ::"m"(idt_ptr));
 }
