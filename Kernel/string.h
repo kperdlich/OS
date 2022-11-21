@@ -10,16 +10,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef __STRING_H__
-#define __STRING_H__
+#pragma once
 
 #include "types.h"
 
-
-void ConvertInt2String(sInt32_t value, unsigned char* valuestring);
+void ConvertInt2String(sInt32_t value, char* valuestring);
 
 size_t strlen(const char* str);
 
 void* memset(void* ptr, int value, size_t num);
-
-#endif

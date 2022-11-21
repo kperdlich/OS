@@ -11,73 +11,70 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#include "video.h"
 #include "gdt.h"
 #include "idt.h"
-#include "isr.h"
 #include "irq.h"
-#include "timer.h"
+#include "isr.h"
 #include "keyboard.h"
+#include "timer.h"
+#include "video.h"
 
+const char* setupGDTState = "Setup GDT";
+const char* setupIDTState = "Setup IDT";
+const char* setupISRState = "Setup ISR's";
+const char* setupIRQState = "Setup IRQ";
+const char* setupTimerState = "Setup Timer";
+const char* setupKeyboard = "Setup Keyboard";
 
-uInt8_t setupGDTState[] = "Setup GDT";
-uInt8_t setupIDTState[] = "Setup IDT";
-uInt8_t setupISRState[] = "Setup ISR's";
-uInt8_t setupIRQState[] = "Setup IRQ";
-uInt8_t setupTimerState[] = "Setup Timer";
-uInt8_t setupKeyboard[] = "Setup Keyboard";
+extern "C" void kmain()
+{
+    asm volatile("cli");
 
-void main()
-{	
-	__asm__ volatile("cli");
+    Console* con = InitConsole();
+    clrConsoleScreen(con);
 
-	Console* con = InitConsole();
-	clrConsoleScreen(con);	
+    printKernelInformations(con);
 
-	printKernelInformations(con);
-	
-	k_print(setupGDTState, ColorBlack | ColorLightGray, con);
-	gdt_install();		//
-	k_print("........................[", ColorBlack | ColorLightGray, con);
-	k_print("Ok", ColorBlack | ColorGreen, con);
-	k_print("]\n", ColorBlack | ColorLightGray, con);
-	
-	
-	k_print(setupIDTState, ColorBlack | ColorLightGray, con);
-	idt_install();		//
-	k_print("........................[", ColorBlack | ColorLightGray, con);
-	k_print("Ok", ColorBlack | ColorGreen, con);
-	k_print("]\n", ColorBlack | ColorLightGray, con);
+    k_print(setupGDTState, ColorBlack | ColorLightGray, con);
+    gdt_install(); //
+    k_print("........................[", ColorBlack | ColorLightGray, con);
+    k_print("Ok", ColorBlack | ColorGreen, con);
+    k_print("]\n", ColorBlack | ColorLightGray, con);
 
+    k_print(setupIDTState, ColorBlack | ColorLightGray, con);
+    idt_install(); //
+    k_print("........................[", ColorBlack | ColorLightGray, con);
+    k_print("Ok", ColorBlack | ColorGreen, con);
+    k_print("]\n", ColorBlack | ColorLightGray, con);
 
-	k_print(setupISRState, ColorBlack | ColorLightGray, con);
-	isr_install();		//
-	k_print("......................[", ColorBlack | ColorLightGray, con);
-	k_print("Ok", ColorBlack | ColorGreen, con);
-	k_print("]\n", ColorBlack | ColorLightGray, con);
+    k_print(setupISRState, ColorBlack | ColorLightGray, con);
+    isr_install(); //
+    k_print("......................[", ColorBlack | ColorLightGray, con);
+    k_print("Ok", ColorBlack | ColorGreen, con);
+    k_print("]\n", ColorBlack | ColorLightGray, con);
 
-	k_print(setupIRQState, ColorBlack | ColorLightGray, con);
-	irq_install();		//
-	k_print("........................[", ColorBlack | ColorLightGray, con);
-	k_print("Ok", ColorBlack | ColorGreen, con);
-	k_print("]\n", ColorBlack | ColorLightGray, con);
+    k_print(setupIRQState, ColorBlack | ColorLightGray, con);
+    irq_install(); //
+    k_print("........................[", ColorBlack | ColorLightGray, con);
+    k_print("Ok", ColorBlack | ColorGreen, con);
+    k_print("]\n", ColorBlack | ColorLightGray, con);
 
-	k_print(setupTimerState, ColorBlack | ColorLightGray, con);
-	timer_install(100);		//
-	k_print("......................[", ColorBlack | ColorLightGray, con);
-	k_print("Ok", ColorBlack | ColorGreen, con);
-	k_print("]\n", ColorBlack | ColorLightGray, con);
+    k_print(setupTimerState, ColorBlack | ColorLightGray, con);
+    timer_install(100); //
+    k_print("......................[", ColorBlack | ColorLightGray, con);
+    k_print("Ok", ColorBlack | ColorGreen, con);
+    k_print("]\n", ColorBlack | ColorLightGray, con);
 
-	k_print(setupKeyboard, ColorBlack | ColorLightGray, con);
-	keyboard_install();		//
-	k_print("...................[", ColorBlack | ColorLightGray, con);
-	k_print("Ok", ColorBlack | ColorGreen, con);
-	k_print("]\n", ColorBlack | ColorLightGray, con);
-	
-	
-	__asm__ volatile("sti");
+    /*k_print(setupKeyboard, ColorBlack | ColorLightGray, con);
+    keyboard_install();		//
+    k_print("...................[", ColorBlack | ColorLightGray, con);
+    k_print("Ok", ColorBlack | ColorGreen, con);
+    k_print("]\n", ColorBlack | ColorLightGray, con);*/
 
-	__asm__ volatile("int $0x1");
+    asm volatile("sti");
 
-	for(;;);   
+    asm volatile("int $0x1");
+
+    for (;;)
+        ;
 }

@@ -1,5 +1,5 @@
 TOOLCHAIN := ../Toolchain/Local/i686/bin
-CC := $(TOOLCHAIN)/i686-elf-gcc
+CC := $(TOOLCHAIN)/i686-elf-g++
 CFLAGS=-Wall -O -fstrength-reduce -fomit-frame-pointer -nostdinc -fno-builtin -fno-strict-aliasing -fno-common -fno-stack-protector -I$(SRC)
 SRC=./Source
 ASM=nasm
