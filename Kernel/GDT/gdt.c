@@ -1,17 +1,8 @@
 #include "gdt.h"
 #include "../vga.h"
 
-static void Hang()
-{
-    asm("cli; hlt");
-}
 
-typedef struct registers {
-   u32int ds;                  // Data segment selector
-   u32int edi, esi, ebp, esp, ebx, edx, ecx, eax; // Pushed by pusha.
-   u32int int_no, err_code;    // Interrupt number and error code (if applicable)
-   u32int eip, cs, eflags, useresp, ss; // Pushed by the processor automatically.
-} registers_t;
+#define HALT asm("cli; hlt");
 
 #define NAKED __attribute__((naked))
 
@@ -19,69 +10,11 @@ typedef struct registers {
     static void exception_handler_##idx() \
     {                                     \
         terminal_writestring(msg);        \
-        Hang();                           \
+        HALT                              \
     }
 
-#define ISR_HANDLER(idx, name)             \
-    void name##_isr_handler(registers_t);  \
-    NAKED void name##_isr_asm_entry()      \
-    {                                      \
-        asm(                               \
-            "cli\n"                        \
-            "pushl $0x0\n"                 \
-            "pushl $" #idx "\n"            \
-            "pushad\n"                      \
-            "pushl %ds\n"                  \
-            "pushl %es\n"                  \
-            "pushl %fs\n"                  \
-            "pushl %gs\n"                  \
-            "mov $0x10, %ax\n"             \
-            "mov %ax, %ds\n"               \
-            "mov %ax, %es\n"               \
-            "mov %ax, %fs\n"               \
-            "mov %ax, %gs\n"               \
-            "call " #name "_isr_handler\n" \
-            "popl %gs\n"                    \
-            "popl %fs\n"                   \
-            "popl %es\n"                   \
-            "popl %ds\n"                   \
-            "popad\n"                       \
-            "addl $8, %esp\n" \
-            "sti\n"                        \
-            "iret\n");                     \
-    }
 
-#define ISR_HANDLER_WITH_ERROR_CODE(idx, name) \
-    void name##_isr_handler(registers_t);      \
-    NAKED void name##_isr_asm_entry()          \
-    {                                          \
-        asm(                               \
-            "cli\n"                        \
-            "pushl $" #idx "\n"            \
-            "pushad\n"                      \
-            "pushl %ds\n"                  \
-            "pushl %es\n"                  \
-            "pushl %fs\n"                  \
-            "pushl %gs\n"                  \
-            "mov $0x10, %ax\n"             \
-            "mov %ax, %ds\n"               \
-            "mov %ax, %es\n"               \
-            "mov %ax, %fs\n"               \
-            "mov %ax, %gs\n"               \
-            "call " #name "_isr_handler\n" \
-            "popl %gs\n"                    \
-            "popl %fs\n"                   \
-            "popl %es\n"                   \
-            "popl %ds\n"                   \
-            "popad\n"                       \
-            "addl $4, %esp\n" \
-            "sti\n"                        \
-            "iret\n");                     \
-    }
 
-EXCEPTION_HANDLER(19_31, "Exception 19 - 31")
-
-/*
 EXCEPTION_HANDLER(0, "Division by zero")
 EXCEPTION_HANDLER(1, "Debug exception")
 EXCEPTION_HANDLER(2, "Non maskable interrupt")
@@ -101,123 +34,8 @@ EXCEPTION_HANDLER(15, "Unknown interrupt exception")
 EXCEPTION_HANDLER(16, "Coprocessor fault")
 EXCEPTION_HANDLER(17, "Alignment check exception")
 EXCEPTION_HANDLER(18, "Machine check exception")
- */
+EXCEPTION_HANDLER(19_31, "Exception 19 - 31")
 
-ISR_HANDLER(0, division_by_zero)
-void division_by_zero_isr_handler(registers_t reg)
-{
-    terminal_writestring("division_by_zero_isr_handler");
-}
-
-ISR_HANDLER(1, debug_exception)
-void debug_exception_isr_handler(registers_t reg)
-{
-    terminal_writestring("debug_exception_isr_handler");
-}
-
-ISR_HANDLER(2, non_maskable_interrupt)
-void non_maskable_interrupt_isr_handler(registers_t reg)
-{
-    terminal_writestring("non_maskable_interrupt_isr_handler");
-}
-
-ISR_HANDLER(3, breakpoint)
-void breakpoint_isr_handler(registers_t reg)
-{
-    terminal_writestring("breakpoint_isr_handler");
-}
-
-ISR_HANDLER(4, detected_overflow)
-void detected_overflow_isr_handler(registers_t reg)
-{
-    terminal_writestring("detected_overflow_isr_handler");
-}
-
-ISR_HANDLER(5, out_of_bounds)
-void out_of_bounds_isr_handler(registers_t reg)
-{
-    terminal_writestring("out_of_bounds_isr_handler");
-}
-
-ISR_HANDLER(6, invalid_opcode)
-void invalid_opcode_isr_handler(registers_t reg)
-{
-    terminal_writestring("invalid_opcode_isr_handler");
-}
-
-ISR_HANDLER(7, no_coprocessor)
-void no_coprocessor_isr_handler(registers_t reg)
-{
-    terminal_writestring("no_coprocessor_isr_handler");
-}
-
-ISR_HANDLER(9, coprocessor_segment_overrun)
-void coprocessor_segment_overrun_isr_handler(registers_t reg)
-{
-    terminal_writestring("coprocessor_segment_overrun_isr_handler");
-}
-
-ISR_HANDLER(15, unknown_interrupt_exception)
-void unknown_interrupt_exception_isr_handler(registers_t reg)
-{
-    terminal_writestring("unknown_interrupt_exception_isr_handler");
-}
-
-ISR_HANDLER(16, coprocessor_fault)
-void coprocessor_fault_isr_handler(registers_t reg)
-{
-    terminal_writestring("coprocessor_fault_isr_handler");
-}
-
-ISR_HANDLER(17, alignment_check_exception)
-void alignment_check_exception_isr_handler(registers_t reg)
-{
-    terminal_writestring("alignment_check_exception_isr_handler");
-}
-
-ISR_HANDLER(18, machine_check_exception)
-void machine_check_exception_isr_handler(registers_t reg)
-{
-    terminal_writestring("machine_check_exception_isr_handler");
-}
-
-ISR_HANDLER_WITH_ERROR_CODE(8, double_fault)
-void double_fault_isr_handler(registers_t reg)
-{
-    terminal_writestring("double_fault_isr_handler");
-}
-
-ISR_HANDLER_WITH_ERROR_CODE(10, bad_tss)
-void bad_tss_isr_handler(registers_t reg)
-{
-    terminal_writestring("bad_tss_fault_isr_handler");
-}
-
-ISR_HANDLER_WITH_ERROR_CODE(11, segment_not_found)
-void segment_not_found_isr_handler(registers_t reg)
-{
-    terminal_writestring("segment_not_fault");
-}
-
-ISR_HANDLER_WITH_ERROR_CODE(12, stack_fault)
-void stack_fault_isr_handler(registers_t reg)
-{
-    terminal_writestring("stack_fault_isr_handler");
-}
-
-ISR_HANDLER_WITH_ERROR_CODE(13, general_protection_fault)
-void general_protection_fault_isr_handler(registers_t reg)
-{
-    // if (reg.int_no == 13) {
-    terminal_writestring("general_protection_fault_isr_handler");
-    //}
-}
-
-ISR_HANDLER_WITH_ERROR_CODE(14, page_fault)
-void page_fault_isr_handler(registers_t reg)
-{
-    terminal_writestring("page_fault_isr_handler");
-}
 
 gdt_entry_t gdt_entries[5];
 gdt_ptr_t gdt_ptr;
@@ -282,25 +100,25 @@ static void init_idt()
 
     __builtin_memset(&idt_entries, 0, sizeof(idt_entry_t) * 256);
 
-    idt_set_gate(0, division_by_zero_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(1, debug_exception_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(2, non_maskable_interrupt_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(3, breakpoint_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(4, detected_overflow_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(5, out_of_bounds_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(6, invalid_opcode_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(7, no_coprocessor_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(8, double_fault_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(9, coprocessor_segment_overrun_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(10, bad_tss_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(11, segment_not_found_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(12, stack_fault_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(13, general_protection_fault_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(14, page_fault_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(15, unknown_interrupt_exception_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(16, coprocessor_segment_overrun_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(17, alignment_check_exception_isr_asm_entry, 0x08, 0x8E);
-    idt_set_gate(18, machine_check_exception_isr_asm_entry, 0x08, 0x8E);
+    idt_set_gate(0, exception_handler_0, 0x08, 0x8E);
+    idt_set_gate(1, exception_handler_1, 0x08, 0x8E);
+    idt_set_gate(2, exception_handler_2, 0x08, 0x8E);
+    idt_set_gate(3, exception_handler_3, 0x08, 0x8E);
+    idt_set_gate(4, exception_handler_4, 0x08, 0x8E);
+    idt_set_gate(5, exception_handler_5, 0x08, 0x8E);
+    idt_set_gate(6, exception_handler_6, 0x08, 0x8E);
+    idt_set_gate(7, exception_handler_7, 0x08, 0x8E);
+    idt_set_gate(8, exception_handler_8, 0x08, 0x8E);
+    idt_set_gate(9, exception_handler_9, 0x08, 0x8E);
+    idt_set_gate(10, exception_handler_10, 0x08, 0x8E);
+    idt_set_gate(11, exception_handler_11, 0x08, 0x8E);
+    idt_set_gate(12, exception_handler_12, 0x08, 0x8E);
+    idt_set_gate(13, exception_handler_13, 0x08, 0x8E);
+    idt_set_gate(14, exception_handler_14, 0x08, 0x8E);
+    idt_set_gate(15, exception_handler_15, 0x08, 0x8E);
+    idt_set_gate(16, exception_handler_16, 0x08, 0x8E);
+    idt_set_gate(17, exception_handler_17, 0x08, 0x8E);
+    idt_set_gate(18, exception_handler_18, 0x08, 0x8E);
 
     for (int i = 19; i <= 31; ++i) {
         idt_set_gate(i, exception_handler_19_31, 0x08, 0x8E);
