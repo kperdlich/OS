@@ -1,11 +1,20 @@
 TOOLCHAIN := Toolchain/Local/i686/bin
-LD := $(TOOLCHAIN)/i686-elf-g++
+LD := $(TOOLCHAIN)/i686-elf-gcc
 
-BUILD_DIR := Build
+OBJDIR := Build
 
-OBJ:=$(BUILD_DIR)/kernel.o \
-	$(BUILD_DIR)/gdt.o \
-	$(BUILD_DIR)/IO.o \
+OBJ=$(OBJDIR)/gdt_setup.o \
+	$(OBJDIR)/interrupts.o \
+	$(OBJDIR)/kmain.o \
+	$(OBJDIR)/video.o \
+	$(OBJDIR)/io.o \
+	$(OBJDIR)/string.o \
+	$(OBJDIR)/gdt.o \
+	$(OBJDIR)/idt.o \
+	$(OBJDIR)/isr.o \
+	$(OBJDIR)/irq.o \
+	$(OBJDIR)/timer.o \
+	$(OBJDIR)/keyboard.o
 
 
 all: clean
