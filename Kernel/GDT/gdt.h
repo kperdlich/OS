@@ -45,3 +45,4 @@ typedef struct idt_ptr_struct idt_ptr_t;
 
 // Initialisation function is publicly accessible.
 void init_descriptor_tables();
+void init_timer(u32int frequency);

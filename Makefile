@@ -5,6 +5,8 @@ BUILD_DIR := Build
 
 OBJ:=$(BUILD_DIR)/kernel.o \
 	$(BUILD_DIR)/gdt.o \
+	$(BUILD_DIR)/IO.o \
+
 
 all: clean
 	make -C ./Kernel

@@ -108,18 +108,23 @@ void terminal_writestring(const char* data)
 
 extern "C" void kernel_main(void)
 {
+    asm volatile("cli");
+
     /* Initialize terminal interface */
     terminal_initialize();
 
     init_descriptor_tables();
     terminal_writestring("GDT initialised!\n");
 
-    asm volatile ("int $0x4");
+    /*asm volatile ("int $0x4");
     asm volatile ("int $0x3");
     asm volatile ("int $0x8");
-    asm volatile ("int $0x11");
+    asm volatile ("int $0x11");*/
+    //asm volatile ("int $32");
 
-
-    terminal_writestring("Bllaaaaaaaaaaaaa!\n");
+    terminal_writestring("init_timer!\n");
+    asm volatile("sti");
+    init_timer(50);
+    terminal_writestring("Reached");
 
 }
