@@ -13,8 +13,6 @@
         HALT                              \
     }
 
-
-
 EXCEPTION_HANDLER(0, "Division by zero")
 EXCEPTION_HANDLER(1, "Debug exception")
 EXCEPTION_HANDLER(2, "Non maskable interrupt")
@@ -48,7 +46,7 @@ static void init_gdt();
 static void gdt_set_gate(s32int, u32int, u32int, u8int, u8int);
 
 static void init_idt();
-static void idt_set_gate(u8int, u32int, u16int, u8int);
+static void idt_set_gate(u8int, void (handler)(), u16int, u8int);
 
 void init_descriptor_tables()
 {
@@ -127,8 +125,10 @@ static void init_idt()
     asm volatile("lidt %0" ::"m"(idt_ptr));
 }
 
-static void idt_set_gate(u8int num, u32int base, u16int sel, u8int flags)
+static void idt_set_gate(u8int num, void (handler)(), u16int sel, u8int flags)
 {
+    u32int base = (u32int) handler;
+
     idt_entries[num].base_lo = base & 0xFFFF;
     idt_entries[num].base_hi = (base >> 16) & 0xFFFF;
 

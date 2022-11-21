@@ -1,5 +1,5 @@
 TOOLCHAIN := Toolchain/Local/i686/bin
-LD := $(TOOLCHAIN)/i686-elf-gcc
+LD := $(TOOLCHAIN)/i686-elf-g++
 
 BUILD_DIR := Build
 

@@ -106,7 +106,7 @@ void terminal_writestring(const char* data)
     terminal_write(data, strlen(data));
 }
 
-void kernel_main(void)
+extern "C" void kernel_main(void)
 {
     /* Initialize terminal interface */
     terminal_initialize();
