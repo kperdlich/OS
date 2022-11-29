@@ -7,7 +7,7 @@
 Install all dependencies
 #### Ubuntu
 ```
-sudo apt install build-essential cmake libmpfr-dev libmpc-dev libgmp-dev e2fsprogs ninja-build qemu-system-gui qemu-system-x86 qemu-util
+sudo apt install build-essential cmake libmpfr-dev libmpc-dev libgmp-dev e2fsprogs ninja-build qemu-system-gui qemu-system-x86 qemu-utils
 ```
 
 
