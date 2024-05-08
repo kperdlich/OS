@@ -10,13 +10,13 @@ namespace GUI {
 Window::Window(IntRect rect)
     : m_rect(rect)
 {
-    m_closeButton = new Button(nullptr, [&]() {
-        GUI::WindowStack::the().remove(this);
-    });
+    m_closeButton = ADS::UniquePtr<Button>(new Button(nullptr, [&]() {
+        GUI::WindowStack::the().remove(*this);
+    }));
 
-    m_hideButton = new Button(nullptr, [&]() {
+    m_hideButton = ADS::UniquePtr<Button>(new Button(nullptr, [&]() {
         hide();
-    });
+    }));
 }
 
 void Window::render(Painter& painter)

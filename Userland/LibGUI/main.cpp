@@ -43,7 +43,7 @@ int main()
         std::cout << it << std::endl;
     }
 
-    const ADS::String title = "OS LibGui Emulator";
+    const ADS::String title = "OS LibGUI Emulator";
 
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -55,14 +55,14 @@ int main()
         SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, width, height);
 
     auto framebuffer = new uint32_t[width * height];
-    ADS::memset(framebuffer, 255, width * height * sizeof(uint32_t));
-
     auto framebufferBitmap = GUI::Bitmap::createFrom(GUI::BitmapFormat::RGBA32, { width, height }, (char*)framebuffer);
 
-    auto painter = new GUI::Painter(framebufferBitmap);
+    auto painter = ADS::UniquePtr<GUI::Painter>(new GUI::Painter(*framebufferBitmap));
 
-    GUI::WindowStack::the().add(new GUI::Window(GUI::IntRect { 10, 10, 800, 600 }));
-    GUI::WindowStack::the().add(new GUI::Window(GUI::IntRect { 10, 10, 800, 600 }));
+    auto win1 = ADS::UniquePtr<GUI::Window>(new GUI::Window(GUI::IntRect { 10, 10, 800, 600 }));
+    auto win2 = ADS::UniquePtr<GUI::Window>(new GUI::Window(GUI::IntRect { 10, 10, 800, 600 }));
+    GUI::WindowStack::the().add(*win1);
+    GUI::WindowStack::the().add(*win2);
 
     bool leftMouseButtonDown = false;
 
@@ -70,9 +70,9 @@ int main()
 
     bool quit = false;
     while (!quit) {
-        framebufferBitmap->clear(GUI::Color { 255 });
+        framebufferBitmap->fill(GUI::Color { 255 });
 
-        GUI::WindowStack::the().forEachVisibleWindowBackToFont([&](GUI::Window& window) -> GUI::IteratorResult {
+        GUI::WindowStack::the().forEachVisibleWindowBackToFront([&](GUI::Window& window) -> GUI::IteratorResult {
             window.render(*painter);
             return GUI::IteratorResult::Continue;
         });

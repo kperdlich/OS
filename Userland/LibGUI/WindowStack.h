@@ -24,15 +24,15 @@ public:
         return instance;
     }
 
-    void add(Window* window);
-    void makeActive(Window* window);
-    void remove(Window* window);
+    void add(Window& window);
+    void makeActive(Window& window);
+    void remove(Window& window);
 
     template<typename Callback>
-    void forEachVisibleWindowBackToFont(Callback callback);
+    void forEachVisibleWindowBackToFront(Callback callback);
 
     template<typename Callback>
-    void forEachVisibleWindowFontToBack(Callback callback);
+    void forEachVisibleWindowFrontToBack(Callback callback);
 
     void onMouseMove(int x, int y);
     void onMouseDown(int key, int x, int y);
@@ -44,7 +44,7 @@ private:
 };
 
 template<typename Callback>
-inline void WindowStack::forEachVisibleWindowBackToFont(Callback callback)
+inline void WindowStack::forEachVisibleWindowBackToFront(Callback callback)
 {
     for (auto& window : m_windows) {
         if (!window->isVisible())
@@ -56,7 +56,7 @@ inline void WindowStack::forEachVisibleWindowBackToFont(Callback callback)
 }
 
 template<typename Callback>
-inline void WindowStack::forEachVisibleWindowFontToBack(Callback callback)
+inline void WindowStack::forEachVisibleWindowFrontToBack(Callback callback)
 {
     for (auto it = m_windows.rbegin(); it != m_windows.rend(); ++it) {
         if (!(*it)->isVisible())

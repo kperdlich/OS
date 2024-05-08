@@ -29,12 +29,12 @@ public:
     bool hits(int x, int y);
 
 private:
-    bool m_isVisible = true;
-    bool m_isDragging = false;
-    Button* m_closeButton;
-    Button* m_hideButton;
+    ADS::UniquePtr<Button> m_closeButton;
+    ADS::UniquePtr<Button> m_hideButton;
     IntRect m_rect;
     IntSize m_lastMouseMovePos { 0, 0 };
+    bool m_isVisible = true;
+    bool m_isDragging = false;
 };
 
 } // GUI

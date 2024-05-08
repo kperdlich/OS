@@ -12,14 +12,14 @@ namespace GUI {
 
 class Painter {
 public:
-    explicit Painter(Bitmap* target);
+    explicit Painter(Bitmap& target);
 
     void drawRectangle(IntRect rect, GUI::Color color);
     void drawQuad(int x, int y, int size, GUI::Color color);
     void drawLine(int x0, int y0, int x1, int y1, GUI::Color color);
 
 private:
-    Bitmap* m_targetBuffer = nullptr;
+    Bitmap& m_targetBuffer;
 };
 
 } // GUI

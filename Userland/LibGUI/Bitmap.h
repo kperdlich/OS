@@ -6,6 +6,7 @@
 
 #include "Color.h"
 #include "Size.h"
+#include "Types.h"
 
 namespace GUI {
 
@@ -16,13 +17,13 @@ enum class BitmapFormat {
 class Bitmap final {
 public:
     Bitmap() = default;
-    static Bitmap* createFrom(BitmapFormat format, IntSize size, char* data);
+    static ADS::UniquePtr<Bitmap> createFrom(BitmapFormat format, IntSize size, char* data);
 
     inline char* data() { return m_data; }
     inline IntSize size() { return m_size; }
 
     void setPixel(int x, int y, GUI::Color color);
-    void clear(GUI::Color color);
+    void fill(GUI::Color color);
 
 private:
     Bitmap(BitmapFormat format, IntSize size, char* data);

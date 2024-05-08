@@ -3,7 +3,6 @@
 //
 
 #include "Bitmap.h"
-#include "Types.h"
 
 namespace GUI {
 
@@ -14,10 +13,9 @@ Bitmap::Bitmap(BitmapFormat format, IntSize size, char* data)
 {
 }
 
-Bitmap* Bitmap::createFrom(BitmapFormat format, IntSize size, char* data)
+ADS::UniquePtr<Bitmap> Bitmap::createFrom(BitmapFormat format, IntSize size, char* data)
 {
-    auto bitmap = new Bitmap(format, size, data);
-    return bitmap;
+    return ADS::UniquePtr<Bitmap>(new Bitmap(format, size, data));;
 }
 
 void Bitmap::setPixel(int x, int y, GUI::Color color)
@@ -33,7 +31,7 @@ void Bitmap::setPixel(int x, int y, GUI::Color color)
         ASSERT(false);
     }
 }
-void Bitmap::clear(GUI::Color color)
+void Bitmap::fill(GUI::Color color)
 {
     switch (m_format) {
     case BitmapFormat::RGBA32: {
