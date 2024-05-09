@@ -24,9 +24,12 @@ public:
     virtual void onMouseDown(int key, int x, int y);
     virtual void onMouseUp(int key, int x, int y);
 
-    void render(Painter& painter);
+    void render(Painter& painter, bool isActiveWindow) const;
 
     bool hits(int x, int y);
+
+private:
+    IntRect titleBarRect() const;
 
 private:
     ADS::UniquePtr<Button> m_closeButton;

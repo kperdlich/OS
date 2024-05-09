@@ -1,10 +1,9 @@
 
-#include <stddef.h>
+#include "Types.h"
 #include "Array.h"
 #include "Bitmap.h"
 #include "Painter.h"
 #include "Rect.h"
-#include "Types.h"
 #include "Vector.h"
 #include "Window.h"
 #include "WindowStack.h"
@@ -33,7 +32,7 @@ int main()
         std::cout << *it << std::endl;
     }
 
-    ADS::Array<int, 5> array = { 10, 20, 30, 40 } ;
+    ADS::Array<int, 5> array = { 10, 20, 30, 40 };
     for (auto it : array) {
         std::cout << it << std::endl;
     }
@@ -57,12 +56,13 @@ int main()
     auto framebuffer = new uint32_t[width * height];
     auto framebufferBitmap = GUI::Bitmap::createFrom(GUI::BitmapFormat::RGBA32, { width, height }, (char*)framebuffer);
 
-    auto painter = ADS::UniquePtr<GUI::Painter>(new GUI::Painter(*framebufferBitmap));
+    GUI::Painter painter(*framebufferBitmap);
 
-    auto win1 = ADS::UniquePtr<GUI::Window>(new GUI::Window(GUI::IntRect { 10, 10, 800, 600 }));
-    auto win2 = ADS::UniquePtr<GUI::Window>(new GUI::Window(GUI::IntRect { 10, 10, 800, 600 }));
-    GUI::WindowStack::the().add(*win1);
-    GUI::WindowStack::the().add(*win2);
+    GUI::Window win1 { GUI::IntRect { 10, 10, 800, 600 } };
+    GUI::Window win2 { GUI::IntRect { 10, 10, 800, 600 } };
+
+    GUI::WindowStack::the().add(win1);
+    GUI::WindowStack::the().add(win2);
 
     bool leftMouseButtonDown = false;
 
@@ -72,10 +72,7 @@ int main()
     while (!quit) {
         framebufferBitmap->fill(GUI::Color { 255 });
 
-        GUI::WindowStack::the().forEachVisibleWindowBackToFront([&](GUI::Window& window) -> GUI::IteratorResult {
-            window.render(*painter);
-            return GUI::IteratorResult::Continue;
-        });
+        GUI::WindowStack::the().render(painter);
 
         SDL_UpdateTexture(texture, nullptr, framebufferBitmap->data(), width * sizeof(uint32_t));
 
@@ -89,7 +86,7 @@ int main()
                 GUI::WindowStack::the().onMouseUp(event.button.button, event.motion.x, event.motion.y);
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     leftMouseButtonDown = false;
-                    painter->drawLine(startDownX, startDownY, event.motion.x, event.motion.y, GUI::Color { 0xff, 0, 0, 0xff });
+                    painter.drawLine(startDownX, startDownY, event.motion.x, event.motion.y, GUI::Color { 0xff, 0, 0, 0xff });
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:

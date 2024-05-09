@@ -14,6 +14,8 @@ enum class IteratorResult {
     Break,
 };
 
+class Painter;
+
 class WindowStack {
 public:
     WindowStack() = default;
@@ -37,6 +39,7 @@ public:
     void onMouseMove(int x, int y);
     void onMouseDown(int key, int x, int y);
     void onMouseUp(int key, int x, int y);
+    void render(Painter& painter);
 
 private:
     ADS::Vector<Window*> m_windows;
