@@ -16,13 +16,13 @@ enum class IteratorResult {
 
 class Painter;
 
-class WindowStack {
+class WindowManager {
 public:
-    WindowStack() = default;
-    ~WindowStack() = default;
+    WindowManager() = default;
+    ~WindowManager() = default;
 
-    static WindowStack& the() {
-        static WindowStack instance;
+    static WindowManager& the() {
+        static WindowManager instance;
         return instance;
     }
 
@@ -47,7 +47,7 @@ private:
 };
 
 template<typename Callback>
-inline void WindowStack::forEachVisibleWindowBackToFront(Callback callback)
+inline void WindowManager::forEachVisibleWindowBackToFront(Callback callback)
 {
     for (auto& window : m_windows) {
         if (!window->isVisible())
@@ -59,7 +59,7 @@ inline void WindowStack::forEachVisibleWindowBackToFront(Callback callback)
 }
 
 template<typename Callback>
-inline void WindowStack::forEachVisibleWindowFrontToBack(Callback callback)
+inline void WindowManager::forEachVisibleWindowFrontToBack(Callback callback)
 {
     for (auto it = m_windows.rbegin(); it != m_windows.rend(); ++it) {
         if (!(*it)->isVisible())

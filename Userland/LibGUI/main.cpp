@@ -1,12 +1,12 @@
 
-#include "Types.h"
 #include "Array.h"
 #include "Bitmap.h"
 #include "Painter.h"
 #include "Rect.h"
+#include "Types.h"
 #include "Vector.h"
 #include "Window.h"
-#include "WindowStack.h"
+#include "WindowManager.h"
 #include <SDL2/SDL.h>
 #include <string>
 
@@ -42,7 +42,7 @@ int main()
         std::cout << it << std::endl;
     }
 
-    const ADS::String title = "OS LibGUI Emulator";
+    const ADS::String title = "OS GUI Emulator";
 
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -61,8 +61,8 @@ int main()
     GUI::Window win1 { GUI::IntRect { 10, 10, 800, 600 } };
     GUI::Window win2 { GUI::IntRect { 10, 10, 800, 600 } };
 
-    GUI::WindowStack::the().add(win1);
-    GUI::WindowStack::the().add(win2);
+    GUI::WindowManager::the().add(win1);
+    GUI::WindowManager::the().add(win2);
 
     bool leftMouseButtonDown = false;
 
@@ -72,7 +72,7 @@ int main()
     while (!quit) {
         framebufferBitmap->fill(GUI::Color { 255 });
 
-        GUI::WindowStack::the().render(painter);
+        GUI::WindowManager::the().render(painter);
 
         SDL_UpdateTexture(texture, nullptr, framebufferBitmap->data(), width * sizeof(uint32_t));
 
@@ -83,14 +83,14 @@ int main()
                 quit = true;
                 break;
             case SDL_MOUSEBUTTONUP:
-                GUI::WindowStack::the().onMouseUp(event.button.button, event.motion.x, event.motion.y);
+                GUI::WindowManager::the().onMouseUp(event.button.button, event.motion.x, event.motion.y);
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     leftMouseButtonDown = false;
                     painter.drawLine(startDownX, startDownY, event.motion.x, event.motion.y, GUI::Color { 0xff, 0, 0, 0xff });
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                GUI::WindowStack::the().onMouseDown(event.button.button, event.motion.x, event.motion.y);
+                GUI::WindowManager::the().onMouseDown(event.button.button, event.motion.x, event.motion.y);
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     leftMouseButtonDown = true;
                     startDownX = event.motion.x;
@@ -99,7 +99,7 @@ int main()
             case SDL_MOUSEMOTION:
                 int mouseX = event.motion.x;
                 int mouseY = event.motion.y;
-                GUI::WindowStack::the().onMouseMove(mouseX, mouseY);
+                GUI::WindowManager::the().onMouseMove(mouseX, mouseY);
                 if (leftMouseButtonDown) {
                     // framebufferBitmap->setPixel(mouseX, mouseY, GUI::Color { 0 });
                 }

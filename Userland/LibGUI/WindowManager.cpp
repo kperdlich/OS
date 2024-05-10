@@ -2,17 +2,17 @@
 // Created by n3dry on 21.09.22.
 //
 
-#include "WindowStack.h"
+#include "WindowManager.h"
 #include "Painter.h"
 
 namespace GUI {
 
-void WindowStack::add(Window& window)
+void WindowManager::add(Window& window)
 {
     m_windows.emplace_back(&window);
 }
 
-void WindowStack::remove(Window& window)
+void WindowManager::remove(Window& window)
 {
     // FIXME: This sucks
     for (auto iter = m_windows.begin(); iter != m_windows.end();) {
@@ -25,7 +25,7 @@ void WindowStack::remove(Window& window)
     }
 }
 
-void WindowStack::makeActive(Window& window)
+void WindowManager::makeActive(Window& window)
 {
     // FIXME: Handle z-sorting better
     remove(window);
@@ -34,7 +34,7 @@ void WindowStack::makeActive(Window& window)
     m_activeWindow = &window;
 }
 
-void WindowStack::onMouseDown(int key, int x, int y)
+void WindowManager::onMouseDown(int key, int x, int y)
 {
     forEachVisibleWindowFrontToBack([&](Window& window) -> IteratorResult {
         if (window.hits(x, y)) {
@@ -46,14 +46,14 @@ void WindowStack::onMouseDown(int key, int x, int y)
     });
 }
 
-void WindowStack::onMouseMove(int x, int y)
+void WindowManager::onMouseMove(int x, int y)
 {
     if (m_activeWindow) {
         m_activeWindow->onMouseMove(x, y);
     }
 }
 
-void WindowStack::onMouseUp(int key, int x, int y)
+void WindowManager::onMouseUp(int key, int x, int y)
 {
     forEachVisibleWindowFrontToBack([&](Window& window) -> IteratorResult {
         if (window.hits(x, y)) {
@@ -63,7 +63,7 @@ void WindowStack::onMouseUp(int key, int x, int y)
         return IteratorResult::Continue;
     });
 }
-void WindowStack::render(Painter& painter)
+void WindowManager::render(Painter& painter)
 {
     forEachVisibleWindowBackToFront([&](GUI::Window& window) -> GUI::IteratorResult {
         window.render(painter, m_activeWindow == &window);

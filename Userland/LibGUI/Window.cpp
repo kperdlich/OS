@@ -3,7 +3,7 @@
 //
 
 #include "Window.h"
-#include "WindowStack.h"
+#include "WindowManager.h"
 
 namespace GUI {
 
@@ -15,7 +15,7 @@ Window::Window(IntRect rect)
     : m_rect(rect)
 {
     m_closeButton = ADS::UniquePtr<Button>(new Button(nullptr, [&]() {
-        GUI::WindowStack::the().remove(*this);
+        GUI::WindowManager::the().remove(*this);
     }));
 
     m_hideButton = ADS::UniquePtr<Button>(new Button(nullptr, [&]() {
