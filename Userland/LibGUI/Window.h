@@ -35,6 +35,7 @@ private:
     ADS::UniquePtr<Button> m_closeButton;
     ADS::UniquePtr<Button> m_hideButton;
     IntRect m_rect;
+    IntRect m_contentRect;
     IntSize m_lastMouseMovePos { 0, 0 };
     bool m_isVisible = true;
     bool m_isDragging = false;

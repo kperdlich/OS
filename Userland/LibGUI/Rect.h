@@ -31,14 +31,14 @@ public:
         m_y += y;
     }
 
-    bool isPointInside(T x, T y) const
+    bool contains(T x, T y) const
     {
         if (x > m_x && x < (m_x + m_width) && y > m_y && y < (m_y + m_height))
             return true;
         return false;
     }
 
-    Rect<T> clip(Rect<T> clipInside) const
+    Rect<T> clip(const Rect<T>& clipInside) const
     {
         const T clippedX = ADS::clamp(clipInside.m_x, m_x, m_x + m_width);
         const T clippedY = ADS::clamp(clipInside.m_y, m_y, m_y + m_height);

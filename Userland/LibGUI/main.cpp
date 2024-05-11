@@ -1,9 +1,9 @@
 
+#include "Types.h"
 #include "Array.h"
 #include "Bitmap.h"
 #include "Painter.h"
 #include "Rect.h"
-#include "Types.h"
 #include "Vector.h"
 #include "Window.h"
 #include "WindowManager.h"
