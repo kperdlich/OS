@@ -42,6 +42,9 @@ public:
     void render(Painter& painter);
 
 private:
+    void paintTaskbar(Painter& painter) const;
+
+private:
     ADS::Vector<Window*> m_windows;
     Window* m_activeWindow { nullptr };
 };

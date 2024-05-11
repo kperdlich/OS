@@ -7,6 +7,14 @@
 
 namespace GUI {
 
+// FIXME get this from framebuffer
+constexpr int width = 1024;
+constexpr int height = 720;
+constexpr int TaskbarHeight = 20;
+// FIXME render everything window frame related in the window manager and not in the windows class
+static const GUI::Color TaskbarColor { 190, 190, 190, 0xff };
+static const IntRect TaskbarRect {0, height - TaskbarHeight, width, TaskbarHeight};
+
 void WindowManager::add(Window& window)
 {
     m_windows.emplace_back(&window);
@@ -69,6 +77,12 @@ void WindowManager::render(Painter& painter)
         window.render(painter, m_activeWindow == &window);
         return GUI::IteratorResult::Continue;
     });
+
+    paintTaskbar(painter);
+}
+void WindowManager::paintTaskbar(Painter& painter) const
+{
+    painter.drawRectangle(TaskbarRect, TaskbarColor);
 }
 
 } // GUI
