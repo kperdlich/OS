@@ -72,7 +72,7 @@ int main()
     while (!quit) {
         framebufferBitmap->fill(GUI::Color { 255 });
 
-        GUI::WindowManager::the().render(painter);
+        GUI::WindowManager::the().paint(painter);
 
         SDL_UpdateTexture(texture, nullptr, framebufferBitmap->data(), width * sizeof(uint32_t));
 

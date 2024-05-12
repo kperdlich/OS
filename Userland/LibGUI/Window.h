@@ -24,21 +24,14 @@ public:
     virtual void onMouseDown(int key, int x, int y);
     virtual void onMouseUp(int key, int x, int y);
 
-    void render(Painter& painter, bool isActiveWindow) const;
+    bool contains(int x, int y);
+    void moveBy(int x, int y);
 
-    bool hits(int x, int y);
-
-private:
-    IntRect titleBarRect() const;
+    [[nodiscard]] inline IntRect rect() const { return m_rect; }
 
 private:
-    ADS::UniquePtr<Button> m_closeButton;
-    ADS::UniquePtr<Button> m_hideButton;
     IntRect m_rect;
-    IntRect m_contentRect;
-    IntSize m_lastMouseMovePos { 0, 0 };
     bool m_isVisible = true;
-    bool m_isDragging = false;
 };
 
 } // GUI

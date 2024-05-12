@@ -21,7 +21,8 @@ public:
     WindowManager() = default;
     ~WindowManager() = default;
 
-    static WindowManager& the() {
+    static WindowManager& the()
+    {
         static WindowManager instance;
         return instance;
     }
@@ -39,14 +40,18 @@ public:
     void onMouseMove(int x, int y);
     void onMouseDown(int key, int x, int y);
     void onMouseUp(int key, int x, int y);
-    void render(Painter& painter);
+    void paint(Painter& painter);
 
 private:
-    void paintTaskbar(Painter& painter) const;
+    void onWindowTaskBarMouseDown(Window& window, int x, int y);
+    void paintWindow(Painter& painter, const Window& window);
 
 private:
     ADS::Vector<Window*> m_windows;
     Window* m_activeWindow { nullptr };
+
+    IntSize m_lastMouseDragPos { 0, 0 };
+    bool m_isDraggingWindow { false };
 };
 
 template<typename Callback>
