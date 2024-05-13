@@ -11,6 +11,7 @@ namespace GUI {
 template<typename T>
 class Rect {
 public:
+    Rect() { }
     Rect(T x, T y, T width, T height)
         : m_x(x)
         , m_y(y)
@@ -48,8 +49,10 @@ public:
     }
 
 private:
-    T m_x, m_y;
-    T m_width, m_height;
+    T m_x {};
+    T m_y {};
+    T m_width {};
+    T m_height {};
 };
 
 using IntRect = Rect<int>;

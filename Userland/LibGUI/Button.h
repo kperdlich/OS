@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "Painter.h"
 #include "Widget.h"
 #include "functional"
 
@@ -12,16 +11,15 @@ namespace GUI {
 
 class Button : public Widget {
 public:
-    Button(Widget* parent, std::function<void()> onClickCallback);
+    Button(std::function<void()> onClickCallback, Widget* parent = nullptr);
 
     void onMouseDown(int key, int x, int y) override;
     void onMouseUp(int key, int x, int y) override;
 
-    void render(Painter& painter, IntRect rect, Color color);
+    void onPaint() override;
     void onMouseMove(int x, int y) override;
 
-private:
-    std::function<void()> m_onClick;
+    std::function<void()> onClick;
 };
 
 } // GUI

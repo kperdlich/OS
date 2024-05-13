@@ -3,10 +3,21 @@
 //
 
 #include "Widget.h"
+#include "Painter.h"
 
 namespace GUI {
 Widget::Widget(Widget* parent)
-    : m_parent(parent)
+    : CObject(parent)
 {
 }
+
+void Widget::onPaint()
+{
+}
+
+void Widget::setRect(const IntRect& rect)
+{
+    m_rect = rect;
+}
+
 } // GUI

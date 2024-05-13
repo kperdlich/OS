@@ -1,9 +1,9 @@
 
-#include "Types.h"
 #include "Array.h"
 #include "Bitmap.h"
 #include "Painter.h"
 #include "Rect.h"
+#include "Types.h"
 #include "Vector.h"
 #include "Window.h"
 #include "WindowManager.h"
@@ -58,11 +58,18 @@ int main()
 
     GUI::Painter painter(*framebufferBitmap);
 
-    GUI::Window win1 { GUI::IntRect { 10, 10, 800, 600 } };
-    GUI::Window win2 { GUI::IntRect { 10, 10, 800, 600 } };
+    GUI::Button* button = new GUI::Button([]() {
+        std::cout << "Button clicked" << std::endl;
+    });
+    button->setRect(GUI::IntRect { 0, 0, 50, 20 } );
 
-    GUI::WindowManager::the().add(win1);
-    GUI::WindowManager::the().add(win2);
+    GUI::Window win1;
+    win1.setRect(GUI::IntRect { 10, 10, 800, 600 } );
+    win1.setCentralWidget(*button);
+    win1.show();
+
+    //GUI::Window win2;
+    //win2.setRect({ GUI::IntRect { 10, 10, 800, 600 } });
 
     bool leftMouseButtonDown = false;
 
@@ -74,8 +81,6 @@ int main()
 
         GUI::WindowManager::the().paint(painter);
 
-        SDL_UpdateTexture(texture, nullptr, framebufferBitmap->data(), width * sizeof(uint32_t));
-
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -86,7 +91,7 @@ int main()
                 GUI::WindowManager::the().onMouseUp(event.button.button, event.motion.x, event.motion.y);
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     leftMouseButtonDown = false;
-                    painter.drawLine(startDownX, startDownY, event.motion.x, event.motion.y, GUI::Color { 0xff, 0, 0, 0xff });
+                    // painter.drawLine(startDownX, startDownY, event.motion.x, event.motion.y, GUI::Color { 0xff, 0, 0, 0xff });
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:
@@ -105,6 +110,8 @@ int main()
                 }
                 break;
             }
+
+            SDL_UpdateTexture(texture, nullptr, framebufferBitmap->data(), width * sizeof(uint32_t));
         }
 
         SDL_RenderClear(renderer);

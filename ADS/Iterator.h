@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Types.h"
+
 namespace ADS {
 
 template<typename Container, typename Value>

@@ -6,6 +6,7 @@
 
 #include "Iterator.h"
 #include "ReverseIterator.h"
+#include "Types.h"
 
 namespace ADS {
 

@@ -12,6 +12,7 @@ namespace GUI {
 
 class Painter {
 public:
+    // FIXME: Created painter based on Widget to respect relative widget position.
     explicit Painter(Bitmap& target);
 
     void drawRectangle(IntRect rect, GUI::Color color);
