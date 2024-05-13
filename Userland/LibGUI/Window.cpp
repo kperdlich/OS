@@ -3,8 +3,8 @@
 //
 
 #include "Window.h"
-#include "WindowManager.h"
 #include "Painter.h"
+#include "WindowManager.h"
 
 namespace GUI {
 
@@ -25,14 +25,38 @@ Window::~Window()
 
 void Window::onMouseMove(int x, int y)
 {
+    if (!m_centralWidget)
+        return;
+
+    IntRect translatedRect = m_centralWidget->rect();
+    translatedRect.moveBy(m_rect.x(), m_rect.y());
+    if (translatedRect.contains(x, y)) {
+        m_centralWidget->onMouseMove(x, y);
+    }
 }
 
 void Window::onMouseUp(int key, int x, int y)
 {
+    if (!m_centralWidget)
+        return;
+
+    IntRect translatedRect = m_centralWidget->rect();
+    translatedRect.moveBy(m_rect.x(), m_rect.y());
+    if (translatedRect.contains(x, y)) {
+        m_centralWidget->onMouseUp(key, x, y);
+    }
 }
 
 void Window::onMouseDown(int key, int x, int y)
 {
+    if (!m_centralWidget)
+        return;
+
+    IntRect translatedRect = m_centralWidget->rect();
+    translatedRect.moveBy(m_rect.x(), m_rect.y());
+    if (translatedRect.contains(x, y)) {
+        m_centralWidget->onMouseDown(key, x, y);
+    }
 }
 
 void Window::onPaint()
@@ -69,10 +93,8 @@ void Window::setCentralWidget(Widget& widget)
     }
 
     m_centralWidget = &widget;
-
-    if (m_centralWidget) {
-        m_centralWidget->setParent(this);
-    }
+    m_centralWidget->setParent(this);
+    m_centralWidget->setWindow(this);
 }
 
 void Window::show()

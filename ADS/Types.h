@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <optional>
 
 #define ASSERT(X) assert(X)
 
@@ -24,6 +25,9 @@ using SharedPtr = std::shared_ptr<T>;
 
 template<typename T>
 using UniquePtr = std::unique_ptr<T>;
+
+template<typename T>
+using Optional = std::optional<T>;
 
 template<typename T>
 using Vector = std::vector<T>;

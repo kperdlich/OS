@@ -17,10 +17,12 @@ enum class BitmapFormat {
 class Bitmap final {
 public:
     Bitmap() = default;
+    ~Bitmap();
+
     static ADS::UniquePtr<Bitmap> createFrom(BitmapFormat format, IntSize size, char* data);
 
     inline char* data() { return m_data; }
-    inline IntSize size() { return m_size; }
+    inline IntSize size() const { return m_size; }
 
     void setPixel(int x, int y, GUI::Color color);
     void fill(GUI::Color color);

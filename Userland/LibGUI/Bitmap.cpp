@@ -13,6 +13,15 @@ Bitmap::Bitmap(BitmapFormat format, IntSize size, char* data)
 {
 }
 
+Bitmap::~Bitmap()
+{
+    // FIXME: Make ownership optional?
+    if (m_data) {
+        delete m_data;
+        m_data = nullptr;
+    }
+}
+
 ADS::UniquePtr<Bitmap> Bitmap::createFrom(BitmapFormat format, IntSize size, char* data)
 {
     return ADS::UniquePtr<Bitmap>(new Bitmap(format, size, data));;

@@ -8,5 +8,5 @@ include_directories(${SDL2_INCLUDE_DIRS})
 
 include_directories(../../ADS)
 
-add_executable(LibGUI main.cpp Widget.cpp Widget.h Window.cpp Window.h Painter.cpp Painter.h Rect.h Bitmap.cpp Bitmap.h Color.cpp Color.h Size.h WindowManager.cpp WindowManager.h Button.cpp Button.h CObject.cpp CObject.h)
+add_executable(LibGUI main.cpp Widget.cpp Widget.h Window.cpp Window.h Painter.cpp Painter.h Rect.h Bitmap.cpp Bitmap.h Color.cpp Color.h Size.h WindowManager.cpp WindowManager.h Button.cpp Button.h CObject.cpp CObject.h Screen.cpp Screen.h)
 target_link_libraries(LibGUI ${SDL2_LIBRARIES})

@@ -1,20 +1,15 @@
 
 #include "Array.h"
 #include "Bitmap.h"
-#include "Painter.h"
 #include "Rect.h"
-#include "Types.h"
+#include "Screen.h"
 #include "Vector.h"
 #include "Window.h"
 #include "WindowManager.h"
 #include <SDL2/SDL.h>
-#include <string>
 
 int main()
 {
-    constexpr int width = 1024;
-    constexpr int height = 720;
-
     TEST::Vector<int> test;
     test.pushBack(10);
     test.pushBack(20);
@@ -42,34 +37,19 @@ int main()
         std::cout << it << std::endl;
     }
 
-    const ADS::String title = "OS GUI Emulator";
-
-    SDL_Init(SDL_INIT_VIDEO);
-
-    SDL_Window* sdlWindow = SDL_CreateWindow(title.c_str(),
-        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
-
-    SDL_Renderer* renderer = SDL_CreateRenderer(sdlWindow, -1, 0);
-    SDL_Texture* texture = SDL_CreateTexture(renderer,
-        SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, width, height);
-
-    auto framebuffer = new uint32_t[width * height];
-    auto framebufferBitmap = GUI::Bitmap::createFrom(GUI::BitmapFormat::RGBA32, { width, height }, (char*)framebuffer);
-
-    GUI::Painter painter(*framebufferBitmap);
-
     GUI::Button* button = new GUI::Button([]() {
         std::cout << "Button clicked" << std::endl;
     });
-    button->setRect(GUI::IntRect { 0, 0, 50, 20 } );
+
+    button->setRect(GUI::IntRect { 0, 0, 50, 20 });
 
     GUI::Window win1;
-    win1.setRect(GUI::IntRect { 10, 10, 800, 600 } );
+    win1.setRect(GUI::IntRect { 50, 50, 600, 400 });
     win1.setCentralWidget(*button);
     win1.show();
 
-    //GUI::Window win2;
-    //win2.setRect({ GUI::IntRect { 10, 10, 800, 600 } });
+    // GUI::Window win2;
+    // win2.setRect({ GUI::IntRect { 10, 10, 800, 600 } });
 
     bool leftMouseButtonDown = false;
 
@@ -77,9 +57,9 @@ int main()
 
     bool quit = false;
     while (!quit) {
-        framebufferBitmap->fill(GUI::Color { 255 });
+        GUI::Screen::the().fill(GUI::Color { 255 });
 
-        GUI::WindowManager::the().paint(painter);
+        GUI::WindowManager::the().paint();
 
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -110,18 +90,8 @@ int main()
                 }
                 break;
             }
-
-            SDL_UpdateTexture(texture, nullptr, framebufferBitmap->data(), width * sizeof(uint32_t));
         }
 
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, texture, nullptr, nullptr);
-        SDL_RenderPresent(renderer);
+        GUI::Screen::the().update();
     }
-
-    delete[] framebuffer;
-    SDL_DestroyTexture(texture);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(sdlWindow);
-    SDL_Quit();
 }

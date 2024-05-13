@@ -16,11 +16,8 @@ enum class IteratorResult {
 
 class Painter;
 
-class WindowManager {
+class WindowManager final {
 public:
-    WindowManager() = default;
-    ~WindowManager() = default;
-
     static WindowManager& the()
     {
         static WindowManager instance;
@@ -40,11 +37,13 @@ public:
     void onMouseMove(int x, int y);
     void onMouseDown(int key, int x, int y);
     void onMouseUp(int key, int x, int y);
-    void paint(Painter& painter);
+    void paint();
 
 private:
+    WindowManager() = default;
+
     void onWindowTaskBarMouseDown(Window& window, int x, int y);
-    void paintWindow(Painter& painter, Window& window);
+    void paintWindow(Window& window);
 
 private:
     ADS::Vector<Window*> m_windows;

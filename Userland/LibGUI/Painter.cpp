@@ -3,21 +3,34 @@
 //
 
 #include "Painter.h"
-#include "Types.h"
+#include "Screen.h"
+#include "Window.h"
 
 namespace GUI {
 
-Painter::Painter(Bitmap& targetBuffer)
-    : m_targetBuffer(targetBuffer)
+Painter::Painter(Widget* widget)
 {
+    if (!widget)
+        return;
+
+    m_relativeTranslationX = widget->rect().x();
+    m_relativeTranslationY = widget->rect().y();
+
+    if (const Window* window = widget->window()) {
+        m_relativeTranslationX += window->rect().x();
+        m_relativeTranslationY += window->rect().y();
+    }
 }
 
-void Painter::drawRectangle(IntRect rect, GUI::Color color)
+void Painter::drawRectangle(const IntRect& rect, GUI::Color color)
 {
-    const auto clippedRect = IntRect { 0, 0, m_targetBuffer.size().width(), m_targetBuffer.size().height() }.clip(rect);
+    IntRect translated = rect;
+    translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
+
+    const auto clippedRect = IntRect { 0, 0, Screen::the().width(), Screen::the().height() }.clip(translated);
     for (int i = 0; i < clippedRect.width(); ++i) {
         for (int j = 0; j < clippedRect.height(); ++j) {
-            m_targetBuffer.setPixel(clippedRect.x() + i, clippedRect.y() + j, color);
+            Screen::the().setPixel(clippedRect.x() + i, clippedRect.y() + j, color);
         }
     }
 }
@@ -34,7 +47,7 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
         const int startY = ADS::min(y0, y1);
         const int endY = ADS::max(y0, y1);
         for (int i = startY; i < endY; ++i) {
-            m_targetBuffer.setPixel(x0, i, color);
+            Screen::the().setPixel(x0, i, color);
         }
         return;
     }
@@ -44,7 +57,7 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
         const int startX = ADS::min(x0, x1);
         const int endX = ADS::max(x0, x1);
         for (int i = startX; i < endX; ++i) {
-            m_targetBuffer.setPixel(i, y0, color);
+            Screen::the().setPixel(i, y0, color);
         }
         return;
     }
@@ -59,7 +72,7 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
     int y = y0;
 
     while (true) {
-        m_targetBuffer.setPixel(x, y, color);
+        Screen::the().setPixel(x, y, color);
         if (x == x1 && y == y1)
             break;
         const int error2 = 2 * error;

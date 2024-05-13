@@ -20,4 +20,9 @@ void Widget::setRect(const IntRect& rect)
     m_rect = rect;
 }
 
+void Widget::setWindow(Window* window)
+{
+    m_window = window;
+}
+
 } // GUI

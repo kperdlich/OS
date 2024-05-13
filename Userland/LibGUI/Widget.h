@@ -9,7 +9,7 @@
 
 namespace GUI {
 
-class Painter;
+class Window;
 
 class Widget : public CObject {
 public:
@@ -20,10 +20,14 @@ public:
     virtual void onMouseDown(int key, int x, int y) = 0;
     virtual void onMouseUp(int key, int x, int y) = 0;
 
+    void setWindow(Window* window);
+    Window* window() const { return m_window; }
+
     void setRect(const IntRect& rect);
     inline IntRect rect() { return m_rect; }
 
 protected:
+    Window* m_window;
     IntRect m_rect;
 };
 

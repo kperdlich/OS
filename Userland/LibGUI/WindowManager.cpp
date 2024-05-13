@@ -22,17 +22,18 @@ static const IntRect TaskbarRect { 0, height - TaskbarHeight, width, TaskbarHeig
 static IntRect windowTitleBarCloseButtonRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x() + rect.width() - TitleBarHeight, rect.y(), TitleBarHeight, TitleBarHeight };
+    return { rect.x() + rect.width() - TitleBarHeight, rect.y() - TitleBarHeight, TitleBarHeight, TitleBarHeight };
 }
 
 static IntRect windowTitleBarRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x(), rect.y(), rect.width(), TitleBarHeight };
+    return { rect.x(), rect.y() - TitleBarHeight, rect.width(), TitleBarHeight };
 }
 
-static void paintTaskbar(Painter& painter)
+static void paintTaskbar()
 {
+    Painter painter;
     painter.drawRectangle(TaskbarRect, TaskbarColor);
 }
 
@@ -113,18 +114,19 @@ void WindowManager::onMouseUp(int key, int x, int y)
         return IteratorResult::Continue;
     });
 }
-void WindowManager::paint(Painter& painter)
+void WindowManager::paint()
 {
     forEachVisibleWindowBackToFront([&](GUI::Window& window) -> GUI::IteratorResult {
-        paintWindow(painter, window);
+        paintWindow(window);
         return GUI::IteratorResult::Continue;
     });
 
-    paintTaskbar(painter);
+    paintTaskbar();
 }
 
-void WindowManager::paintWindow(Painter& painter, Window& window)
+void WindowManager::paintWindow(Window& window)
 {
+    Painter painter;
     painter.drawRectangle(window.rect(), GUI::Color(0x00, 0, 0, 0xff));
     painter.drawRectangle(windowTitleBarRect(window), m_activeWindow == &window ? ActiveWindowTitleBarColor : TitleBarColor);
     painter.drawRectangle(windowTitleBarCloseButtonRect(window), Color { 0xff, 0, 0, 0xff });
@@ -135,7 +137,7 @@ void WindowManager::paintWindow(Painter& painter, Window& window)
 void WindowManager::onWindowTaskBarMouseDown(Window& window, int x, int y)
 {
     const auto& rect = window.rect();
-    if (IntRect { rect.x() + rect.width() - TitleBarHeight, rect.y(), TitleBarHeight, TitleBarHeight }.contains(x, y)) {
+    if (windowTitleBarCloseButtonRect(window).contains(x, y)) {
         remove(window);
         return;
     }
