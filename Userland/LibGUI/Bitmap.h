@@ -16,7 +16,6 @@ enum class BitmapFormat {
 
 class Bitmap final {
 public:
-    Bitmap() = default;
     ~Bitmap();
 
     static ADS::UniquePtr<Bitmap> createFrom(BitmapFormat format, IntSize size, char* data);

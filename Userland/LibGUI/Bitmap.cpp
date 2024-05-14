@@ -6,6 +6,11 @@
 
 namespace GUI {
 
+ADS::UniquePtr<Bitmap> Bitmap::createFrom(BitmapFormat format, IntSize size, char* data)
+{
+    return ADS::UniquePtr<Bitmap>(new Bitmap(format, size, data));
+}
+
 Bitmap::Bitmap(BitmapFormat format, IntSize size, char* data)
     : m_format(format)
     , m_size(size)
@@ -22,11 +27,6 @@ Bitmap::~Bitmap()
     }
 }
 
-ADS::UniquePtr<Bitmap> Bitmap::createFrom(BitmapFormat format, IntSize size, char* data)
-{
-    return ADS::UniquePtr<Bitmap>(new Bitmap(format, size, data));;
-}
-
 void Bitmap::setPixel(int x, int y, GUI::Color color)
 {
     switch (m_format) {
@@ -40,6 +40,7 @@ void Bitmap::setPixel(int x, int y, GUI::Color color)
         ASSERT(false);
     }
 }
+
 void Bitmap::fill(GUI::Color color)
 {
     switch (m_format) {
@@ -55,4 +56,5 @@ void Bitmap::fill(GUI::Color color)
         ASSERT(false);
     }
 }
+
 } // GUI

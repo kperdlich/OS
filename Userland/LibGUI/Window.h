@@ -33,10 +33,14 @@ public:
     void setRect(const IntRect& rect);
     [[nodiscard]] inline IntRect rect() const { return m_rect; }
 
+    inline void setTitle(const ADS::String& title) { m_title = title; }
+    inline ADS::String title() const { return m_title; }
+
     void setCentralWidget(Widget& widget);
     inline Widget* centralWidget() { return m_centralWidget; };
 
 private:
+    ADS::String m_title {};
     IntRect m_rect;
     Widget* m_centralWidget { nullptr };
     bool m_isVisible = true;

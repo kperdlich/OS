@@ -19,8 +19,8 @@ public:
     inline T height() { return m_height; }
 
 private:
-    T m_width;
-    T m_height;
+    T m_width {};
+    T m_height {};
 };
 
 using IntSize = Size<int>;

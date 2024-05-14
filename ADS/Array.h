@@ -62,12 +62,12 @@ struct Array {
         return ReverseIterator::begin(*this);
     }
 
-    inline const T& operator[](int index) const
+    inline const T& operator[](size_t index) const
     {
         return m_data[index];
     }
 
-    inline T& operator[](int index)
+    inline T& operator[](size_t index)
     {
         return m_data[index];
     }

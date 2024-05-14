@@ -130,6 +130,7 @@ void WindowManager::paintWindow(Window& window)
     painter.drawRectangle(window.rect(), GUI::Color(0x00, 0, 0, 0xff));
     painter.drawRectangle(windowTitleBarRect(window), m_activeWindow == &window ? ActiveWindowTitleBarColor : TitleBarColor);
     painter.drawRectangle(windowTitleBarCloseButtonRect(window), Color { 0xff, 0, 0, 0xff });
+    painter.drawText(windowTitleBarRect(window), window.title(), TextAlignment::Center, { 0xff, 0, 0, 0xff });
 
     window.onPaint();
 }

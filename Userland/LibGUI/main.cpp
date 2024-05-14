@@ -46,10 +46,13 @@ int main()
     GUI::Window win1;
     win1.setRect(GUI::IntRect { 50, 50, 600, 400 });
     win1.setCentralWidget(*button);
+    win1.setTitle("Windows 1");
     win1.show();
 
-    // GUI::Window win2;
-    // win2.setRect({ GUI::IntRect { 10, 10, 800, 600 } });
+    GUI::Window win2;
+    win2.setRect({ GUI::IntRect { 100, 100, 600, 400 } });
+    win2.setTitle("Windows 2");
+    win2.show();
 
     bool leftMouseButtonDown = false;
 

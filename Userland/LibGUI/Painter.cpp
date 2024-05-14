@@ -3,10 +3,14 @@
 //
 
 #include "Painter.h"
+#include "ASCIIFont.h"
+#include "DefaultFont8x10.h"
 #include "Screen.h"
 #include "Window.h"
 
 namespace GUI {
+
+static ASCIIFont s_defaultFont(DefaultFont::font, DefaultFont::firstCharacter, DefaultFont::lastCharacter, DefaultFont::fontWidth, DefaultFont::fontHeight);
 
 Painter::Painter(Widget* widget)
 {
@@ -90,4 +94,51 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
         }
     }
 }
+
+void Painter::drawText(const IntRect& rect, const ADS::String& text, TextAlignment alignment, GUI::Color color)
+{
+    if (text.empty())
+        return;
+
+    IntRect translated = rect;
+    translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
+
+    // FIXME: add some margin/padding
+    switch (alignment) {
+    case TextAlignment::Right:
+        translated.moveBy(rect.width() - (s_defaultFont.width() * text.length()), 0);
+        break;
+    case TextAlignment::Center:
+        translated.moveBy((rect.width() - (s_defaultFont.width() * text.length())) / 2, 0);
+        break;
+    }
+
+    // Center horizontal by default
+    translated.moveBy(0, (rect.height() - s_defaultFont.height()) / 2);
+
+    for (size_t i = 0; i < text.size(); ++i) {
+        const char asciiChar = text[i];
+        if (asciiChar == ' ') {
+            continue;
+        }
+
+        const char* font = s_defaultFont.GetAsciiBitmapForChar(asciiChar);
+        if (!font) {
+            std::cerr << "[Painter::drawText] Ascii char " << asciiChar << " not in font!" << std::endl;
+            return;
+        }
+
+        for (int x = 0; x < s_defaultFont.width(); ++x) {
+            for (int y = 0; y < s_defaultFont.height(); ++y) {
+                const size_t index = (y * s_defaultFont.width()) + x;
+                if (font[index] == '#') {
+                    const int xPos = translated.x() + x + (i * s_defaultFont.width());
+                    const int yPos = translated.y() + y;
+                    Screen::the().setPixel(xPos, yPos, color);
+                }
+            }
+        }
+    }
+}
+
 } // GUI
