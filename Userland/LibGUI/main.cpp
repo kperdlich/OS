@@ -1,12 +1,9 @@
 
+#include "Application.h"
 #include "Array.h"
-#include "Bitmap.h"
 #include "Rect.h"
-#include "Screen.h"
 #include "Vector.h"
 #include "Window.h"
-#include "WindowManager.h"
-#include <SDL2/SDL.h>
 
 int main()
 {
@@ -54,47 +51,6 @@ int main()
     win2.setTitle("Windows 2");
     win2.show();
 
-    bool leftMouseButtonDown = false;
-
-    int startDownX = 0, startDownY = 0;
-
-    bool quit = false;
-    while (!quit) {
-        GUI::Screen::the().fill(GUI::Color { 255 });
-
-        GUI::WindowManager::the().paint();
-
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT:
-                quit = true;
-                break;
-            case SDL_MOUSEBUTTONUP:
-                GUI::WindowManager::the().onMouseUp(event.button.button, event.motion.x, event.motion.y);
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    leftMouseButtonDown = false;
-                    // painter.drawLine(startDownX, startDownY, event.motion.x, event.motion.y, GUI::Color { 0xff, 0, 0, 0xff });
-                }
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                GUI::WindowManager::the().onMouseDown(event.button.button, event.motion.x, event.motion.y);
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    leftMouseButtonDown = true;
-                    startDownX = event.motion.x;
-                    startDownY = event.motion.y;
-                }
-            case SDL_MOUSEMOTION:
-                int mouseX = event.motion.x;
-                int mouseY = event.motion.y;
-                GUI::WindowManager::the().onMouseMove(mouseX, mouseY);
-                if (leftMouseButtonDown) {
-                    // framebufferBitmap->setPixel(mouseX, mouseY, GUI::Color { 0 });
-                }
-                break;
-            }
-        }
-
-        GUI::Screen::the().update();
-    }
+    GUI::Application app;
+    return app.exec();
 }
