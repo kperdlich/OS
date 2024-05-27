@@ -8,8 +8,10 @@
 namespace GUI {
 
 static const int TitleBarHeight = 20;
-static const GUI::Color TitleBarColor { 190, 190, 190, 0xff };
-static const GUI::Color ActiveWindowTitleBarColor { 90, 90, 90, 0xff };
+static const GUI::Color InactiveTitleBarColor { 140, 140, 140, 0xff };
+static const GUI::Color InactiveTitleBarTextColor { 234, 233, 233, 0xff };
+static const GUI::Color ActiveWindowTitleBarColor { 0, 0, 104, 0xff };
+static const GUI::Color ActiveWindowTitleBarTextColor { 0xff, 0xff, 0xff, 0xff };
 
 // FIXME get this from framebuffer
 constexpr int width = 1024;
@@ -18,6 +20,12 @@ constexpr int height = 720;
 constexpr int TaskbarHeight = 20;
 static const GUI::Color TaskbarColor { 190, 190, 190, 0xff };
 static const IntRect TaskbarRect { 0, height - TaskbarHeight, width, TaskbarHeight };
+
+static IntRect windowFrameRect(const Window& window)
+{
+    const auto& rect = window.rect();
+    return { rect.x(), rect.y() - TitleBarHeight, rect.width(), rect.height() + TitleBarHeight };
+}
 
 static IntRect windowTitleBarCloseButtonRect(const Window& window)
 {
@@ -34,7 +42,7 @@ static IntRect windowTitleBarRect(const Window& window)
 static void paintTaskbar()
 {
     Painter painter;
-    painter.drawRectangle(TaskbarRect, TaskbarColor);
+    painter.drawFilledRect(TaskbarRect, TaskbarColor);
 }
 
 void WindowManager::add(Window& window)
@@ -126,11 +134,16 @@ void WindowManager::paint()
 
 void WindowManager::paintWindow(Window& window)
 {
+    const bool isActiveWindow = m_activeWindow == &window;
+
     Painter painter;
-    painter.drawRectangle(window.rect(), GUI::Color(0x00, 0, 0, 0xff));
-    painter.drawRectangle(windowTitleBarRect(window), m_activeWindow == &window ? ActiveWindowTitleBarColor : TitleBarColor);
-    painter.drawRectangle(windowTitleBarCloseButtonRect(window), Color { 0xff, 0, 0, 0xff });
-    painter.drawText(windowTitleBarRect(window), window.title(), TextAlignment::Center, { 0xff, 0, 0, 0xff });
+    painter.drawFilledRect(windowFrameRect(window), Color { 172, 172, 172, 0xff });
+    painter.drawFilledRect(windowTitleBarRect(window), isActiveWindow ? ActiveWindowTitleBarColor : InactiveTitleBarColor);
+    painter.drawFilledRect(windowTitleBarCloseButtonRect(window), Color { 0xff, 0, 0, 0xff });
+
+    painter.drawRect(windowTitleBarCloseButtonRect(window), Color { 0x00, 0, 0, 0xff });
+    painter.drawText(windowTitleBarRect(window), window.title(), TextAlignment::Center, isActiveWindow ? ActiveWindowTitleBarTextColor : InactiveTitleBarTextColor);
+    painter.drawRect(windowFrameRect(window), isActiveWindow ? Color { 0, 0, 0, 0xff } : InactiveTitleBarColor);
 
     window.onPaint();
 }

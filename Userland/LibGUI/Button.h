@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Types.h"
 #include "Widget.h"
 #include "functional"
 
@@ -20,6 +21,11 @@ public:
     void onMouseMove(int x, int y) override;
 
     std::function<void()> onClick;
+
+    void setText(const ADS::String& text);
+
+private:
+    ADS::String m_text;
 };
 
 } // GUI

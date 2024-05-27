@@ -8,6 +8,8 @@
 
 namespace GUI {
 
+static const GUI::Color ButtonColor { 172, 172, 172, 0xff };
+
 Button::Button(std::function<void()> onClickCallback, Widget* parent)
     : onClick(std::move(onClickCallback))
     , Widget(parent)
@@ -34,7 +36,15 @@ void Button::onMouseMove(int x, int y)
 void Button::onPaint()
 {
     Painter painter(this);
-    painter.drawRectangle(m_rect, Color {0, 0xff, 0, 0xff});
+    painter.drawFilledRect(m_rect, ButtonColor);
+    painter.drawRect(m_rect, Color { 0, 0, 0, 0xff });
+
+    painter.drawText(m_rect, m_text, GUI::TextAlignment::Center, Color { 0, 0, 0, 0xff });
+}
+
+void Button::setText(const ADS::String& text)
+{
+    m_text = text;
 }
 
 } // GUI

@@ -26,22 +26,40 @@ Painter::Painter(Widget* widget)
     }
 }
 
-void Painter::drawRectangle(const IntRect& rect, GUI::Color color)
+void Painter::drawFilledRect(const IntRect& rect, GUI::Color color)
 {
     IntRect translated = rect;
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
 
     const auto clippedRect = IntRect { 0, 0, Screen::the().width(), Screen::the().height() }.clip(translated);
-    for (int i = 0; i < clippedRect.width(); ++i) {
-        for (int j = 0; j < clippedRect.height(); ++j) {
-            Screen::the().setPixel(clippedRect.x() + i, clippedRect.y() + j, color);
+    for (int y = 0; y < clippedRect.height(); ++y) {
+        for (int x = 0; x < clippedRect.width(); ++x) {
+            Screen::the().setPixel(clippedRect.x() + x, clippedRect.y() + y, color);
         }
     }
 }
 
-void Painter::drawQuad(int x, int y, int size, GUI::Color color)
+void Painter::drawRect(const IntRect& rect, GUI::Color color)
 {
-    drawRectangle({ x, y, size, size }, color);
+    IntRect translated = rect;
+    translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
+
+    const auto clippedRect = IntRect { 0, 0, Screen::the().width(), Screen::the().height() }.clip(translated);
+    for (int y = 0; y < clippedRect.height(); ++y) {
+        if (y == 0 || y == clippedRect.height() - 1) {
+            for (int x = 0; x < clippedRect.width(); ++x) {
+                Screen::the().setPixel(clippedRect.x() + x, clippedRect.y() + y, color);
+            }
+        } else {
+            Screen::the().setPixel(clippedRect.x(), clippedRect.y() + y, color);
+            Screen::the().setPixel(clippedRect.x() + clippedRect.width() - 1, clippedRect.y() + y, color);
+        }
+    }
+}
+
+void Painter::drawFilledQuad(int x, int y, int size, GUI::Color color)
+{
+    drawFilledRect({ x, y, size, size }, color);
 }
 
 void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
