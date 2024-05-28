@@ -22,6 +22,8 @@ public:
 
     inline char* data() { return m_data; }
     inline IntSize size() const { return m_size; }
+    inline int width() const { return m_size.width(); }
+    inline int height() const { return m_size.height(); }
 
     void setPixel(int x, int y, GUI::Color color);
     void fill(GUI::Color color);

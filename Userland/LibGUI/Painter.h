@@ -7,6 +7,7 @@
 #include "Widget.h"
 #include "Rect.h"
 #include "Color.h"
+#include "CharacterBitmap.h"
 #include "Types.h"
 
 namespace GUI {
@@ -26,6 +27,7 @@ public:
     void drawFilledQuad(int x, int y, int size, GUI::Color color);
     void drawLine(int x0, int y0, int x1, int y1, GUI::Color color);
     void drawText(const IntRect& rect, const ADS::String& text, TextAlignment alignment, GUI::Color color);
+    void drawCharacterBitmap(const IntPoint& point, CharacterBitmap& bitmap, Color color);
 
 private:
     int m_relativeTranslationX {};

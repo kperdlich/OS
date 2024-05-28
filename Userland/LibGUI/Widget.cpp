@@ -3,7 +3,6 @@
 //
 
 #include "Widget.h"
-#include "Painter.h"
 
 namespace GUI {
 Widget::Widget(Widget* parent)

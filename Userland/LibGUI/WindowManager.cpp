@@ -3,19 +3,38 @@
 //
 
 #include "WindowManager.h"
+#include "CharacterBitmap.h"
 #include "Painter.h"
 
 namespace GUI {
 
 static const int TitleBarHeight = 20;
+static const int TitleBarButtonsMargin = 2;
+static const int TitleBarButtonSize = TitleBarHeight - (2 * TitleBarButtonsMargin);
 static const GUI::Color InactiveTitleBarColor { 140, 140, 140, 0xff };
 static const GUI::Color InactiveTitleBarTextColor { 234, 233, 233, 0xff };
 static const GUI::Color ActiveWindowTitleBarColor { 0, 0, 104, 0xff };
 static const GUI::Color ActiveWindowTitleBarTextColor { 0xff, 0xff, 0xff, 0xff };
 
 // FIXME get this from framebuffer
-constexpr int width = 1024;
-constexpr int height = 720;
+static constexpr int width = 1024;
+static constexpr int height = 720;
+
+static constexpr int closeButtonCharactersWidth = 11;
+static constexpr int closeButtonCharactersHeight = 9;
+static constexpr const char* closeButtonCharacters {
+    " ##     ## "
+    "  ##   ##  "
+    "   ## ##   "
+    "    ###    "
+    "     #     "
+    "    ###    "
+    "   ## ##   "
+    "  ##   ##  "
+    " ##     ## "
+};
+
+static ADS::UniquePtr<CharacterBitmap> closeButtonBitmap {};
 
 constexpr int TaskbarHeight = 20;
 static const GUI::Color TaskbarColor { 190, 190, 190, 0xff };
@@ -30,7 +49,7 @@ static IntRect windowFrameRect(const Window& window)
 static IntRect windowTitleBarCloseButtonRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x() + rect.width() - TitleBarHeight, rect.y() - TitleBarHeight, TitleBarHeight, TitleBarHeight };
+    return { rect.x() + rect.width() - TitleBarButtonSize - TitleBarButtonsMargin, rect.y() - TitleBarHeight + TitleBarButtonsMargin, TitleBarButtonSize, TitleBarButtonSize };
 }
 
 static IntRect windowTitleBarRect(const Window& window)
@@ -139,7 +158,16 @@ void WindowManager::paintWindow(Window& window)
     Painter painter;
     painter.drawFilledRect(windowFrameRect(window), Color { 172, 172, 172, 0xff });
     painter.drawFilledRect(windowTitleBarRect(window), isActiveWindow ? ActiveWindowTitleBarColor : InactiveTitleBarColor);
-    painter.drawFilledRect(windowTitleBarCloseButtonRect(window), Color { 0xff, 0, 0, 0xff });
+
+    if (!closeButtonBitmap) {
+        closeButtonBitmap = CharacterBitmap::createFrom( {closeButtonCharactersWidth, closeButtonCharactersHeight}, closeButtonCharacters);
+    }
+
+    IntRect closeButtonRect = windowTitleBarCloseButtonRect(window);
+    IntPoint closeButtonBitmapPos = closeButtonRect.position();
+    closeButtonBitmapPos.moveBy(3, 3);
+    painter.drawFilledRect(closeButtonRect, InactiveTitleBarColor);
+    painter.drawCharacterBitmap(closeButtonBitmapPos, *closeButtonBitmap, Color { 0, 0, 0, 0xff });
 
     painter.drawRect(windowTitleBarCloseButtonRect(window), Color { 0x00, 0, 0, 0xff });
     painter.drawText(windowTitleBarRect(window), window.title(), TextAlignment::Center, isActiveWindow ? ActiveWindowTitleBarTextColor : InactiveTitleBarTextColor);

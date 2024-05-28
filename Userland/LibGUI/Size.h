@@ -9,14 +9,14 @@ namespace GUI {
 template<typename T>
 class Size {
 public:
-    Size(T with, T height)
-        : m_width(with)
+    Size(T width, T height)
+        : m_width(width)
         , m_height(height)
     {
     }
 
-    inline T width() { return m_width; }
-    inline T height() { return m_height; }
+    inline T width() const { return m_width; }
+    inline T height() const { return m_height; }
 
 private:
     T m_width {};
