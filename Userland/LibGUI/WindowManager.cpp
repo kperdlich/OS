@@ -133,6 +133,12 @@ void WindowManager::onMouseUp(int key, int x, int y)
     }
 
     forEachVisibleWindowFrontToBack([&](Window& window) -> IteratorResult {
+        const auto& rect = window.rect();
+        if (windowTitleBarCloseButtonRect(window).contains(x, y)) {
+            remove(window);
+            return IteratorResult::Break;
+        }
+
         if (window.contains(x, y)) {
             window.onMouseUp(key, x, y);
             return IteratorResult::Break;
@@ -179,13 +185,10 @@ void WindowManager::paintWindow(Window& window)
 void WindowManager::onWindowTaskBarMouseDown(Window& window, int x, int y)
 {
     const auto& rect = window.rect();
-    if (windowTitleBarCloseButtonRect(window).contains(x, y)) {
-        remove(window);
-        return;
+    if (!windowTitleBarCloseButtonRect(window).contains(x, y)) {
+        m_lastMouseDragPos = { x, y };
+        m_isDraggingWindow = true;
     }
-
-    m_lastMouseDragPos = { x, y };
-    m_isDraggingWindow = true;
 }
 
 } // GUI
