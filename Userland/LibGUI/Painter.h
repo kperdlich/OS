@@ -27,7 +27,7 @@ public:
     void drawFilledQuad(int x, int y, int size, GUI::Color color);
     void drawLine(int x0, int y0, int x1, int y1, GUI::Color color);
     void drawText(const IntRect& rect, const ADS::String& text, TextAlignment alignment, GUI::Color color);
-    void drawCharacterBitmap(const IntPoint& point, CharacterBitmap& bitmap, Color color);
+    void drawCharacterBitmap(const IntPoint& point, const CharacterBitmap& bitmap, Color color);
 
 private:
     int m_relativeTranslationX {};

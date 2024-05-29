@@ -6,11 +6,6 @@
 
 namespace GUI {
 
-ADS::UniquePtr<CharacterBitmap> CharacterBitmap::createFrom(IntSize size, const char* data)
-{
-    return ADS::UniquePtr<CharacterBitmap>(new CharacterBitmap(size, data));
-}
-
 CharacterBitmap::CharacterBitmap(IntSize size, const char* data)
     : m_size(size)
     , m_data(data)

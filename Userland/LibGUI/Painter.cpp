@@ -161,7 +161,7 @@ void Painter::drawText(const IntRect& rect, const ADS::String& text, TextAlignme
     }
 }
 
-void Painter::drawCharacterBitmap(const IntPoint& point, CharacterBitmap& bitmap, Color color)
+void Painter::drawCharacterBitmap(const IntPoint& point, const CharacterBitmap& bitmap, Color color)
 {
     IntRect translated = { point.x(), point.y(), bitmap.width(), bitmap.height() };
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);

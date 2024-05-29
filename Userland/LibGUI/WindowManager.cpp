@@ -20,8 +20,7 @@ static const GUI::Color ActiveWindowTitleBarTextColor { 0xff, 0xff, 0xff, 0xff }
 static constexpr int width = 1024;
 static constexpr int height = 720;
 
-static constexpr int closeButtonCharactersWidth = 11;
-static constexpr int closeButtonCharactersHeight = 9;
+static const IntSize closeButtonCharSize {11, 9};
 static constexpr const char* closeButtonCharacters {
     " ##     ## "
     "  ##   ##  "
@@ -34,7 +33,7 @@ static constexpr const char* closeButtonCharacters {
     " ##     ## "
 };
 
-static ADS::UniquePtr<CharacterBitmap> closeButtonBitmap {};
+static const CharacterBitmap closeButtonBitmap(closeButtonCharSize, closeButtonCharacters);
 
 constexpr int TaskbarHeight = 20;
 static const GUI::Color TaskbarColor { 190, 190, 190, 0xff };
@@ -165,15 +164,11 @@ void WindowManager::paintWindow(Window& window)
     painter.drawFilledRect(windowFrameRect(window), Color { 172, 172, 172, 0xff });
     painter.drawFilledRect(windowTitleBarRect(window), isActiveWindow ? ActiveWindowTitleBarColor : InactiveTitleBarColor);
 
-    if (!closeButtonBitmap) {
-        closeButtonBitmap = CharacterBitmap::createFrom( {closeButtonCharactersWidth, closeButtonCharactersHeight}, closeButtonCharacters);
-    }
-
     IntRect closeButtonRect = windowTitleBarCloseButtonRect(window);
     IntPoint closeButtonBitmapPos = closeButtonRect.position();
     closeButtonBitmapPos.moveBy(3, 3);
     painter.drawFilledRect(closeButtonRect, InactiveTitleBarColor);
-    painter.drawCharacterBitmap(closeButtonBitmapPos, *closeButtonBitmap, Color { 0, 0, 0, 0xff });
+    painter.drawCharacterBitmap(closeButtonBitmapPos, closeButtonBitmap, Color { 0, 0, 0, 0xff });
 
     painter.drawRect(windowTitleBarCloseButtonRect(window), Color { 0x00, 0, 0, 0xff });
     painter.drawText(windowTitleBarRect(window), window.title(), TextAlignment::Center, isActiveWindow ? ActiveWindowTitleBarTextColor : InactiveTitleBarTextColor);

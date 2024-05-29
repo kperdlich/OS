@@ -11,15 +11,12 @@ namespace GUI {
 
 class CharacterBitmap final {
 public:
-    static ADS::UniquePtr<CharacterBitmap> createFrom(IntSize size, const char* data);
+    CharacterBitmap(IntSize size, const char* data);
 
-    inline const char* data() { return m_data; }
+    inline const char* data() const { return m_data; }
     inline IntSize size() const { return m_size; }
     inline int width() const { return m_size.width(); }
     inline int height() const { return m_size.height(); }
-
-private:
-    CharacterBitmap(IntSize size, const char* data);
 
 private:
     IntSize m_size;
