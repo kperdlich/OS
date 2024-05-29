@@ -22,6 +22,12 @@ public:
     T x() const { return m_x; }
     T y() const { return m_y; }
 
+    void moveBy(const Point<T>& point)
+    {
+        m_x += point.x();
+        m_y += point.y();
+    }
+
     void moveBy(T x, T y)
     {
         m_x += x;

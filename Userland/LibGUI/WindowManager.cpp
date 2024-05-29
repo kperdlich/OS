@@ -5,20 +5,21 @@
 #include "WindowManager.h"
 #include "CharacterBitmap.h"
 #include "Painter.h"
+#include "Widget.h"
 
 namespace GUI {
 
-static const int TitleBarHeight = 20;
-static const int TitleBarButtonsMargin = 2;
-static const int TitleBarButtonSize = TitleBarHeight - (2 * TitleBarButtonsMargin);
+static constexpr const int TitleBarHeight = 20;
+static constexpr const int TitleBarButtonsMargin = 2;
+static constexpr const int TitleBarButtonSize = TitleBarHeight - (2 * TitleBarButtonsMargin);
 static const GUI::Color InactiveTitleBarColor { 140, 140, 140, 0xff };
 static const GUI::Color InactiveTitleBarTextColor { 234, 233, 233, 0xff };
 static const GUI::Color ActiveWindowTitleBarColor { 0, 0, 104, 0xff };
 static const GUI::Color ActiveWindowTitleBarTextColor { 0xff, 0xff, 0xff, 0xff };
 
 // FIXME get this from framebuffer
-static constexpr int width = 1024;
-static constexpr int height = 720;
+static constexpr const int width = 1024;
+static constexpr const int height = 720;
 
 static const IntSize closeButtonCharSize {11, 9};
 static constexpr const char* closeButtonCharacters {
@@ -35,7 +36,7 @@ static constexpr const char* closeButtonCharacters {
 
 static const CharacterBitmap closeButtonBitmap(closeButtonCharSize, closeButtonCharacters);
 
-constexpr int TaskbarHeight = 20;
+static constexpr const int TaskbarHeight = 20;
 static const GUI::Color TaskbarColor { 190, 190, 190, 0xff };
 static const IntRect TaskbarRect { 0, height - TaskbarHeight, width, TaskbarHeight };
 

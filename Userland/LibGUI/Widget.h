@@ -16,9 +16,11 @@ public:
     explicit Widget(Widget* parent = nullptr);
 
     virtual void onPaint();
-    virtual void onMouseMove(int x, int y) = 0;
-    virtual void onMouseDown(int key, int x, int y) = 0;
-    virtual void onMouseUp(int key, int x, int y) = 0;
+    virtual void onMouseMove(int x, int y);
+    virtual void onMouseDown(int key, int x, int y);
+    virtual void onMouseUp(int key, int x, int y);
+    virtual void focusInEvent();
+    virtual void focusOutEvent();
 
     void setWindow(Window* window);
     Window* window() const { return m_window; }
@@ -26,9 +28,13 @@ public:
     void setRect(const IntRect& rect);
     inline IntRect rect() { return m_rect; }
 
+    bool hasFocus() const { return m_hasFocus; }
+    void setFocus() { m_hasFocus = true; }
+
 protected:
     Window* m_window;
     IntRect m_rect;
+    bool m_hasFocus { false };
 };
 
 } // GUI

@@ -23,6 +23,9 @@ public:
     inline T width() const { return m_width; }
     inline T height() const { return m_height; }
 
+    void setWidth(T width) { m_width = width; }
+    void setHeight(T height) { m_height = height; }
+
     inline T x() const { return m_position.x(); }
     inline T y() const { return m_position.y(); }
 
@@ -31,6 +34,11 @@ public:
     inline void moveBy(T x, T y)
     {
         m_position.moveBy(x, y);
+    }
+
+    void moveBy(const Point<T>& point)
+    {
+        m_position.moveBy(point);
     }
 
     bool contains(T x, T y) const
