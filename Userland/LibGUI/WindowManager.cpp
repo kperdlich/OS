@@ -147,6 +147,21 @@ void WindowManager::onMouseUp(int key, int x, int y)
         return IteratorResult::Continue;
     });
 }
+
+void WindowManager::onKeyDown(const KeyEvent& event)
+{
+    if (m_activeWindow) {
+        m_activeWindow->onKeyDown(event);
+    }
+}
+
+void WindowManager::onKeyUp(const KeyEvent& event)
+{
+    if (m_activeWindow) {
+        m_activeWindow->onKeyUp(event);
+    }
+}
+
 void WindowManager::paint()
 {
     forEachVisibleWindowBackToFront([&](GUI::Window& window) -> GUI::IteratorResult {

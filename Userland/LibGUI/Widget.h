@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CObject.h"
+#include "Event.h"
 #include "Rect.h"
 
 namespace GUI {
@@ -19,6 +20,8 @@ public:
     virtual void onMouseMove(int x, int y);
     virtual void onMouseDown(int key, int x, int y);
     virtual void onMouseUp(int key, int x, int y);
+    virtual void onKeyDown(const KeyEvent& event);
+    virtual void onKeyUp(const KeyEvent& event);
     virtual void focusInEvent();
     virtual void focusOutEvent();
 
@@ -28,13 +31,12 @@ public:
     void setRect(const IntRect& rect);
     inline IntRect rect() { return m_rect; }
 
-    bool hasFocus() const { return m_hasFocus; }
-    void setFocus() { m_hasFocus = true; }
+    bool hasFocus() const;
+    void setFocus();
 
 protected:
     Window* m_window;
     IntRect m_rect;
-    bool m_hasFocus { false };
 };
 
 } // GUI

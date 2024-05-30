@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Event.h"
 #include "Types.h"
 #include "Window.h"
 
@@ -37,6 +38,8 @@ public:
     void onMouseMove(int x, int y);
     void onMouseDown(int key, int x, int y);
     void onMouseUp(int key, int x, int y);
+    void onKeyDown(const KeyEvent& event);
+    void onKeyUp(const KeyEvent& event);
     void paint();
 
 private:

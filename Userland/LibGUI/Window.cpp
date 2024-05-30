@@ -102,4 +102,27 @@ void Window::show()
     GUI::WindowManager::the().add(*this);
 }
 
+void Window::onKeyDown(const KeyEvent& event)
+{
+    if (m_focusedWidget) {
+        m_focusedWidget->onKeyDown(event);
+    }
+}
+
+void Window::onKeyUp(const KeyEvent& event)
+{
+    if (m_focusedWidget) {
+        m_focusedWidget->onKeyUp(event);
+    }
+}
+
+void Window::setFocusedWidget(Widget* widget)
+{
+    if (m_focusedWidget == widget)
+        return;
+
+    // FIXME: handle focus event on old and new widget
+    m_focusedWidget = widget;
+}
+
 } // GUI

@@ -2,9 +2,9 @@
 #include "Application.h"
 #include "Array.h"
 #include "Rect.h"
+#include "TextBox.h"
 #include "Vector.h"
 #include "Window.h"
-#include "TextBox.h"
 
 int main()
 {
@@ -47,9 +47,8 @@ int main()
     win1.setTitle("Window 1");
     win1.show();
 
-    GUI::TextBox* textBox = new GUI::TextBox();
+    GUI::TextBox* textBox = new GUI::TextBox("TextBox text");
     textBox->setRect(GUI::IntRect { 2, 2, 200, 30 });
-    textBox->setText("TextBox text");
 
     GUI::Window win2;
     win2.setRect({ GUI::IntRect { 100, 100, 600, 400 } });

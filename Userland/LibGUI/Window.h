@@ -9,6 +9,7 @@
 #include "Painter.h"
 #include "Rect.h"
 #include "Size.h"
+#include "Event.h"
 
 namespace GUI {
 
@@ -26,6 +27,8 @@ public:
     virtual void onMouseMove(int x, int y);
     virtual void onMouseDown(int key, int x, int y);
     virtual void onMouseUp(int key, int x, int y);
+    virtual void onKeyDown(const KeyEvent& event);
+    virtual void onKeyUp(const KeyEvent& event);
 
     bool contains(int x, int y);
     void moveBy(int x, int y);
@@ -39,10 +42,14 @@ public:
     void setCentralWidget(Widget& widget);
     inline Widget* centralWidget() { return m_centralWidget; };
 
+    Widget* focusedWidget() const { return m_focusedWidget; }
+    void setFocusedWidget(Widget* widget);
+
 private:
     ADS::String m_title {};
     IntRect m_rect;
     Widget* m_centralWidget { nullptr };
+    Widget* m_focusedWidget { nullptr };
     bool m_isVisible = true;
 };
 
