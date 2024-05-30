@@ -13,9 +13,9 @@ TextBox::TextBox(Widget* parent)
 }
 
 TextBox::TextBox(const ADS::String& text, Widget* parent)
-    : m_text(text)
-    , Widget(parent)
+    : Widget(parent)
 {
+    setText(text);
 }
 
 void TextBox::onPaint()
@@ -30,20 +30,36 @@ void TextBox::onPaint()
     textRect.moveBy(cursorMargin, 0);
     painter.drawText(textRect, m_text, TextAlignment::Left, Colors::Black);
 
-    if (m_hasFocus) {
+    if (hasFocus()) {
         // FIXME: get this from the font
         static const int fontWidth = 8;
         IntRect cursorRect = m_rect;
         cursorRect.setHeight(m_rect.height() - (2 * cursorMargin));
         cursorRect.setWidth(1);
-        cursorRect.moveBy(cursorMargin + (ADS::max(0, m_cursorOffset) * fontWidth), (m_rect.height() - cursorRect.height()) / 2);
+        cursorRect.moveBy(cursorMargin + (m_cursorOffset * fontWidth), (m_rect.height() - cursorRect.height()) / 2);
         painter.drawFilledRect(cursorRect, Colors::Black);
     }
 }
 
-void TextBox::onMouseUp(int key, int x, int y)
+void TextBox::onKeyDown(const KeyEvent& event)
 {
-    m_cursorOffset = ADS::min(m_cursorOffset + 1, static_cast<int>(m_text.length()));
+    if (event.key() == Key::Left) {
+        m_cursorOffset = ADS::max(m_cursorOffset - 1, 0);
+    } else if (event.key() == Key::Right) {
+        m_cursorOffset = ADS::min(m_cursorOffset + 1, static_cast<int>(m_text.length()));
+    } else if (event.key() == Key::Backspace) {
+        if (m_cursorOffset > 0 && m_text.length() > 0) {
+            m_text.erase(--m_cursorOffset, 1);
+        }
+    } else {
+        m_text.insert(m_cursorOffset++, event.text());
+    }
+}
+
+void TextBox::setText(const ADS::String& text)
+{
+    m_text = text;
+    m_cursorOffset = static_cast<int>(m_text.length());
 }
 
 } // GUI
