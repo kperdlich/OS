@@ -17,9 +17,12 @@ public:
 
     virtual void onPaint() override;
     virtual void onKeyDown(const KeyEvent& event) override;
+    virtual void onMouseDown(int key, int x, int y) override;
 
     void setText(const ADS::String& text);
     ADS::String text() const { return m_text; }
+
+    virtual const char* name() const override { return "TextBox"; }
 
 private:
     ADS::String m_text;

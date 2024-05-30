@@ -102,7 +102,7 @@ void WindowManager::onMouseDown(int key, int x, int y)
 
         if (window.contains(x, y)) {
             makeActive(window);
-            window.onMouseDown(key, x, y);
+            window.onMouseDown(key, x - window.rect().x(), y - window.rect().y());
             return IteratorResult::Break;
         }
 
@@ -121,7 +121,7 @@ void WindowManager::onMouseMove(int x, int y)
     }
 
     if (m_activeWindow) {
-        m_activeWindow->onMouseMove(x, y);
+        m_activeWindow->onMouseMove(x - m_activeWindow->rect().x(), y - m_activeWindow->rect().y());
     }
 }
 
@@ -140,7 +140,7 @@ void WindowManager::onMouseUp(int key, int x, int y)
         }
 
         if (window.contains(x, y)) {
-            window.onMouseUp(key, x, y);
+            window.onMouseUp(key, x - window.rect().x(), y - window.rect().y());
             return IteratorResult::Break;
         }
 

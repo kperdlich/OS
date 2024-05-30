@@ -17,8 +17,8 @@ Painter::Painter(Widget* widget)
     if (!widget)
         return;
 
-    m_relativeTranslationX = widget->rect().x();
-    m_relativeTranslationY = widget->rect().y();
+    m_relativeTranslationX = widget->windowRelativeRect().x();
+    m_relativeTranslationY = widget->windowRelativeRect().y();
 
     if (const Window* window = widget->window()) {
         m_relativeTranslationX += window->rect().x();

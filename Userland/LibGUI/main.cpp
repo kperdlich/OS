@@ -38,7 +38,7 @@ int main()
     GUI::Button* button = new GUI::Button([]() {
         std::cout << "Button clicked" << std::endl;
     });
-    button->setRect(GUI::IntRect { 2, 2, 200, 30 });
+    button->setWindowRelativeRect(GUI::IntRect { 2, 2, 200, 30 });
     button->setText("Press me :)");
 
     GUI::Window win1;
@@ -47,13 +47,24 @@ int main()
     win1.setTitle("Window 1");
     win1.show();
 
+    GUI::Widget* container = new GUI::Widget();
+    container->setWindowRelativeRect(GUI::IntRect { 0, 0, 300, 400 });
+
     GUI::TextBox* textBox = new GUI::TextBox("TextBox text");
-    textBox->setRect(GUI::IntRect { 2, 2, 200, 30 });
+    textBox->setWindowRelativeRect(GUI::IntRect { 2, 2, 200, 30 });
+    textBox->setParent(container);
+
+    GUI::Button* textBoxButton = new GUI::Button([&]() {
+        textBox->setText("");
+    });
+    textBoxButton->setWindowRelativeRect(GUI::IntRect { 2, 20, 200, 30 });
+    textBoxButton->setText("Reset");
+    textBoxButton->setParent(container);
 
     GUI::Window win2;
     win2.setRect({ GUI::IntRect { 100, 100, 600, 400 } });
     win2.setTitle("Window 2");
-    win2.setCentralWidget(*textBox);
+    win2.setCentralWidget(*container);
     win2.show();
 
     GUI::Application app;

@@ -36,10 +36,12 @@ void Button::onMouseMove(int x, int y)
 void Button::onPaint()
 {
     Painter painter(this);
-    painter.drawFilledRect(m_rect, ButtonColor);
-    painter.drawRect(m_rect, Colors::Black);
+    painter.drawFilledRect(m_windowRelativeRect, ButtonColor);
+    painter.drawRect(m_windowRelativeRect, Colors::Black);
 
-    painter.drawText(m_rect, m_text, GUI::TextAlignment::Center, Colors::Black);
+    painter.drawText(m_windowRelativeRect, m_text, GUI::TextAlignment::Center, Colors::Black);
+
+    Widget::onPaint();
 }
 
 void Button::setText(const ADS::String& text)

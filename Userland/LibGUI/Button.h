@@ -24,6 +24,8 @@ public:
 
     void setText(const ADS::String& text);
 
+    virtual const char* name() const override { return "Button"; }
+
 private:
     ADS::String m_text;
 };

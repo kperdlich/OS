@@ -28,10 +28,9 @@ void Window::onMouseMove(int x, int y)
     if (!m_centralWidget)
         return;
 
-    IntRect translatedRect = m_centralWidget->rect();
-    translatedRect.moveBy(m_rect.x(), m_rect.y());
-    if (translatedRect.contains(x, y)) {
-        m_centralWidget->onMouseMove(x, y);
+    Widget::HitResult result {};
+    if (m_centralWidget->hits(x, y, result)) {
+        result.widget->onMouseMove(x, y);
     }
 }
 
@@ -40,10 +39,9 @@ void Window::onMouseUp(int key, int x, int y)
     if (!m_centralWidget)
         return;
 
-    IntRect translatedRect = m_centralWidget->rect();
-    translatedRect.moveBy(m_rect.x(), m_rect.y());
-    if (translatedRect.contains(x, y)) {
-        m_centralWidget->onMouseUp(key, x, y);
+    Widget::HitResult result {};
+    if (m_centralWidget->hits(x, y, result)) {
+        result.widget->onMouseUp(key, x, y);
     }
 }
 
@@ -52,10 +50,10 @@ void Window::onMouseDown(int key, int x, int y)
     if (!m_centralWidget)
         return;
 
-    IntRect translatedRect = m_centralWidget->rect();
-    translatedRect.moveBy(m_rect.x(), m_rect.y());
-    if (translatedRect.contains(x, y)) {
-        m_centralWidget->onMouseDown(key, x, y);
+    Widget::HitResult result {};
+    if (m_centralWidget->hits(x, y, result)) {
+        std::cout << "[Widget::HitResult] " << result.widget->name() << " localX: " << result.localX << " localY: " << result.localY << std::endl;
+        result.widget->onMouseDown(key, x, y);
     }
 }
 

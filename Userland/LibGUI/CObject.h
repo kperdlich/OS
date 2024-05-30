@@ -16,11 +16,11 @@ public:
     void setParent(CObject* parent);
     inline CObject* parent() { return m_parent; };
 
-private:
+protected:
     void addChild(CObject& child);
     void removeChild(CObject& child);
 
-private:
+protected:
     ADS::Vector<CObject*> m_children;
     CObject* m_parent { nullptr };
 };
