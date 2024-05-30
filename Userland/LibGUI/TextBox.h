@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "Widget.h"
-#include "Types.h"
 #include "Size.h"
+#include "Types.h"
+#include "Widget.h"
 
 namespace GUI {
 

@@ -7,16 +7,15 @@
 
 namespace GUI {
 
-TextBox::TextBox(Widget *parent) : Widget(parent)
+TextBox::TextBox(Widget* parent)
+    : Widget(parent)
 {
-
 }
 
-TextBox::TextBox(const ADS::String& text, Widget *parent)
-    : m_text(text),
-    Widget(parent)
+TextBox::TextBox(const ADS::String& text, Widget* parent)
+    : m_text(text)
+    , Widget(parent)
 {
-
 }
 
 void TextBox::onPaint()
@@ -24,12 +23,12 @@ void TextBox::onPaint()
     static const int cursorMargin = 5;
 
     Painter painter(this);
-    painter.drawFilledRect(m_rect, Color{0xff, 0xff, 0xff, 0xff});
-    painter.drawRect(m_rect, Color {0, 0, 0, 0xff});
+    painter.drawFilledRect(m_rect, Colors::White);
+    painter.drawRect(m_rect, Colors::Black);
 
     IntRect textRect = m_rect;
     textRect.moveBy(cursorMargin, 0);
-    painter.drawText(textRect, m_text, TextAlignment::Left, Color {0, 0, 0, 0xff});
+    painter.drawText(textRect, m_text, TextAlignment::Left, Colors::Black);
 
     if (m_hasFocus) {
         // FIXME: get this from the font
@@ -37,8 +36,8 @@ void TextBox::onPaint()
         IntRect cursorRect = m_rect;
         cursorRect.setHeight(m_rect.height() - (2 * cursorMargin));
         cursorRect.setWidth(1);
-        cursorRect.moveBy( cursorMargin + (ADS::max(0, m_cursorOffset) * fontWidth), (m_rect.height() - cursorRect.height()) / 2);
-        painter.drawFilledRect(cursorRect, Color{ 0, 0, 0, 0xff});
+        cursorRect.moveBy(cursorMargin + (ADS::max(0, m_cursorOffset) * fontWidth), (m_rect.height() - cursorRect.height()) / 2);
+        painter.drawFilledRect(cursorRect, Colors::Black);
     }
 }
 

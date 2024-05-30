@@ -12,16 +12,16 @@ namespace GUI {
 static constexpr const int TitleBarHeight = 20;
 static constexpr const int TitleBarButtonsMargin = 2;
 static constexpr const int TitleBarButtonSize = TitleBarHeight - (2 * TitleBarButtonsMargin);
-static const GUI::Color InactiveTitleBarColor { 140, 140, 140, 0xff };
-static const GUI::Color InactiveTitleBarTextColor { 234, 233, 233, 0xff };
-static const GUI::Color ActiveWindowTitleBarColor { 0, 0, 104, 0xff };
-static const GUI::Color ActiveWindowTitleBarTextColor { 0xff, 0xff, 0xff, 0xff };
+static const GUI::Color InactiveTitleBarColor = Colors::DarkGrey;
+static const GUI::Color InactiveTitleBarTextColor = Colors::LightWhite;
+static const GUI::Color ActiveWindowTitleBarColor = Colors::DarkBlue;
+static const GUI::Color ActiveWindowTitleBarTextColor = Colors::White;
 
 // FIXME get this from framebuffer
 static constexpr const int width = 1024;
 static constexpr const int height = 720;
 
-static const IntSize closeButtonCharSize {11, 9};
+static const IntSize closeButtonCharSize { 11, 9 };
 static constexpr const char* closeButtonCharacters {
     " ##     ## "
     "  ##   ##  "
@@ -162,18 +162,18 @@ void WindowManager::paintWindow(Window& window)
     const bool isActiveWindow = m_activeWindow == &window;
 
     Painter painter;
-    painter.drawFilledRect(windowFrameRect(window), Color { 172, 172, 172, 0xff });
+    painter.drawFilledRect(windowFrameRect(window), Colors::Grey);
     painter.drawFilledRect(windowTitleBarRect(window), isActiveWindow ? ActiveWindowTitleBarColor : InactiveTitleBarColor);
 
     IntRect closeButtonRect = windowTitleBarCloseButtonRect(window);
     IntPoint closeButtonBitmapPos = closeButtonRect.position();
     closeButtonBitmapPos.moveBy(3, 3);
-    painter.drawFilledRect(closeButtonRect, InactiveTitleBarColor);
-    painter.drawCharacterBitmap(closeButtonBitmapPos, closeButtonBitmap, Color { 0, 0, 0, 0xff });
+    painter.drawFilledRect(closeButtonRect, Colors::Grey);
+    painter.drawCharacterBitmap(closeButtonBitmapPos, closeButtonBitmap, Colors::Black);
 
-    painter.drawRect(windowTitleBarCloseButtonRect(window), Color { 0x00, 0, 0, 0xff });
+    painter.drawRect(windowTitleBarCloseButtonRect(window), Colors::Black);
     painter.drawText(windowTitleBarRect(window), window.title(), TextAlignment::Center, isActiveWindow ? ActiveWindowTitleBarTextColor : InactiveTitleBarTextColor);
-    painter.drawRect(windowFrameRect(window), isActiveWindow ? Color { 0, 0, 0, 0xff } : InactiveTitleBarColor);
+    painter.drawRect(windowFrameRect(window), isActiveWindow ? Colors::Black : InactiveTitleBarColor);
 
     window.onPaint();
 }

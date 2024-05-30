@@ -35,7 +35,7 @@ int Application::exec()
         }
 
         // FIXME: Only handle the paint event here and remove the rest.
-        GUI::Screen::the().fill(GUI::Color { 255 });
+        GUI::Screen::the().fill(GUI::Colors::White);
         GUI::WindowManager::the().paint();
         GUI::Screen::the().update();
     }

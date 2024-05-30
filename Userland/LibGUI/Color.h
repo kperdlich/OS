@@ -6,13 +6,28 @@
 
 namespace GUI {
 
+enum class Colors {
+    Black,
+    White,
+    LightWhite,
+    Grey,
+    DarkGrey,
+    Blue,
+    DarkBlue,
+};
+
 class Color {
 public:
-    explicit Color(unsigned char value);
+    Color(Colors color);
     Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
 private:
-    unsigned char m_r, m_g, m_b, m_a;
+    struct RGBA {
+        unsigned char r;
+        unsigned char g;
+        unsigned char b;
+        unsigned char a;
+    } m_rgba;
 };
 
 } // GUI
