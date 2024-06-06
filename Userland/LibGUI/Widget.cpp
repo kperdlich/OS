@@ -11,6 +11,32 @@ Widget::Widget(Widget* parent)
 {
 }
 
+bool Widget::event(Event& event)
+{
+    switch (event.type()) {
+    case Event::Type::MouseDown:
+        onMouseDownEvent(static_cast<MouseEvent&>(event));
+        return true;
+    case Event::Type::MouseUp:
+        onMouseUpEvent(static_cast<MouseEvent&>(event));
+        return true;
+    case Event::Type::MouseMove:
+        onMouseMoveEvent(static_cast<MouseEvent&>(event));
+        return true;
+    case Event::Type::KeyDown:
+        onKeyDownEvent(static_cast<KeyEvent&>(event));
+        return true;
+    case Event::Type::KeyUp:
+        onKeyUpEvent(static_cast<KeyEvent&>(event));
+        return true;
+    case Event::Type::Paint:
+        onPaintEvent(event);
+        return true;
+    default:
+        return CObject::event(event);
+    }
+}
+
 bool Widget::hits(int x, int y, HitResult& result)
 {
     for (auto& child : m_children) {
@@ -30,32 +56,24 @@ bool Widget::hits(int x, int y, HitResult& result)
     return false;
 }
 
-void Widget::onPaint()
+void Widget::onPaintEvent(Event& event)
 {
     for (auto& child : m_children) {
         Widget* childWidget = static_cast<Widget*>(child);
-        childWidget->onPaint();
+        childWidget->onPaintEvent(event);
     }
 }
 
-void Widget::onMouseMove(int x, int y)
+void Widget::onMouseMoveEvent(MouseEvent& event)
 {
 }
 
-void Widget::onMouseDown(int key, int x, int y)
+void Widget::onMouseDownEvent(MouseEvent& event)
 {
     setFocus();
 }
 
-void Widget::onMouseUp(int key, int x, int y)
-{
-}
-
-void Widget::focusInEvent()
-{
-}
-
-void Widget::focusOutEvent()
+void Widget::onMouseUpEvent(MouseEvent& event)
 {
 }
 
@@ -85,11 +103,11 @@ void Widget::setFocus()
     m_window->setFocusedWidget(this);
 }
 
-void Widget::onKeyDown(const KeyEvent& event)
+void Widget::onKeyDownEvent(KeyEvent& event)
 {
 }
 
-void Widget::onKeyUp(const KeyEvent& event)
+void Widget::onKeyUpEvent(KeyEvent& event)
 {
 }
 

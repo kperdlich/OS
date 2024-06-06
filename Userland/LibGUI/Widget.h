@@ -16,14 +16,7 @@ class Widget : public CObject {
 public:
     explicit Widget(Widget* parent = nullptr);
 
-    virtual void onPaint();
-    virtual void onMouseMove(int x, int y);
-    virtual void onMouseDown(int key, int x, int y);
-    virtual void onMouseUp(int key, int x, int y);
-    virtual void onKeyDown(const KeyEvent& event);
-    virtual void onKeyUp(const KeyEvent& event);
-    virtual void focusInEvent();
-    virtual void focusOutEvent();
+    virtual bool event(Event& event) override;
 
     void setWindow(Window* window);
     Window* window() const { return m_window; }
@@ -45,6 +38,14 @@ public:
     void setFocus();
 
     virtual const char* name() const { return "Widget"; }
+
+protected:
+    virtual void onPaintEvent(Event& event);
+    virtual void onMouseMoveEvent(MouseEvent& event);
+    virtual void onMouseDownEvent(MouseEvent& event);
+    virtual void onMouseUpEvent(MouseEvent& event);
+    virtual void onKeyDownEvent(KeyEvent& event);
+    virtual void onKeyUpEvent(KeyEvent& event);
 
 protected:
     Window* m_window;

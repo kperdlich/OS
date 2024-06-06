@@ -8,10 +8,14 @@
 
 namespace GUI {
 
+class Event;
+
 class CObject {
 public:
     explicit CObject(CObject* parent = nullptr);
     virtual ~CObject();
+
+    virtual bool event(Event& event);
 
     void setParent(CObject* parent);
     inline CObject* parent() { return m_parent; };

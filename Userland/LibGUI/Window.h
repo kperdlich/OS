@@ -6,10 +6,11 @@
 
 #include "Button.h"
 #include "CObject.h"
+#include "Event.h"
+#include "Point.h"
 #include "Painter.h"
 #include "Rect.h"
 #include "Size.h"
-#include "Event.h"
 
 namespace GUI {
 
@@ -20,17 +21,12 @@ public:
     explicit Window(CObject* parent = nullptr);
     ~Window() override;
 
+    virtual bool event(Event& event) override;
+
     void show();
     inline bool isVisible() { return m_isVisible; }
 
-    virtual void onPaint();
-    virtual void onMouseMove(int x, int y);
-    virtual void onMouseDown(int key, int x, int y);
-    virtual void onMouseUp(int key, int x, int y);
-    virtual void onKeyDown(const KeyEvent& event);
-    virtual void onKeyUp(const KeyEvent& event);
-
-    bool contains(int x, int y);
+    bool contains(IntPoint position);
     void moveBy(int x, int y);
 
     void setRect(const IntRect& rect);

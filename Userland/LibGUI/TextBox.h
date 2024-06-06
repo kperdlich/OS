@@ -15,14 +15,15 @@ public:
     explicit TextBox(Widget* parent = nullptr);
     TextBox(const ADS::String& text, Widget* parent = nullptr);
 
-    virtual void onPaint() override;
-    virtual void onKeyDown(const KeyEvent& event) override;
-    virtual void onMouseDown(int key, int x, int y) override;
-
     void setText(const ADS::String& text);
     ADS::String text() const { return m_text; }
 
     virtual const char* name() const override { return "TextBox"; }
+
+protected:
+    virtual void onPaintEvent(Event& event) override;
+    virtual void onKeyDownEvent(KeyEvent& event) override;
+    virtual void onMouseDownEvent(MouseEvent& event) override;
 
 private:
     ADS::String m_text;

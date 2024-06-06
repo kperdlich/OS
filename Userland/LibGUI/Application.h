@@ -5,15 +5,20 @@
 #pragma once
 
 #include "Types.h"
+#include "CObject.h"
 
 namespace GUI {
 
 class Application {
 public:
+    static Application& instance();
+
     Application();
     ~Application();
 
     int exec();
+
+    void postEvent(CObject* receiver, ADS::UniquePtr<Event>&& event);
 
 private:
     class EventLoopImpl;

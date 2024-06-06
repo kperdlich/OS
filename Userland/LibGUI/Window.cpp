@@ -3,6 +3,8 @@
 //
 
 #include "Window.h"
+#include "Application.h"
+#include "Event.h"
 #include "Painter.h"
 #include "WindowManager.h"
 
@@ -23,50 +25,40 @@ Window::~Window()
     GUI::WindowManager::the().remove(*this);
 }
 
-void Window::onMouseMove(int x, int y)
+bool Window::event(Event& event)
 {
-    if (!m_centralWidget)
-        return;
-
-    Widget::HitResult result {};
-    if (m_centralWidget->hits(x, y, result)) {
-        result.widget->onMouseMove(x, y);
+    if (event.isMouseEvent()) {
+        MouseEvent& mouseEvent = static_cast<MouseEvent&>(event);
+        if (m_centralWidget) {
+            Widget::HitResult result {};
+            if (m_centralWidget->hits(mouseEvent.x(), mouseEvent.y(), result)) {
+                std::cout << "[Widget::HitResult] " << result.widget->name() << " localX: " << result.localX << " localY: " << result.localY << std::endl;
+                return result.widget->event(event);
+            }
+        }
+        return CObject::event(event);
     }
+
+    if (event.isKeyboardEvent()) {
+        if (m_focusedWidget) {
+            return m_focusedWidget->event(event);
+        }
+        return CObject::event(event);
+    }
+
+    if (event.isPaintEvent()) {
+        if (m_centralWidget) {
+            return m_centralWidget->event(event);
+        }
+        return CObject::event(event);
+    }
+
+    return CObject::event(event);
 }
 
-void Window::onMouseUp(int key, int x, int y)
+bool Window::contains(IntPoint point)
 {
-    if (!m_centralWidget)
-        return;
-
-    Widget::HitResult result {};
-    if (m_centralWidget->hits(x, y, result)) {
-        result.widget->onMouseUp(key, x, y);
-    }
-}
-
-void Window::onMouseDown(int key, int x, int y)
-{
-    if (!m_centralWidget)
-        return;
-
-    Widget::HitResult result {};
-    if (m_centralWidget->hits(x, y, result)) {
-        std::cout << "[Widget::HitResult] " << result.widget->name() << " localX: " << result.localX << " localY: " << result.localY << std::endl;
-        result.widget->onMouseDown(key, x, y);
-    }
-}
-
-void Window::onPaint()
-{
-    if (m_centralWidget) {
-        m_centralWidget->onPaint();
-    }
-}
-
-bool Window::contains(int x, int y)
-{
-    return m_rect.contains(x, y);
+    return m_rect.contains(point);
 }
 
 void Window::moveBy(int x, int y)
@@ -98,20 +90,6 @@ void Window::setCentralWidget(Widget& widget)
 void Window::show()
 {
     GUI::WindowManager::the().add(*this);
-}
-
-void Window::onKeyDown(const KeyEvent& event)
-{
-    if (m_focusedWidget) {
-        m_focusedWidget->onKeyDown(event);
-    }
-}
-
-void Window::onKeyUp(const KeyEvent& event)
-{
-    if (m_focusedWidget) {
-        m_focusedWidget->onKeyUp(event);
-    }
 }
 
 void Window::setFocusedWidget(Widget* widget)

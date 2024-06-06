@@ -16,24 +16,24 @@ Button::Button(std::function<void()> onClickCallback, Widget* parent)
 {
 }
 
-void Button::onMouseDown(int key, int x, int y)
+void Button::onMouseDownEvent(MouseEvent& event)
 {
-    std::cout << "[Button] onMouseDown" << std::endl;
+    std::cout << "[Button] onMouseDownEvent" << std::endl;
 }
 
-void Button::onMouseUp(int key, int x, int y)
+void Button::onMouseUpEvent(MouseEvent& event)
 {
-    std::cout << "[Button] onMouseUp" << std::endl;
+    std::cout << "[Button] onMouseUpEvent" << std::endl;
     if (onClick)
         onClick();
 }
 
-void Button::onMouseMove(int x, int y)
+void Button::onMouseMoveEvent(MouseEvent& event)
 {
-    std::cout << "[Button] onMouseMove" << std::endl;
+    std::cout << "[Button] onMouseMoveEvent" << std::endl;
 }
 
-void Button::onPaint()
+void Button::onPaintEvent(Event& event)
 {
     Painter painter(this);
     painter.drawFilledRect(m_windowRelativeRect, ButtonColor);
@@ -41,7 +41,7 @@ void Button::onPaint()
 
     painter.drawText(m_windowRelativeRect, m_text, GUI::TextAlignment::Center, Colors::Black);
 
-    Widget::onPaint();
+    Widget::onPaintEvent(event);
 }
 
 void Button::setText(const ADS::String& text)

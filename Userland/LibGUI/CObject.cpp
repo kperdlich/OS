@@ -26,6 +26,11 @@ CObject::~CObject()
     }
 }
 
+bool CObject::event(Event& event)
+{
+    return false;
+}
+
 void CObject::addChild(CObject& child)
 {
     m_children.emplace_back(&child);

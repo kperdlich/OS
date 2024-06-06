@@ -18,7 +18,7 @@ TextBox::TextBox(const ADS::String& text, Widget* parent)
     setText(text);
 }
 
-void TextBox::onPaint()
+void TextBox::onPaintEvent(Event& event)
 {
     static const int cursorMargin = 5;
 
@@ -40,10 +40,10 @@ void TextBox::onPaint()
         painter.drawFilledRect(cursorRect, Colors::Black);
     }
 
-    Widget::onPaint();
+    Widget::onPaintEvent(event);
 }
 
-void TextBox::onKeyDown(const KeyEvent& event)
+void TextBox::onKeyDownEvent(KeyEvent& event)
 {
     if (event.key() == Key::Left) {
         m_cursorOffset = ADS::max(m_cursorOffset - 1, 0);
@@ -64,9 +64,9 @@ void TextBox::setText(const ADS::String& text)
     m_cursorOffset = static_cast<int>(m_text.length());
 }
 
-void TextBox::onMouseDown(int key, int x, int y)
+void TextBox::onMouseDownEvent(MouseEvent& event)
 {
-    Widget::onMouseDown(key, x, y);
+    Widget::onMouseDownEvent(event);
 }
 
 } // GUI

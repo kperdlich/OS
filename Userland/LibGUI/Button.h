@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Event.h"
 #include "Types.h"
 #include "Widget.h"
 #include "functional"
@@ -13,18 +14,17 @@ namespace GUI {
 class Button : public Widget {
 public:
     Button(std::function<void()> onClickCallback, Widget* parent = nullptr);
-
-    void onMouseDown(int key, int x, int y) override;
-    void onMouseUp(int key, int x, int y) override;
-
-    void onPaint() override;
-    void onMouseMove(int x, int y) override;
-
     std::function<void()> onClick;
 
     void setText(const ADS::String& text);
 
     virtual const char* name() const override { return "Button"; }
+
+protected:
+    virtual void onPaintEvent(Event& event) override;
+    virtual void onMouseDownEvent(MouseEvent& event) override;
+    virtual void onMouseUpEvent(MouseEvent& event) override;
+    virtual void onMouseMoveEvent(MouseEvent& event) override;
 
 private:
     ADS::String m_text;

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Point.h"
 #include "Types.h"
 
 namespace GUI {
@@ -18,6 +19,8 @@ public:
         MouseMove,
         KeyDown,
         KeyUp,
+        Paint,
+        Quit,
     };
 
     explicit Event(Type type)
@@ -27,8 +30,38 @@ public:
 
     [[nodiscard]] Type type() const { return m_type; }
 
+    bool isMouseEvent() const { return m_type == Type::MouseDown || m_type == Type::MouseUp || m_type == Type::MouseMove; }
+    bool isKeyboardEvent() const { return m_type == Type::KeyUp || m_type == Type::KeyDown; }
+    bool isPaintEvent() const { return m_type == Type::Paint; }
+
 private:
     Type m_type { Type::Invalid };
+};
+
+enum class MouseButton {
+    NoButton,
+    Left,
+    Right,
+    Middle,
+};
+
+class MouseEvent : public Event {
+public:
+    MouseEvent(Type type, int x, int y, MouseButton button = MouseButton::NoButton)
+        : m_position(x, y)
+        , m_button(button)
+        , Event(type)
+    {
+    }
+
+    [[nodiscard]] int x() const { return m_position.x(); }
+    [[nodiscard]] int y() const { return m_position.y(); }
+    IntPoint position() const { return m_position; }
+    MouseButton button() const { return m_button; }
+
+private:
+    IntPoint m_position;
+    MouseButton m_button;
 };
 
 enum class Key {

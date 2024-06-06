@@ -5,6 +5,7 @@
 #include "WindowManager.h"
 #include "CharacterBitmap.h"
 #include "Painter.h"
+#include "Screen.h"
 #include "Widget.h"
 
 namespace GUI {
@@ -64,6 +65,28 @@ static void paintTaskbar()
     painter.drawFilledRect(TaskbarRect, TaskbarColor);
 }
 
+bool WindowManager::event(Event& event)
+{
+    if (event.isMouseEvent()) {
+        processMouseEvent(static_cast<MouseEvent&>(event));
+        return true;
+    }
+
+    if (event.isKeyboardEvent()) {
+        if (m_activeWindow) {
+            return m_activeWindow->event(event);
+        }
+        return CObject::event(event);
+    }
+
+    if (event.isPaintEvent()) {
+        processPaintEvent(event);
+        return true;
+    }
+
+    return CObject::event(event);
+}
+
 void WindowManager::add(Window& window)
 {
     m_windows.emplace_back(&window);
@@ -91,56 +114,41 @@ void WindowManager::makeActive(Window& window)
     m_activeWindow = &window;
 }
 
-void WindowManager::onMouseDown(int key, int x, int y)
+void WindowManager::processMouseEvent(MouseEvent& event)
 {
-    forEachVisibleWindowFrontToBack([&](Window& window) -> IteratorResult {
-        if (windowTitleBarRect(window).contains(x, y)) {
-            makeActive(window);
-            onWindowTaskBarMouseDown(window, x, y);
-            return IteratorResult::Break;
-        }
-
-        if (window.contains(x, y)) {
-            makeActive(window);
-            window.onMouseDown(key, x - window.rect().x(), y - window.rect().y());
-            return IteratorResult::Break;
-        }
-
-        return IteratorResult::Continue;
-    });
-}
-
-void WindowManager::onMouseMove(int x, int y)
-{
-    if (m_isDraggingWindow) {
-        const int deltaX = x - m_lastMouseDragPos.width();
-        const int deltaY = y - m_lastMouseDragPos.height();
+    if (event.type() == Event::Type::MouseMove && m_isDraggingWindow) {
+        const int deltaX = event.x() - m_lastMouseDragPos.width();
+        const int deltaY = event.y() - m_lastMouseDragPos.height();
         m_activeWindow->moveBy(deltaX, deltaY);
-        m_lastMouseDragPos = { x, y };
+        m_lastMouseDragPos = { event.x(), event.y() };
         return;
     }
 
-    if (m_activeWindow) {
-        m_activeWindow->onMouseMove(x - m_activeWindow->rect().x(), y - m_activeWindow->rect().y());
-    }
-}
-
-void WindowManager::onMouseUp(int key, int x, int y)
-{
-    if (m_isDraggingWindow) {
+    if (event.type() == Event::Type::MouseUp && m_isDraggingWindow) {
         m_isDraggingWindow = false;
         return;
     }
 
     forEachVisibleWindowFrontToBack([&](Window& window) -> IteratorResult {
-        const auto& rect = window.rect();
-        if (windowTitleBarCloseButtonRect(window).contains(x, y)) {
-            remove(window);
-            return IteratorResult::Break;
+        if (event.type() == Event::Type::MouseDown) {
+            if (windowTitleBarRect(window).contains(event.position())) {
+                if (windowTitleBarCloseButtonRect(window).contains(event.position())) {
+                    remove(window);
+                    return IteratorResult::Break;
+                }
+
+                makeActive(window);
+                onWindowTaskBarMouseDown(window, event.x(), event.y());
+                return IteratorResult::Break;
+            }
         }
 
-        if (window.contains(x, y)) {
-            window.onMouseUp(key, x - window.rect().x(), y - window.rect().y());
+        if (window.contains(event.position())) {
+            if (event.type() == Event::Type::MouseDown) {
+                makeActive(window);
+            }
+            MouseEvent mouseEventRelativeToWindow(event.type(), event.x() - window.rect().x(), event.y() - window.rect().y());
+            window.event(mouseEventRelativeToWindow);
             return IteratorResult::Break;
         }
 
@@ -148,31 +156,23 @@ void WindowManager::onMouseUp(int key, int x, int y)
     });
 }
 
-void WindowManager::onKeyDown(const KeyEvent& event)
+void WindowManager::processPaintEvent(Event& event)
 {
-    if (m_activeWindow) {
-        m_activeWindow->onKeyDown(event);
-    }
-}
+    // FIXME: handle outside of windows manager
+    GUI::Screen::the().fill(GUI::Colors::White);
 
-void WindowManager::onKeyUp(const KeyEvent& event)
-{
-    if (m_activeWindow) {
-        m_activeWindow->onKeyUp(event);
-    }
-}
-
-void WindowManager::paint()
-{
     forEachVisibleWindowBackToFront([&](GUI::Window& window) -> GUI::IteratorResult {
-        paintWindow(window);
+        paintWindow(window, event);
         return GUI::IteratorResult::Continue;
     });
 
     paintTaskbar();
+
+    // FIXME: handle outside of windows manager;
+    GUI::Screen::the().update();
 }
 
-void WindowManager::paintWindow(Window& window)
+void WindowManager::paintWindow(Window& window, Event& event)
 {
     const bool isActiveWindow = m_activeWindow == &window;
 
@@ -190,7 +190,7 @@ void WindowManager::paintWindow(Window& window)
     painter.drawText(windowTitleBarRect(window), window.title(), TextAlignment::Center, isActiveWindow ? ActiveWindowTitleBarTextColor : InactiveTitleBarTextColor);
     painter.drawRect(windowFrameRect(window), isActiveWindow ? Colors::Black : InactiveTitleBarColor);
 
-    window.onPaint();
+    window.event(event);
 }
 
 void WindowManager::onWindowTaskBarMouseDown(Window& window, int x, int y)

@@ -13,45 +13,61 @@ class Application::EventLoopImpl {
 public:
     int exec()
     {
-        // TODO: Map and queue sdl events to application events and call WindowManager.
-
-        bool quit = false;
-        while (!quit) {
-            SDL_Event event;
-            while (SDL_PollEvent(&event)) {
-                switch (event.type) {
-                case SDL_QUIT:
-                    quit = true;
-                    break;
-                case SDL_MOUSEBUTTONUP:
-                    GUI::WindowManager::the().onMouseUp(event.button.button, event.motion.x, event.motion.y);
-                    break;
-                case SDL_MOUSEBUTTONDOWN:
-                    GUI::WindowManager::the().onMouseDown(event.button.button, event.motion.x, event.motion.y);
-                    break;
-                case SDL_MOUSEMOTION: {
-                    int mouseX = event.motion.x;
-                    int mouseY = event.motion.y;
-                    GUI::WindowManager::the().onMouseMove(mouseX, mouseY);
-                    break;
-                }
-                case SDL_KEYDOWN:
-                case SDL_KEYUP:
-                    handleKey(event.key);
-                    break;
+        while (true) {
+            processSDLEvents();
+            if (!m_eventQueue.empty()) {
+                ADS::Vector<QueuedEvent> queue = std::move(m_eventQueue);
+                for (auto& queuedEvent : queue) {
+                    if (queuedEvent.receiver) {
+                        queuedEvent.receiver->event(*queuedEvent.event);
+                    } else {
+                        if (queuedEvent.event->type() == Event::Type::Quit) {
+                            return 0;
+                        }
+                        std::cerr << "event type " << static_cast<int>(queuedEvent.event->type()) << " has no receiver." << std::endl;
+                        return 1;
+                    }
                 }
             }
-
-            // FIXME: Only handle the paint event here and remove the rest.
-            GUI::Screen::the().fill(GUI::Colors::White);
-            GUI::WindowManager::the().paint();
-            GUI::Screen::the().update();
         }
+    }
 
-        return 0;
+    void postEvent(CObject* receiver, ADS::UniquePtr<Event>&& event)
+    {
+        m_eventQueue.push_back({ receiver, std::move(event) });
     }
 
 private:
+    void processSDLEvents()
+    {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+            case SDL_QUIT:
+                Application::instance().postEvent(nullptr, ADS::UniquePtr<Event>(new Event(Event::Type::Quit)));
+                break;
+            case SDL_MOUSEBUTTONUP:
+                // FIXME: map mouse buttons
+                Application::instance().postEvent(&GUI::WindowManager::the(), ADS::UniquePtr<MouseEvent>(new MouseEvent(Event::Type::MouseUp, event.motion.x, event.motion.y, MouseButton::Left)));
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                // FIXME: map mouse buttons
+                Application::instance().postEvent(&GUI::WindowManager::the(), ADS::UniquePtr<MouseEvent>(new MouseEvent(Event::Type::MouseDown, event.motion.x, event.motion.y, MouseButton::Left)));
+                break;
+            case SDL_MOUSEMOTION:
+                Application::instance().postEvent(&GUI::WindowManager::the(), ADS::UniquePtr<MouseEvent>(new MouseEvent(Event::Type::MouseMove, event.motion.x, event.motion.y)));
+                break;
+            case SDL_KEYDOWN:
+            case SDL_KEYUP:
+                handleKey(event.key);
+                break;
+            }
+        }
+
+        // FIXME: Don't repaint every "frame"
+        Application::instance().postEvent(&GUI::WindowManager::the(), ADS::UniquePtr<Event>(new Event(Event::Type::Paint)));
+    }
+
     void handleKey(const SDL_KeyboardEvent& event)
     {
         Key key = Key::Unknown;
@@ -83,16 +99,33 @@ private:
 
         // FIXME: Handle key modifiers
         if (event.type == SDL_KEYDOWN) {
-            GUI::WindowManager::the().onKeyDown(KeyEvent { Event::Type::KeyDown, key, text });
+            Application::instance().postEvent(&GUI::WindowManager::the(), ADS::UniquePtr<KeyEvent>(new KeyEvent(Event::Type::KeyDown, key, text)));
         } else if (event.type == SDL_KEYUP) {
-            GUI::WindowManager::the().onKeyUp(KeyEvent { Event::Type::KeyDown, key, text });
+            Application::instance().postEvent(&GUI::WindowManager::the(), ADS::UniquePtr<KeyEvent>(new KeyEvent(Event::Type::KeyUp, key, text)));
         }
     }
+
+    struct QueuedEvent {
+        CObject* receiver { nullptr };
+        ADS::UniquePtr<Event> event;
+    };
+
+    ADS::Vector<QueuedEvent> m_eventQueue;
 };
+
+static Application* s_instance = nullptr;
+
+Application& Application::instance()
+{
+    ASSERT(s_instance != nullptr);
+    return *s_instance;
+}
 
 Application::Application()
     : m_impl(new Application::EventLoopImpl())
 {
+    ASSERT(s_instance == nullptr);
+    s_instance = this;
 }
 
 Application::~Application() = default;
@@ -100,6 +133,11 @@ Application::~Application() = default;
 int Application::exec()
 {
     return m_impl->exec();
+}
+
+void Application::postEvent(CObject* receiver, ADS::UniquePtr<Event>&& event)
+{
+    m_impl->postEvent(receiver, std::move(event));
 }
 
 } // GUI

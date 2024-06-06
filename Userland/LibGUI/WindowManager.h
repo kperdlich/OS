@@ -17,7 +17,7 @@ enum class IteratorResult {
 
 class Painter;
 
-class WindowManager final {
+class WindowManager final : public CObject {
 public:
     static WindowManager& the()
     {
@@ -29,24 +29,22 @@ public:
     void makeActive(Window& window);
     void remove(Window& window);
 
+    virtual bool event(Event& event) override;
+
     template<typename Callback>
     void forEachVisibleWindowBackToFront(Callback callback);
 
     template<typename Callback>
     void forEachVisibleWindowFrontToBack(Callback callback);
 
-    void onMouseMove(int x, int y);
-    void onMouseDown(int key, int x, int y);
-    void onMouseUp(int key, int x, int y);
-    void onKeyDown(const KeyEvent& event);
-    void onKeyUp(const KeyEvent& event);
-    void paint();
-
 private:
+    void processMouseEvent(MouseEvent& event);
+    void processPaintEvent(Event& event);
+
     WindowManager() = default;
 
     void onWindowTaskBarMouseDown(Window& window, int x, int y);
-    void paintWindow(Window& window);
+    void paintWindow(Window& window, Event& event);
 
 private:
     ADS::Vector<Window*> m_windows;
