@@ -16,7 +16,11 @@ public:
         while (true) {
             processSDLEvents();
             if (!m_eventQueue.empty()) {
-                ADS::Vector<QueuedEvent> queue = std::move(m_eventQueue);
+                ADS::Vector<QueuedEvent> queue;
+                {
+                    const ADS::LockGuard<ADS::Mutex> mutex(m_mutex);
+                    queue = std::move(m_eventQueue);
+                }
                 for (auto& queuedEvent : queue) {
                     if (queuedEvent.receiver) {
                         queuedEvent.receiver->event(*queuedEvent.event);
@@ -34,6 +38,7 @@ public:
 
     void postEvent(CObject* receiver, ADS::UniquePtr<Event>&& event)
     {
+        const ADS::LockGuard<ADS::Mutex> mutex(m_mutex);
         m_eventQueue.push_back({ receiver, std::move(event) });
     }
 
@@ -111,6 +116,7 @@ private:
     };
 
     ADS::Vector<QueuedEvent> m_eventQueue;
+    ADS::Mutex m_mutex;
 };
 
 static Application* s_instance = nullptr;

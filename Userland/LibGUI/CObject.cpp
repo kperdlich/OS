@@ -3,6 +3,7 @@
 //
 
 #include "CObject.h"
+#include "TimerManager.h"
 
 namespace GUI {
 
@@ -28,7 +29,23 @@ CObject::~CObject()
 
 bool CObject::event(Event& event)
 {
+    switch (event.type()) {
+    case Event::Type::Timer:
+        onTimerEvent(static_cast<TimerEvent&>(event));
+        return true;
+    }
+
     return false;
+}
+
+int CObject::startTimer(int intervalMs)
+{
+    return TimerManager::instance().startTimer(intervalMs, *this);
+}
+
+void CObject::killTimer(int id)
+{
+    TimerManager::instance().killTimer(id);
 }
 
 void CObject::addChild(CObject& child)
@@ -59,6 +76,10 @@ void CObject::setParent(CObject* parent)
     if (m_parent) {
         m_parent->addChild(*this);
     }
+}
+
+void CObject::onTimerEvent(TimerEvent& event)
+{
 }
 
 bool CObject::isWidgetType() const

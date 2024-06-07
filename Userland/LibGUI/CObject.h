@@ -5,10 +5,9 @@
 #pragma once
 
 #include "Types.h"
+#include "Event.h"
 
 namespace GUI {
-
-class Event;
 
 class CObject {
 public:
@@ -16,8 +15,12 @@ public:
     virtual ~CObject();
 
     virtual bool event(Event& event);
+    virtual void onTimerEvent(TimerEvent& event);
     virtual bool isWidgetType() const;
     virtual bool isWindowType() const;
+
+    int startTimer(int intervalMs);
+    void killTimer(int id);
 
     void setParent(CObject* parent);
     inline CObject* parent() { return m_parent; };

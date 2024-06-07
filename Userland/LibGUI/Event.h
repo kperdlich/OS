@@ -20,6 +20,7 @@ public:
         KeyDown,
         KeyUp,
         Paint,
+        Timer,
         Quit,
     };
 
@@ -89,6 +90,14 @@ public:
 private:
     Key m_key;
     ADS::String m_text;
+};
+
+class TimerEvent : public Event {
+public:
+    TimerEvent()
+        : Event(Type::Timer)
+    {
+    }
 };
 
 }
