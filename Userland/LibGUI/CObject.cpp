@@ -20,8 +20,8 @@ CObject::~CObject()
         m_parent->removeChild(*this);
     }
 
-    const ADS::Vector<CObject*> children_to_remove = std::move(m_children);
-    for (CObject* child : children_to_remove) {
+    const ADS::Vector<CObject*> childrenToRemove = std::move(m_children);
+    for (CObject* child : childrenToRemove) {
         delete child;
     }
 }
@@ -59,6 +59,16 @@ void CObject::setParent(CObject* parent)
     if (m_parent) {
         m_parent->addChild(*this);
     }
+}
+
+bool CObject::isWidgetType() const
+{
+    return false;
+}
+
+bool CObject::isWindowType() const
+{
+    return false;
 }
 
 } // GUI

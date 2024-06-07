@@ -22,6 +22,7 @@ public:
     ~Window() override;
 
     virtual bool event(Event& event) override;
+    virtual bool isWindowType() const override;
 
     void show();
     inline bool isVisible() { return m_isVisible; }

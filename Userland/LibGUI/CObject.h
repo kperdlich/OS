@@ -16,6 +16,8 @@ public:
     virtual ~CObject();
 
     virtual bool event(Event& event);
+    virtual bool isWidgetType() const;
+    virtual bool isWindowType() const;
 
     void setParent(CObject* parent);
     inline CObject* parent() { return m_parent; };

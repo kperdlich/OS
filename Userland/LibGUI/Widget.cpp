@@ -59,8 +59,10 @@ bool Widget::hits(int x, int y, HitResult& result)
 void Widget::onPaintEvent(Event& event)
 {
     for (auto& child : m_children) {
-        Widget* childWidget = static_cast<Widget*>(child);
-        childWidget->onPaintEvent(event);
+        if (child->isWidgetType()) {
+            Widget* childWidget = static_cast<Widget*>(child);
+            childWidget->onPaintEvent(event);
+        }
     }
 }
 
@@ -86,8 +88,10 @@ void Widget::setWindow(Window* window)
 {
     m_window = window;
     for (auto& child : m_children) {
-        Widget* childWidget = static_cast<Widget*>(child);
-        childWidget->setWindow(window);
+        if (child->isWidgetType()) {
+            Widget* childWidget = static_cast<Widget*>(child);
+            childWidget->setWindow(window);
+        }
     }
 }
 
@@ -101,6 +105,11 @@ void Widget::setFocus()
 {
     ASSERT(m_window != nullptr);
     m_window->setFocusedWidget(this);
+}
+
+bool Widget::isWidgetType() const
+{
+    return true;
 }
 
 void Widget::onKeyDownEvent(KeyEvent& event)

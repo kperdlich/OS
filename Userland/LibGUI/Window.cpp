@@ -56,6 +56,11 @@ bool Window::event(Event& event)
     return CObject::event(event);
 }
 
+bool Window::isWindowType() const
+{
+    return true;
+}
+
 bool Window::contains(IntPoint point)
 {
     return m_rect.contains(point);
