@@ -19,7 +19,7 @@ class Painter;
 
 class WindowManager final : public CObject {
 public:
-    static WindowManager& the()
+    static WindowManager& instance()
     {
         static WindowManager instance;
         return instance;

@@ -53,14 +53,14 @@ private:
                 break;
             case SDL_MOUSEBUTTONUP:
                 // FIXME: map mouse buttons
-                Application::instance().postEvent(&GUI::WindowManager::the(), ADS::UniquePtr<MouseEvent>(new MouseEvent(Event::Type::MouseUp, event.motion.x, event.motion.y, MouseButton::Left)));
+                Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<MouseEvent>(new MouseEvent(Event::Type::MouseUp, event.motion.x, event.motion.y, MouseButton::Left)));
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 // FIXME: map mouse buttons
-                Application::instance().postEvent(&GUI::WindowManager::the(), ADS::UniquePtr<MouseEvent>(new MouseEvent(Event::Type::MouseDown, event.motion.x, event.motion.y, MouseButton::Left)));
+                Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<MouseEvent>(new MouseEvent(Event::Type::MouseDown, event.motion.x, event.motion.y, MouseButton::Left)));
                 break;
             case SDL_MOUSEMOTION:
-                Application::instance().postEvent(&GUI::WindowManager::the(), ADS::UniquePtr<MouseEvent>(new MouseEvent(Event::Type::MouseMove, event.motion.x, event.motion.y)));
+                Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<MouseEvent>(new MouseEvent(Event::Type::MouseMove, event.motion.x, event.motion.y)));
                 break;
             case SDL_KEYDOWN:
             case SDL_KEYUP:
@@ -70,7 +70,7 @@ private:
         }
 
         // FIXME: Don't repaint every "frame"
-        Application::instance().postEvent(&GUI::WindowManager::the(), ADS::UniquePtr<Event>(new Event(Event::Type::Paint)));
+        Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<Event>(new Event(Event::Type::Paint)));
     }
 
     void handleKey(const SDL_KeyboardEvent& event)
@@ -104,9 +104,9 @@ private:
 
         // FIXME: Handle key modifiers
         if (event.type == SDL_KEYDOWN) {
-            Application::instance().postEvent(&GUI::WindowManager::the(), ADS::UniquePtr<KeyEvent>(new KeyEvent(Event::Type::KeyDown, key, text)));
+            Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<KeyEvent>(new KeyEvent(Event::Type::KeyDown, key, text)));
         } else if (event.type == SDL_KEYUP) {
-            Application::instance().postEvent(&GUI::WindowManager::the(), ADS::UniquePtr<KeyEvent>(new KeyEvent(Event::Type::KeyUp, key, text)));
+            Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<KeyEvent>(new KeyEvent(Event::Type::KeyUp, key, text)));
         }
     }
 

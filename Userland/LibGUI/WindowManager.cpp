@@ -159,7 +159,7 @@ void WindowManager::processMouseEvent(MouseEvent& event)
 void WindowManager::processPaintEvent(Event& event)
 {
     // FIXME: handle outside of windows manager
-    GUI::Screen::the().fill(GUI::Colors::White);
+    GUI::Screen::instance().fill(GUI::Colors::White);
 
     forEachVisibleWindowBackToFront([&](GUI::Window& window) -> GUI::IteratorResult {
         paintWindow(window, event);
@@ -169,7 +169,7 @@ void WindowManager::processPaintEvent(Event& event)
     paintTaskbar();
 
     // FIXME: handle outside of windows manager;
-    GUI::Screen::the().update();
+    GUI::Screen::instance().update();
 }
 
 void WindowManager::paintWindow(Window& window, Event& event)

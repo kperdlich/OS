@@ -12,7 +12,7 @@ namespace GUI {
 
 class Screen final {
 public:
-    static Screen& the()
+    static Screen& instance()
     {
         static Screen instance;
         return instance;

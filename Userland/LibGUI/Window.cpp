@@ -22,7 +22,7 @@ Window::~Window()
         m_centralWidget = nullptr;
     }
 
-    GUI::WindowManager::the().remove(*this);
+    GUI::WindowManager::instance().remove(*this);
 }
 
 bool Window::event(Event& event)
@@ -94,7 +94,7 @@ void Window::setCentralWidget(Widget& widget)
 
 void Window::show()
 {
-    GUI::WindowManager::the().add(*this);
+    GUI::WindowManager::instance().add(*this);
 }
 
 void Window::setFocusedWidget(Widget* widget)
