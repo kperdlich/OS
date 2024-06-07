@@ -107,10 +107,14 @@ void WindowManager::remove(Window& window)
 
 void WindowManager::makeActive(Window& window)
 {
+    if (m_activeWindow == &window)
+        return;
+
     // FIXME: Handle z-sorting better
     remove(window);
     add(window);
 
+    // FIXME: dispatch window events
     m_activeWindow = &window;
 }
 

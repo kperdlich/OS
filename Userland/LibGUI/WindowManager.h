@@ -37,6 +37,8 @@ public:
     template<typename Callback>
     void forEachVisibleWindowFrontToBack(Callback callback);
 
+    Window* activeWindow() const { return m_activeWindow; }
+
 private:
     void processMouseEvent(MouseEvent& event);
     void processPaintEvent(Event& event);

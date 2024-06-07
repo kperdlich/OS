@@ -22,12 +22,16 @@ public:
 
 protected:
     virtual void onPaintEvent(Event& event) override;
+    virtual void onTimerEvent(TimerEvent& event) override;
     virtual void onKeyDownEvent(KeyEvent& event) override;
-    virtual void onMouseDownEvent(MouseEvent& event) override;
+    virtual void onFocusInEvent(FocusEvent& event) override;
+    virtual void onFocusOutEvent(FocusEvent& event) override;
 
 private:
     ADS::String m_text;
     int m_cursorOffset { 0 };
+    int m_blinkTimerId { 0 };
+    bool m_isCursorVisible { false };
 };
 
 } // GUI

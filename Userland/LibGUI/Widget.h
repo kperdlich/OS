@@ -6,6 +6,7 @@
 
 #include "CObject.h"
 #include "Event.h"
+#include "FocusReason.h"
 #include "Rect.h"
 
 namespace GUI {
@@ -36,7 +37,7 @@ public:
     bool hits(int x, int y, HitResult& result);
 
     bool hasFocus() const;
-    void setFocus();
+    void setFocus(FocusReason reason);
 
     virtual const char* name() const { return "Widget"; }
 
@@ -47,6 +48,8 @@ protected:
     virtual void onMouseUpEvent(MouseEvent& event);
     virtual void onKeyDownEvent(KeyEvent& event);
     virtual void onKeyUpEvent(KeyEvent& event);
+    virtual void onFocusInEvent(FocusEvent& event);
+    virtual void onFocusOutEvent(FocusEvent& event);
 
 protected:
     Window* m_window;

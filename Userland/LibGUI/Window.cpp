@@ -40,16 +40,14 @@ bool Window::event(Event& event)
     }
 
     if (event.isKeyboardEvent()) {
-        if (m_focusedWidget) {
+        if (m_focusedWidget)
             return m_focusedWidget->event(event);
-        }
         return CObject::event(event);
     }
 
     if (event.isPaintEvent()) {
-        if (m_centralWidget) {
+        if (m_centralWidget)
             return m_centralWidget->event(event);
-        }
         return CObject::event(event);
     }
 
@@ -79,13 +77,11 @@ void Window::setRect(const IntRect& rect)
 
 void Window::setCentralWidget(Widget& widget)
 {
-    if (&widget == m_centralWidget) {
+    if (&widget == m_centralWidget)
         return;
-    }
 
-    if (m_centralWidget) {
+    if (m_centralWidget)
         m_centralWidget->setParent(nullptr);
-    }
 
     m_centralWidget = &widget;
     m_centralWidget->setParent(this);
@@ -97,13 +93,23 @@ void Window::show()
     GUI::WindowManager::instance().add(*this);
 }
 
-void Window::setFocusedWidget(Widget* widget)
+void Window::setFocusedWidget(Widget* widget, FocusReason reason)
 {
     if (m_focusedWidget == widget)
         return;
 
-    // FIXME: handle focus event on old and new widget
+    if (m_focusedWidget)
+        Application::instance().postEvent(m_focusedWidget, ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusOut, reason)));
+
     m_focusedWidget = widget;
+
+    if (m_focusedWidget)
+        Application::instance().postEvent(m_focusedWidget, ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusIn, reason)));
+}
+
+bool Window::isActive() const
+{
+    return WindowManager::instance().activeWindow() == this;
 }
 
 } // GUI

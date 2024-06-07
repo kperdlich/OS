@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "FocusReason.h"
 #include "Point.h"
 #include "Types.h"
 
@@ -19,6 +20,8 @@ public:
         MouseMove,
         KeyDown,
         KeyUp,
+        FocusIn,
+        FocusOut,
         Paint,
         Timer,
         Quit,
@@ -98,6 +101,18 @@ public:
         : Event(Type::Timer)
     {
     }
+};
+
+class FocusEvent : public Event {
+public:
+    FocusEvent(Type type, FocusReason focusReason)
+        : m_focusReason(focusReason)
+        , Event(type)
+    {
+    }
+
+private:
+    FocusReason m_focusReason;
 };
 
 }

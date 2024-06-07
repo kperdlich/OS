@@ -11,6 +11,7 @@
 #include "Painter.h"
 #include "Rect.h"
 #include "Size.h"
+#include "FocusReason.h"
 
 namespace GUI {
 
@@ -40,7 +41,9 @@ public:
     inline Widget* centralWidget() { return m_centralWidget; };
 
     Widget* focusedWidget() const { return m_focusedWidget; }
-    void setFocusedWidget(Widget* widget);
+    void setFocusedWidget(Widget* widget, FocusReason reason);
+
+    bool isActive() const;
 
 private:
     ADS::String m_title {};

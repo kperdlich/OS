@@ -20,6 +20,8 @@ TextBox::TextBox(const ADS::String& text, Widget* parent)
 
 void TextBox::onPaintEvent(Event& event)
 {
+    Widget::onPaintEvent(event);
+
     static const int cursorMargin = 5;
 
     Painter painter(this);
@@ -30,7 +32,7 @@ void TextBox::onPaintEvent(Event& event)
     textRect.moveBy(cursorMargin, 0);
     painter.drawText(textRect, m_text, TextAlignment::Left, Colors::Black);
 
-    if (hasFocus()) {
+    if (m_isCursorVisible && hasFocus()) {
         // FIXME: get this from the font
         static const int fontWidth = 8;
         IntRect cursorRect = m_windowRelativeRect;
@@ -39,8 +41,6 @@ void TextBox::onPaintEvent(Event& event)
         cursorRect.moveBy(cursorMargin + (m_cursorOffset * fontWidth), (m_windowRelativeRect.height() - cursorRect.height()) / 2);
         painter.drawFilledRect(cursorRect, Colors::Black);
     }
-
-    Widget::onPaintEvent(event);
 }
 
 void TextBox::onKeyDownEvent(KeyEvent& event)
@@ -64,9 +64,22 @@ void TextBox::setText(const ADS::String& text)
     m_cursorOffset = static_cast<int>(m_text.length());
 }
 
-void TextBox::onMouseDownEvent(MouseEvent& event)
+void TextBox::onFocusInEvent(FocusEvent& event)
 {
-    Widget::onMouseDownEvent(event);
+    m_isCursorVisible = true;
+    m_blinkTimerId = startTimer(530);
+}
+
+void TextBox::onFocusOutEvent(FocusEvent& event)
+{
+    killTimer(m_blinkTimerId);
+    m_blinkTimerId = 0;
+    m_isCursorVisible = false;
+}
+
+void TextBox::onTimerEvent(TimerEvent& event)
+{
+    m_isCursorVisible = !m_isCursorVisible;
 }
 
 } // GUI

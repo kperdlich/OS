@@ -15,6 +15,7 @@ bool Widget::event(Event& event)
 {
     switch (event.type()) {
     case Event::Type::MouseDown:
+        setFocus(FocusReason::Mouse);
         onMouseDownEvent(static_cast<MouseEvent&>(event));
         return true;
     case Event::Type::MouseUp:
@@ -29,7 +30,19 @@ bool Widget::event(Event& event)
     case Event::Type::KeyUp:
         onKeyUpEvent(static_cast<KeyEvent&>(event));
         return true;
+    case Event::Type::FocusIn:
+        onFocusInEvent(static_cast<FocusEvent&>(event));
+        return true;
+    case Event::Type::FocusOut:
+        onFocusOutEvent(static_cast<FocusEvent&>(event));
+        return true;
     case Event::Type::Paint:
+        for (auto& child : m_children) {
+            if (child->isWidgetType()) {
+                Widget* childWidget = static_cast<Widget*>(child);
+                childWidget->onPaintEvent(event);
+            }
+        }
         onPaintEvent(event);
         return true;
     default:
@@ -58,12 +71,6 @@ bool Widget::hits(int x, int y, HitResult& result)
 
 void Widget::onPaintEvent(Event& event)
 {
-    for (auto& child : m_children) {
-        if (child->isWidgetType()) {
-            Widget* childWidget = static_cast<Widget*>(child);
-            childWidget->onPaintEvent(event);
-        }
-    }
 }
 
 void Widget::onMouseMoveEvent(MouseEvent& event)
@@ -72,7 +79,6 @@ void Widget::onMouseMoveEvent(MouseEvent& event)
 
 void Widget::onMouseDownEvent(MouseEvent& event)
 {
-    setFocus();
 }
 
 void Widget::onMouseUpEvent(MouseEvent& event)
@@ -98,13 +104,13 @@ void Widget::setWindow(Window* window)
 bool Widget::hasFocus() const
 {
     ASSERT(m_window != nullptr);
-    return m_window->focusedWidget() == this;
+    return m_window->focusedWidget() == this && m_window->isActive();
 }
 
-void Widget::setFocus()
+void Widget::setFocus(FocusReason reason)
 {
     ASSERT(m_window != nullptr);
-    m_window->setFocusedWidget(this);
+    m_window->setFocusedWidget(this, reason);
 }
 
 bool Widget::isWidgetType() const
@@ -117,6 +123,14 @@ void Widget::onKeyDownEvent(KeyEvent& event)
 }
 
 void Widget::onKeyUpEvent(KeyEvent& event)
+{
+}
+
+void Widget::onFocusOutEvent(FocusEvent& event)
+{
+}
+
+void Widget::onFocusInEvent(FocusEvent& event)
 {
 }
 
