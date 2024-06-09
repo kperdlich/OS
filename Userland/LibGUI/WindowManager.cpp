@@ -141,7 +141,7 @@ void WindowManager::processMouseEvent(MouseEvent& event)
         return;
     }
 
-    forEachVisibleWindowFrontToBack([&](Window& window) -> IteratorResult {
+    const IteratorResult result = forEachVisibleWindowFrontToBack([&](Window& window) -> IteratorResult {
         if (event.type() == Event::Type::MouseDown) {
             if (windowTitleBarRect(window).contains(event.position())) {
                 if (windowTitleBarCloseButtonRect(window).contains(event.position())) {
@@ -166,6 +166,10 @@ void WindowManager::processMouseEvent(MouseEvent& event)
 
         return IteratorResult::Continue;
     });
+
+    const bool didHitNoWindow = event.type() == Event::Type::MouseDown && result != IteratorResult::Break;
+    if (didHitNoWindow)
+        makeActive(nullptr);
 }
 
 void WindowManager::processPaintEvent(Event& event)

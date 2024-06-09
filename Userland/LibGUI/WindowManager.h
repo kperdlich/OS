@@ -35,7 +35,7 @@ public:
     void forEachVisibleWindowBackToFront(Callback callback);
 
     template<typename Callback>
-    void forEachVisibleWindowFrontToBack(Callback callback);
+    IteratorResult forEachVisibleWindowFrontToBack(Callback callback);
 
     Window* activeWindow() const { return m_activeWindow; }
 
@@ -69,15 +69,16 @@ inline void WindowManager::forEachVisibleWindowBackToFront(Callback callback)
 }
 
 template<typename Callback>
-inline void WindowManager::forEachVisibleWindowFrontToBack(Callback callback)
+inline IteratorResult WindowManager::forEachVisibleWindowFrontToBack(Callback callback)
 {
     for (auto it = m_windows.rbegin(); it != m_windows.rend(); ++it) {
         if (!(*it)->isVisible())
             continue;
         const auto result = callback(**it);
         if (result == IteratorResult::Break)
-            break;
+            return IteratorResult::Break;
     }
+    return IteratorResult::Continue;
 }
 
 } // GUI
