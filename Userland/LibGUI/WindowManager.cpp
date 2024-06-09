@@ -3,6 +3,7 @@
 //
 
 #include "WindowManager.h"
+#include "Application.h"
 #include "CharacterBitmap.h"
 #include "Painter.h"
 #include "Screen.h"
@@ -105,17 +106,24 @@ void WindowManager::remove(Window& window)
     }
 }
 
-void WindowManager::makeActive(Window& window)
+void WindowManager::makeActive(Window* window)
 {
-    if (m_activeWindow == &window)
+    if (m_activeWindow == window)
         return;
 
     // FIXME: Handle z-sorting better
-    remove(window);
-    add(window);
+    if (window) {
+        remove(*window);
+        add(*window);
+    }
 
-    // FIXME: dispatch window events
-    m_activeWindow = &window;
+    if (m_activeWindow)
+        Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusOut, FocusReason::ActiveWindow)));
+
+    m_activeWindow = window;
+
+    if (m_activeWindow)
+        Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusIn, FocusReason::ActiveWindow)));
 }
 
 void WindowManager::processMouseEvent(MouseEvent& event)
@@ -141,7 +149,7 @@ void WindowManager::processMouseEvent(MouseEvent& event)
                     return IteratorResult::Break;
                 }
 
-                makeActive(window);
+                makeActive(&window);
                 onWindowTaskBarMouseDown(window, event.x(), event.y());
                 return IteratorResult::Break;
             }
@@ -149,7 +157,7 @@ void WindowManager::processMouseEvent(MouseEvent& event)
 
         if (window.contains(event.position())) {
             if (event.type() == Event::Type::MouseDown) {
-                makeActive(window);
+                makeActive(&window);
             }
             MouseEvent mouseEventRelativeToWindow(event.type(), event.x() - window.rect().x(), event.y() - window.rect().y());
             window.event(mouseEventRelativeToWindow);

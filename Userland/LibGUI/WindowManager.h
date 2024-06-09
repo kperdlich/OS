@@ -26,7 +26,7 @@ public:
     }
 
     void add(Window& window);
-    void makeActive(Window& window);
+    void makeActive(Window* window);
     void remove(Window& window);
 
     virtual bool event(Event& event) override;

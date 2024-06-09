@@ -86,6 +86,9 @@ void Window::setCentralWidget(Widget& widget)
     m_centralWidget = &widget;
     m_centralWidget->setParent(this);
     m_centralWidget->setWindow(this);
+
+    if (!m_focusedWidget)
+        m_focusedWidget = m_centralWidget;
 }
 
 void Window::show()
