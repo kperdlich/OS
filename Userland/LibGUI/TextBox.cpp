@@ -20,25 +20,30 @@ TextBox::TextBox(const ADS::String& text, Widget* parent)
 
 void TextBox::onPaintEvent(Event& event)
 {
-    Widget::onPaintEvent(event);
-
     static const int cursorMargin = 5;
 
     Painter painter(this);
     painter.drawFilledRect(m_windowRelativeRect, Colors::White);
     painter.drawRect(m_windowRelativeRect, Colors::Black);
 
+    // Add TextBox margin
     IntRect textRect = m_windowRelativeRect;
     textRect.moveBy(cursorMargin, 0);
-    painter.drawText(textRect, m_text, TextAlignment::Left, Colors::Black);
+    textRect.setWidth(textRect.width() - cursorMargin);
+
+    const int maxVisibleChars = textRect.width() / fontWidth();
+    const int firstVisibleChar = ADS::max(m_cursorOffset - maxVisibleChars, 0);
+    const int charsToDisplay = ADS::min(static_cast<int>(m_text.length()) - firstVisibleChar, maxVisibleChars);
+    const ADS::String visibleText = m_text.substr(firstVisibleChar, charsToDisplay);
+
+    painter.drawText(textRect, visibleText, TextAlignment::Left, Colors::Black);
 
     if (m_isCursorVisible && hasFocus()) {
-        // FIXME: get this from the font
-        static const int fontWidth = 8;
-        IntRect cursorRect = m_windowRelativeRect;
-        cursorRect.setHeight(m_windowRelativeRect.height() - (2 * cursorMargin));
+        IntRect cursorRect = textRect;
+        cursorRect.setHeight(textRect.height() - (2 * cursorMargin));
         cursorRect.setWidth(1);
-        cursorRect.moveBy(cursorMargin + (m_cursorOffset * fontWidth), (m_windowRelativeRect.height() - cursorRect.height()) / 2);
+        const int newCursorX = (m_cursorOffset - firstVisibleChar) * static_cast<int>(fontWidth());
+        cursorRect.moveBy(newCursorX, (textRect.height() - cursorRect.height()) / 2);
         painter.drawFilledRect(cursorRect, Colors::Black);
     }
 }
@@ -47,15 +52,21 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
 {
     if (event.key() == Key::Left) {
         m_cursorOffset = ADS::max(m_cursorOffset - 1, 0);
-    } else if (event.key() == Key::Right) {
-        m_cursorOffset = ADS::min(m_cursorOffset + 1, static_cast<int>(m_text.length()));
-    } else if (event.key() == Key::Backspace) {
-        if (m_cursorOffset > 0 && m_text.length() > 0) {
-            m_text.erase(--m_cursorOffset, 1);
-        }
-    } else {
-        m_text.insert(m_cursorOffset++, event.text());
+        return;
     }
+
+    if (event.key() == Key::Right) {
+        m_cursorOffset = ADS::min(m_cursorOffset + 1, static_cast<int>(m_text.length()));
+        return;
+    }
+
+    if (event.key() == Key::Backspace) {
+        if (m_cursorOffset > 0 && m_text.length() > 0)
+            m_text.erase(--m_cursorOffset, 1);
+        return;
+    }
+
+    m_text.insert(m_cursorOffset++, event.text());
 }
 
 void TextBox::setText(const ADS::String& text)
@@ -80,6 +91,12 @@ void TextBox::onFocusOutEvent(FocusEvent& event)
 void TextBox::onTimerEvent(TimerEvent& event)
 {
     m_isCursorVisible = !m_isCursorVisible;
+}
+
+size_t TextBox::fontWidth()
+{
+    // FIXME: get this from the font
+    return 8;
 }
 
 } // GUI

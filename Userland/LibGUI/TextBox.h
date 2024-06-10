@@ -28,6 +28,9 @@ protected:
     virtual void onFocusOutEvent(FocusEvent& event) override;
 
 private:
+    static size_t fontWidth() ;
+
+private:
     ADS::String m_text;
     int m_cursorOffset { 0 };
     int m_blinkTimerId { 0 };
