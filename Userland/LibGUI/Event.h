@@ -6,6 +6,7 @@
 
 #include "FocusReason.h"
 #include "Point.h"
+#include "Size.h"
 #include "Types.h"
 
 namespace GUI {
@@ -22,6 +23,7 @@ public:
         KeyUp,
         FocusIn,
         FocusOut,
+        Resize,
         Paint,
         Timer,
         Quit,
@@ -88,7 +90,7 @@ public:
     }
 
     [[nodiscard]] Key key() const { return m_key; }
-    [[nodiscard]] ADS::String text() const { return m_text; }
+    [[nodiscard]] const ADS::String& text() const { return m_text; }
 
 private:
     Key m_key;
@@ -111,8 +113,27 @@ public:
     {
     }
 
+    [[nodiscard]] FocusReason reason() const { return m_focusReason; }
+
 private:
     FocusReason m_focusReason;
+};
+
+class ResizeEvent : public Event {
+public:
+    ResizeEvent(const Size& size, const Size& oldSize)
+        : m_size()
+        , m_oldSize(oldSize)
+        , Event(Type::Resize)
+    {
+    }
+
+    [[nodiscard]] const Size& oldSize() const { return m_oldSize; }
+    [[nodiscard]] const Size& size() const { return m_size; }
+
+private:
+    Size m_size;
+    Size m_oldSize;
 };
 
 }

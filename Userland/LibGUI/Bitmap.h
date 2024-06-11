@@ -18,10 +18,10 @@ class Bitmap final {
 public:
     ~Bitmap();
 
-    static ADS::UniquePtr<Bitmap> createFrom(BitmapFormat format, IntSize size, char* data);
+    static ADS::UniquePtr<Bitmap> createFrom(BitmapFormat format, Size size, char* data);
 
     inline char* data() { return m_data; }
-    inline IntSize size() const { return m_size; }
+    inline Size size() const { return m_size; }
     inline int width() const { return m_size.width(); }
     inline int height() const { return m_size.height(); }
 
@@ -29,10 +29,10 @@ public:
     void fill(GUI::Color color);
 
 private:
-    Bitmap(BitmapFormat format, IntSize size, char* data);
+    Bitmap(BitmapFormat format, Size size, char* data);
 
 private:
-    IntSize m_size;
+    Size m_size;
     BitmapFormat m_format;
     char* m_data { nullptr };
 };

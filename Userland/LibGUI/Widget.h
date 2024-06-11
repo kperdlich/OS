@@ -23,10 +23,10 @@ public:
     void setWindow(Window* window);
     Window* window() const { return m_window; }
 
-    void setWindowRelativeRect(const IntRect& rect);
-    IntRect windowRelativeRect() { return m_windowRelativeRect; }
+    void setWindowRelativeRect(const Rect& rect);
+    Rect windowRelativeRect() { return m_windowRelativeRect; }
 
-    IntRect rect() const { return { 0, 0, m_windowRelativeRect.width(), m_windowRelativeRect.height() }; }
+    Rect rect() const { return { 0, 0, m_windowRelativeRect.width(), m_windowRelativeRect.height() }; }
 
     struct HitResult {
         Widget* widget;
@@ -50,10 +50,11 @@ protected:
     virtual void onKeyUpEvent(KeyEvent& event);
     virtual void onFocusInEvent(FocusEvent& event);
     virtual void onFocusOutEvent(FocusEvent& event);
+    virtual void onResizeEvent(ResizeEvent& event);
 
 protected:
     Window* m_window;
-    IntRect m_windowRelativeRect;
+    Rect m_windowRelativeRect;
 };
 
 } // GUI

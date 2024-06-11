@@ -5,71 +5,75 @@
 #pragma once
 
 #include "Point.h"
+#include "Size.h"
 #include "Types.h"
 
 namespace GUI {
 
-template<typename T>
 class Rect {
 public:
-    Rect() { }
-    Rect(T x, T y, T width, T height)
+    Rect() = default;
+    Rect(int x, int y, int width, int height)
         : m_position(x, y)
-        , m_width(width)
-        , m_height(height)
+        , m_size(width, height)
     {
     }
 
-    inline T width() const { return m_width; }
-    inline T height() const { return m_height; }
+    inline int width() const { return m_size.width(); }
+    inline int height() const { return m_size.height(); }
 
-    void setWidth(T width) { m_width = width; }
-    void setHeight(T height) { m_height = height; }
+    void setWidth(int width) { m_size.setWidth(width); }
+    void setHeight(int height) { m_size.setHeight(height); }
 
-    inline T x() const { return m_position.x(); }
-    inline T y() const { return m_position.y(); }
+    inline int x() const { return m_position.x(); }
+    inline int y() const { return m_position.y(); }
 
-    inline Point<T> position() const { return m_position; }
+    inline Size size() const { return m_size; }
 
-    inline void moveBy(T x, T y)
+    inline Point<int> position() const { return m_position; }
+
+    inline void moveBy(int x, int y)
     {
         m_position.moveBy(x, y);
     }
 
-    void moveBy(const Point<T>& point)
+    void moveBy(const Point<int>& point)
     {
         m_position.moveBy(point);
     }
 
-    bool contains(T x, T y) const
+    bool contains(int x, int y) const
     {
-        if (x > m_position.x() && x < (m_position.x() + m_width) && y > m_position.y() && y < (m_position.y() + m_height))
+        if (x > m_position.x() && x < (m_position.x() + m_size.width()) && y > m_position.y() && y < (m_position.y() + m_size.height()))
             return true;
         return false;
     }
 
-    bool contains(const Point<T>& point) const
+    bool contains(const Point<int>& point) const
     {
-        if (point.x() > m_position.x() && point.x() < (m_position.x() + m_width) && point.y() > m_position.y() && point.y() < (m_position.y() + m_height))
+        if (point.x() > m_position.x() && point.x() < (m_position.x() + m_size.width()) && point.y() > m_position.y() && point.y() < (m_position.y() + m_size.height()))
             return true;
         return false;
     }
 
-    Rect<T> clip(const Rect<T>& clipInside) const
+    Rect clip(const Rect& clipInside) const
     {
-        const T clippedX = ADS::clamp(clipInside.x(), m_position.x(), m_position.x() + m_width);
-        const T clippedY = ADS::clamp(clipInside.y(), m_position.y(), m_position.y() + m_height);
-        const T clippedWidth = ADS::min(clipInside.m_width - ADS::abs(clippedX - clipInside.x()), m_width - clippedX);
-        const T clippedHeight = ADS::min(clipInside.m_height - ADS::abs(clippedY - clipInside.y()), m_height - clippedY);
-        return Rect<T> { clippedX, clippedY, clippedWidth, clippedHeight };
+        const int clippedX = ADS::clamp(clipInside.x(), m_position.x(), m_position.x() + m_size.width());
+        const int clippedY = ADS::clamp(clipInside.y(), m_position.y(), m_position.y() + m_size.height());
+        const int clippedWidth = ADS::min(clipInside.width() - ADS::abs(clippedX - clipInside.x()), m_size.width() - clippedX);
+        const int clippedHeight = ADS::min(clipInside.height() - ADS::abs(clippedY - clipInside.y()), m_size.height() - clippedY);
+        return Rect { clippedX, clippedY, clippedWidth, clippedHeight };
+    }
+
+    bool operator==(const Rect& other) const
+    {
+        return m_position == other.m_position
+            && m_size == other.m_size;
     }
 
 private:
-    Point<T> m_position {};
-    T m_width {};
-    T m_height {};
+    Point<int> m_position {};
+    Size m_size {};
 };
-
-using IntRect = Rect<int>;
 
 }

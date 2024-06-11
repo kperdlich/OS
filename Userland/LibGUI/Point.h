@@ -34,6 +34,12 @@ public:
         m_y += y;
     }
 
+    bool operator==(const Point<T>& other) const
+    {
+        return m_x == other.m_x
+            && m_y == other.m_y;
+    }
+
 private:
     T m_x {};
     T m_y {};

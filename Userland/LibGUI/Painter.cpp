@@ -26,12 +26,12 @@ Painter::Painter(Widget* widget)
     }
 }
 
-void Painter::drawFilledRect(const IntRect& rect, GUI::Color color)
+void Painter::drawFilledRect(const Rect& rect, GUI::Color color)
 {
-    IntRect translated = rect;
+    Rect translated = rect;
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
 
-    const auto clippedRect = IntRect { 0, 0, Screen::instance().width(), Screen::instance().height() }.clip(translated);
+    const auto clippedRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() }.clip(translated);
     for (int y = 0; y < clippedRect.height(); ++y) {
         for (int x = 0; x < clippedRect.width(); ++x) {
             Screen::instance().setPixel(clippedRect.x() + x, clippedRect.y() + y, color);
@@ -39,12 +39,12 @@ void Painter::drawFilledRect(const IntRect& rect, GUI::Color color)
     }
 }
 
-void Painter::drawRect(const IntRect& rect, GUI::Color color)
+void Painter::drawRect(const Rect& rect, GUI::Color color)
 {
-    IntRect translated = rect;
+    Rect translated = rect;
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
 
-    const auto clippedRect = IntRect { 0, 0, Screen::instance().width(), Screen::instance().height() }.clip(translated);
+    const auto clippedRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() }.clip(translated);
     for (int y = 0; y < clippedRect.height(); ++y) {
         if (y == 0 || y == clippedRect.height() - 1) {
             for (int x = 0; x < clippedRect.width(); ++x) {
@@ -114,12 +114,12 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
     }
 }
 
-void Painter::drawText(const IntRect& rect, const ADS::String& text, TextAlignment alignment, GUI::Color color)
+void Painter::drawText(const Rect& rect, const ADS::String& text, TextAlignment alignment, GUI::Color color)
 {
     if (text.empty())
         return;
 
-    IntRect translated = rect;
+    Rect translated = rect;
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
 
     // FIXME: add some margin/padding
@@ -163,12 +163,12 @@ void Painter::drawText(const IntRect& rect, const ADS::String& text, TextAlignme
 
 void Painter::drawCharacterBitmap(const IntPoint& point, const CharacterBitmap& bitmap, Color color)
 {
-    IntRect translated = { point.x(), point.y(), bitmap.width(), bitmap.height() };
+    Rect translated = { point.x(), point.y(), bitmap.width(), bitmap.height() };
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
 
     const char* data = bitmap.data();
 
-    const IntRect clippedRect = IntRect { 0, 0, Screen::instance().width(), Screen::instance().height() }.clip(translated);
+    const Rect clippedRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() }.clip(translated);
 
     for (int y = 0; y < clippedRect.height(); ++y) {
         for (int x = 0; x < clippedRect.width(); ++x) {

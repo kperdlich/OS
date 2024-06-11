@@ -6,23 +6,30 @@
 
 namespace GUI {
 
-template<typename T>
 class Size {
 public:
-    Size(T width, T height)
+    Size() = default;
+    Size(int width, int height)
         : m_width(width)
         , m_height(height)
     {
     }
 
-    inline T width() const { return m_width; }
-    inline T height() const { return m_height; }
+    inline int width() const { return m_width; }
+    inline int height() const { return m_height; }
+
+    inline void setWidth(int value) { m_width = value; }
+    inline void setHeight(int value) { m_height = value; }
+
+    bool operator==(const Size& other) const
+    {
+        return m_width == other.m_width
+            && m_height == other.m_height;
+    }
 
 private:
-    T m_width {};
-    T m_height {};
+    int m_width {};
+    int m_height {};
 };
-
-using IntSize = Size<int>;
 
 } // GUI

@@ -26,13 +26,21 @@ protected:
     virtual void onKeyDownEvent(KeyEvent& event) override;
     virtual void onFocusInEvent(FocusEvent& event) override;
     virtual void onFocusOutEvent(FocusEvent& event) override;
+    virtual void onResizeEvent(ResizeEvent& event) override;
+
+    void scrollCursorIntoView();
 
 private:
-    static size_t fontWidth() ;
+    static int fontWidth();
+    static int margin();
+
+    Rect innerRect() const;
+    Rect cursorRect() const;
 
 private:
     ADS::String m_text;
-    int m_cursorOffset { 0 };
+    int m_cursorPosition { 0 };
+    int m_scrollOffset { 0 };
     int m_blinkTimerId { 0 };
     bool m_isCursorVisible { false };
 };

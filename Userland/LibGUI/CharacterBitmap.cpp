@@ -6,7 +6,7 @@
 
 namespace GUI {
 
-CharacterBitmap::CharacterBitmap(IntSize size, const char* data)
+CharacterBitmap::CharacterBitmap(Size size, const char* data)
     : m_size(size)
     , m_data(data)
 {

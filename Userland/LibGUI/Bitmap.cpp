@@ -6,12 +6,12 @@
 
 namespace GUI {
 
-ADS::UniquePtr<Bitmap> Bitmap::createFrom(BitmapFormat format, IntSize size, char* data)
+ADS::UniquePtr<Bitmap> Bitmap::createFrom(BitmapFormat format, Size size, char* data)
 {
     return ADS::UniquePtr<Bitmap>(new Bitmap(format, size, data));
 }
 
-Bitmap::Bitmap(BitmapFormat format, IntSize size, char* data)
+Bitmap::Bitmap(BitmapFormat format, Size size, char* data)
     : m_format(format)
     , m_size(size)
     , m_data(data)

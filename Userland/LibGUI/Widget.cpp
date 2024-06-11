@@ -36,6 +36,9 @@ bool Widget::event(Event& event)
     case Event::Type::FocusOut:
         onFocusOutEvent(static_cast<FocusEvent&>(event));
         return true;
+    case Event::Type::Resize:
+        onResizeEvent(static_cast<ResizeEvent&>(event));
+        return true;
     case Event::Type::Paint:
         for (auto& child : m_children) {
             if (child->isWidgetType()) {
@@ -85,9 +88,21 @@ void Widget::onMouseUpEvent(MouseEvent& event)
 {
 }
 
-void Widget::setWindowRelativeRect(const IntRect& rect)
+void Widget::setWindowRelativeRect(const Rect& rect)
 {
+    if (rect == m_windowRelativeRect)
+        return;
+
+    const Size oldSize = m_windowRelativeRect.size();
+    const Size newSize = rect.size();
+
     m_windowRelativeRect = rect;
+
+    if (oldSize != newSize) {
+        ResizeEvent resizeEvent(newSize, oldSize);
+        event(resizeEvent);
+    }
+
 }
 
 void Widget::setWindow(Window* window)
@@ -103,8 +118,7 @@ void Widget::setWindow(Window* window)
 
 bool Widget::hasFocus() const
 {
-    ASSERT(m_window != nullptr);
-    return m_window->focusedWidget() == this && m_window->isActive();
+    return m_window && m_window->focusedWidget() == this && m_window->isActive();
 }
 
 void Widget::setFocus(FocusReason reason)
@@ -131,6 +145,10 @@ void Widget::onFocusOutEvent(FocusEvent& event)
 }
 
 void Widget::onFocusInEvent(FocusEvent& event)
+{
+}
+
+void Widget::onResizeEvent(ResizeEvent& event)
 {
 }
 

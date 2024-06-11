@@ -11,15 +11,15 @@ namespace GUI {
 
 class CharacterBitmap final {
 public:
-    CharacterBitmap(IntSize size, const char* data);
+    CharacterBitmap(Size size, const char* data);
 
     inline const char* data() const { return m_data; }
-    inline IntSize size() const { return m_size; }
+    inline Size size() const { return m_size; }
     inline int width() const { return m_size.width(); }
     inline int height() const { return m_size.height(); }
 
 private:
-    IntSize m_size;
+    Size m_size;
     const char* m_data { nullptr };
 };
 

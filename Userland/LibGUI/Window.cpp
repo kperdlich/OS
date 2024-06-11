@@ -32,7 +32,7 @@ bool Window::event(Event& event)
         if (m_centralWidget) {
             Widget::HitResult result {};
             if (m_centralWidget->hits(mouseEvent.x(), mouseEvent.y(), result)) {
-                std::cout << "[Widget::HitResult] " << result.widget->name() << " localX: " << result.localX << " localY: " << result.localY << std::endl;
+                //std::cout << "[Widget::HitResult] " << result.widget->name() << " localX: " << result.localX << " localY: " << result.localY << std::endl;
                 return result.widget->event(event);
             }
         }
@@ -69,7 +69,7 @@ void Window::moveBy(int x, int y)
     m_rect.moveBy(x, y);
 }
 
-void Window::setRect(const IntRect& rect)
+void Window::setRect(const Rect& rect)
 {
     // FIXME: Handle resize event?
     m_rect = rect;

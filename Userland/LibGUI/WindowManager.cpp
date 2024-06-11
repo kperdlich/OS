@@ -23,7 +23,7 @@ static const GUI::Color ActiveWindowTitleBarTextColor = Colors::White;
 static constexpr const int width = 1024;
 static constexpr const int height = 720;
 
-static const IntSize closeButtonCharSize { 11, 9 };
+static const Size closeButtonCharSize { 11, 9 };
 static constexpr const char* closeButtonCharacters {
     " ##     ## "
     "  ##   ##  "
@@ -40,21 +40,21 @@ static const CharacterBitmap closeButtonBitmap(closeButtonCharSize, closeButtonC
 
 static constexpr const int TaskbarHeight = 20;
 static const GUI::Color TaskbarColor { 190, 190, 190, 0xff };
-static const IntRect TaskbarRect { 0, height - TaskbarHeight, width, TaskbarHeight };
+static const Rect TaskbarRect { 0, height - TaskbarHeight, width, TaskbarHeight };
 
-static IntRect windowFrameRect(const Window& window)
+static Rect windowFrameRect(const Window& window)
 {
     const auto& rect = window.rect();
     return { rect.x(), rect.y() - TitleBarHeight, rect.width(), rect.height() + TitleBarHeight };
 }
 
-static IntRect windowTitleBarCloseButtonRect(const Window& window)
+static Rect windowTitleBarCloseButtonRect(const Window& window)
 {
     const auto& rect = window.rect();
     return { rect.x() + rect.width() - TitleBarButtonSize - TitleBarButtonsMargin, rect.y() - TitleBarHeight + TitleBarButtonsMargin, TitleBarButtonSize, TitleBarButtonSize };
 }
 
-static IntRect windowTitleBarRect(const Window& window)
+static Rect windowTitleBarRect(const Window& window)
 {
     const auto& rect = window.rect();
     return { rect.x(), rect.y() - TitleBarHeight, rect.width(), TitleBarHeight };
@@ -196,7 +196,7 @@ void WindowManager::paintWindow(Window& window, Event& event)
     painter.drawFilledRect(windowFrameRect(window), Colors::Grey);
     painter.drawFilledRect(windowTitleBarRect(window), isActiveWindow ? ActiveWindowTitleBarColor : InactiveTitleBarColor);
 
-    IntRect closeButtonRect = windowTitleBarCloseButtonRect(window);
+    Rect closeButtonRect = windowTitleBarCloseButtonRect(window);
     IntPoint closeButtonBitmapPos = closeButtonRect.position();
     closeButtonBitmapPos.moveBy(3, 3);
     painter.drawFilledRect(closeButtonRect, Colors::Grey);

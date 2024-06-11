@@ -52,7 +52,7 @@ private:
     ADS::Vector<Window*> m_windows;
     Window* m_activeWindow { nullptr };
 
-    IntSize m_lastMouseDragPos { 0, 0 };
+    Size m_lastMouseDragPos { 0, 0 };
     bool m_isDraggingWindow { false };
 };
 
