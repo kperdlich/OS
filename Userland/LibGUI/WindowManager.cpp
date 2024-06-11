@@ -203,7 +203,7 @@ void WindowManager::paintWindow(Window& window, Event& event)
     painter.drawCharacterBitmap(closeButtonBitmapPos, closeButtonBitmap, Colors::Black);
 
     painter.drawRect(windowTitleBarCloseButtonRect(window), Colors::Black);
-    painter.drawText(windowTitleBarRect(window), window.title(), TextAlignment::Center, isActiveWindow ? ActiveWindowTitleBarTextColor : InactiveTitleBarTextColor);
+    painter.drawText(windowTitleBarRect(window), window.title(), Alignment::Center, isActiveWindow ? ActiveWindowTitleBarTextColor : InactiveTitleBarTextColor);
     painter.drawRect(windowFrameRect(window), isActiveWindow ? Colors::Black : InactiveTitleBarColor);
 
     window.event(event);

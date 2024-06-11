@@ -5,6 +5,7 @@
 #include "TextBox.h"
 #include "Vector.h"
 #include "Window.h"
+#include "Label.h"
 
 int main()
 {
@@ -50,7 +51,7 @@ int main()
     GUI::Widget* container = new GUI::Widget();
     container->setWindowRelativeRect(GUI::Rect { 0, 0, 300, 400 });
 
-    GUI::TextBox* textBox = new GUI::TextBox("TextBox text 1232142342342342342342344");
+    GUI::TextBox* textBox = new GUI::TextBox("TextBox");
     textBox->setWindowRelativeRect(GUI::Rect { 2, 2, 200, 30 });
     textBox->setParent(container);
 
@@ -60,6 +61,10 @@ int main()
     textBoxButton->setWindowRelativeRect(GUI::Rect { 2, 20, 200, 30 });
     textBoxButton->setText("Reset");
     textBoxButton->setParent(container);
+
+    GUI::Label* label = new GUI::Label(container);
+    label->setText("Label");
+    label->setWindowRelativeRect(GUI::Rect {2, 40, 50, 30});
 
     GUI::Window win2;
     win2.setRect({ GUI::Rect { 100, 100, 600, 400 } });

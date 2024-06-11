@@ -83,7 +83,7 @@ void TextBox::onPaintEvent(Event& event)
 
     const int maxVisibleChars = innerRect().width() / fontWidth();
     const ADS::String visibleText = m_text.substr(m_scrollOffset, ADS::min(static_cast<int>(m_text.length()) - m_scrollOffset, maxVisibleChars));
-    painter.drawText(innerRect(), visibleText, TextAlignment::Left, Colors::Black);
+    painter.drawText(innerRect(), visibleText, Alignment::Left, Colors::Black);
 
     if (m_isCursorVisible && hasFocus()) {
         painter.drawFilledRect(cursorRect(), Colors::Black);

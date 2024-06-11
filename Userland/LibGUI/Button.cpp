@@ -36,7 +36,7 @@ void Button::onPaintEvent(Event& event)
     painter.drawFilledRect(m_windowRelativeRect, ButtonColor);
     painter.drawRect(m_windowRelativeRect, Colors::Black);
 
-    painter.drawText(m_windowRelativeRect, m_text, GUI::TextAlignment::Center, Colors::Black);
+    painter.drawText(m_windowRelativeRect, m_text, Alignment::Center, Colors::Black);
 
     Widget::onPaintEvent(event);
 }

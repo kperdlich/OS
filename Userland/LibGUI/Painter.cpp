@@ -114,7 +114,7 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
     }
 }
 
-void Painter::drawText(const Rect& rect, const ADS::String& text, TextAlignment alignment, GUI::Color color)
+void Painter::drawText(const Rect& rect, const ADS::String& text, Alignment alignment, GUI::Color color)
 {
     if (text.empty())
         return;
@@ -124,10 +124,10 @@ void Painter::drawText(const Rect& rect, const ADS::String& text, TextAlignment 
 
     // FIXME: add some margin/padding
     switch (alignment) {
-    case TextAlignment::Right:
+    case Alignment::Right:
         translated.moveBy(rect.width() - (s_defaultFont.width() * text.length()), 0);
         break;
-    case TextAlignment::Center:
+    case Alignment::Center:
         translated.moveBy((rect.width() - (s_defaultFont.width() * text.length())) / 2, 0);
         break;
     }
