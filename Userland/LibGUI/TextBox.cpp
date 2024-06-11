@@ -109,8 +109,8 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
     if (event.key() == Key::Backspace) {
         if (m_cursorPosition > 0 && m_text.length() > 0) {
             m_text.erase(--m_cursorPosition, 1);
+            m_scrollOffset = ADS::max(m_scrollOffset - 1, 0);
             m_isCursorVisible = true;
-            scrollCursorIntoView();
         }
         return;
     }
