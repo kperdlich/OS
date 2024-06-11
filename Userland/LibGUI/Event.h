@@ -5,6 +5,7 @@
 #pragma once
 
 #include "FocusReason.h"
+#include "Key.h"
 #include "Point.h"
 #include "Size.h"
 #include "Types.h"
@@ -70,30 +71,27 @@ private:
     MouseButton m_button;
 };
 
-enum class Key {
-    Unknown, // FIXME: there shouldn't be any invalid/unknown key
-    Backspace,
-    Enter,
-    Left,
-    Up,
-    Right,
-    Down
-};
-
 class KeyEvent : public Event {
 public:
-    KeyEvent(Type type, Key key, const ADS::String& text)
+    KeyEvent(Type type, Key key, KeyboardModifier modifier, const ADS::String& text)
         : m_key(key)
+        , m_modifier(modifier)
         , m_text(text)
         , Event(type)
     {
     }
 
+    [[nodiscard]] bool ctrl() const { return m_modifier & KeyboardModifier::CtrlModifier; }
+    [[nodiscard]] bool alt() const { return m_modifier & KeyboardModifier::AltModifier; }
+    [[nodiscard]] bool shift() const { return m_modifier & KeyboardModifier::ShiftModifier; }
+    [[nodiscard]] bool meta() const { return m_modifier & KeyboardModifier::MetaModifier; }
+    [[nodiscard]] KeyboardModifier modifier() const { return m_modifier; }
     [[nodiscard]] Key key() const { return m_key; }
     [[nodiscard]] const ADS::String& text() const { return m_text; }
 
 private:
     Key m_key;
+    KeyboardModifier m_modifier;
     ADS::String m_text;
 };
 

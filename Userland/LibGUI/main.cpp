@@ -1,11 +1,11 @@
 
 #include "Application.h"
 #include "Array.h"
+#include "Label.h"
 #include "Rect.h"
 #include "TextBox.h"
 #include "Vector.h"
 #include "Window.h"
-#include "Label.h"
 
 int main()
 {
@@ -64,7 +64,7 @@ int main()
 
     GUI::Label* label = new GUI::Label(container);
     label->setText("Label");
-    label->setWindowRelativeRect(GUI::Rect {2, 40, 50, 30});
+    label->setWindowRelativeRect(GUI::Rect { 2, 40, 50, 30 });
 
     GUI::Window win2;
     win2.setRect({ GUI::Rect { 100, 100, 600, 400 } });

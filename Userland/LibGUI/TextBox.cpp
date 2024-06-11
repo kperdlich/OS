@@ -92,21 +92,21 @@ void TextBox::onPaintEvent(Event& event)
 
 void TextBox::onKeyDownEvent(KeyEvent& event)
 {
-    if (event.key() == Key::Left) {
+    if (event.key() == Key::Key_Left) {
         m_cursorPosition = ADS::max(m_cursorPosition - 1, 0);
         m_isCursorVisible = true;
         scrollCursorIntoView();
         return;
     }
 
-    if (event.key() == Key::Right) {
+    if (event.key() == Key::Key_Right) {
         m_cursorPosition = ADS::min(m_cursorPosition + 1, static_cast<int>(m_text.length()));
         m_isCursorVisible = true;
         scrollCursorIntoView();
         return;
     }
 
-    if (event.key() == Key::Backspace) {
+    if (event.key() == Key::Key_Backspace) {
         if (m_cursorPosition > 0 && m_text.length() > 0) {
             m_text.erase(--m_cursorPosition, 1);
             m_scrollOffset = ADS::max(m_scrollOffset - 1, 0);
@@ -115,9 +115,11 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
         return;
     }
 
-    m_text.insert(m_cursorPosition++, event.text());
-    m_isCursorVisible = true;
-    scrollCursorIntoView();
+    if (event.text().length() > 0) {
+        m_text.insert(m_cursorPosition++, event.text());
+        m_isCursorVisible = true;
+        scrollCursorIntoView();
+    }
 }
 
 void TextBox::onFocusInEvent(FocusEvent&)

@@ -73,40 +73,102 @@ private:
         Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<Event>(new Event(Event::Type::Paint)));
     }
 
+    char handleAlt(const SDL_KeyboardEvent& event)
+    {
+        switch (event.keysym.sym) {
+        case 'q':
+            return '@';
+        }
+        return event.keysym.sym;
+    }
+
+    char handleShift(const SDL_KeyboardEvent& event)
+    {
+        if (event.keysym.sym >= 'a' && event.keysym.sym <= 'z')
+            return static_cast<char>(event.keysym.sym - 32); // to ASCII uppercase
+        
+        switch (event.keysym.sym) {
+        case '1':
+            return '!';
+        case '2':
+            return '"';
+        case '4':
+            return '$';
+        case '5':
+            return '%';
+        case '6':
+            return '&';
+        case '7':
+            return '/';
+        case '8':
+            return '(';
+        case '9':
+            return ')';
+        case '0':
+            return '=';
+        case '.':
+            return ':';
+        case ',':
+            return ';';
+        case '-':
+            return '_';
+        case '+':
+            return '*';
+        case '<':
+            return '>';
+        }
+        return event.keysym.sym;
+    }
+
     void handleKey(const SDL_KeyboardEvent& event)
     {
-        Key key = Key::Unknown;
+        Key key = Key::Key_Unknown;
         ADS::String text;
 
         switch (event.keysym.sym) {
         case SDLK_LEFT:
-            key = Key::Left;
+            key = Key::Key_Left;
             break;
         case SDLK_RIGHT:
-            key = Key::Right;
+            key = Key::Key_Right;
             break;
         case SDLK_UP:
-            key = Key::Up;
+            key = Key::Key_Up;
             break;
         case SDLK_DOWN:
-            key = Key::Down;
+            key = Key::Key_Down;
             break;
         case SDLK_BACKSPACE:
-            key = Key::Backspace;
+            key = Key::Key_Backspace;
             break;
         case SDLK_RETURN:
-            key = Key::Enter;
+            key = Key::Key_Return;
             break;
         default:
-            text = static_cast<char>(event.keysym.sym);
+            if (event.keysym.sym > SDLK_UNKNOWN && event.keysym.sym <= SDLK_z) {
+                if (event.keysym.mod & KMOD_SHIFT) {
+                    text = handleShift(event);
+                } else if (event.keysym.mod & KMOD_RALT) {
+                    text = handleAlt(event);
+                } else {
+                    text = static_cast<char>(event.keysym.sym);
+                }
+            }
             break;
         }
 
-        // FIXME: Handle key modifiers
+        unsigned int modifier = KeyboardModifier::NoModifier;
+        if (event.keysym.mod & KMOD_SHIFT)
+            modifier |= KeyboardModifier::ShiftModifier;
+        if (event.keysym.mod & KMOD_ALT)
+            modifier |= KeyboardModifier::AltModifier;
+        if (event.keysym.mod & KMOD_CTRL)
+            modifier |= KeyboardModifier::CtrlModifier;
+
         if (event.type == SDL_KEYDOWN) {
-            Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<KeyEvent>(new KeyEvent(Event::Type::KeyDown, key, text)));
+            Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<KeyEvent>(new KeyEvent(Event::Type::KeyDown, key, static_cast<KeyboardModifier>(modifier), text)));
         } else if (event.type == SDL_KEYUP) {
-            Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<KeyEvent>(new KeyEvent(Event::Type::KeyUp, key, text)));
+            Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<KeyEvent>(new KeyEvent(Event::Type::KeyUp, key, static_cast<KeyboardModifier>(modifier), text)));
         }
     }
 

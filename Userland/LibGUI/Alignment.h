@@ -4,8 +4,12 @@
 
 #pragma once
 
+namespace GUI {
+
 enum class Alignment {
     Left,
     Right,
     Center
 };
+
+}
