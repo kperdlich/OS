@@ -18,47 +18,6 @@ TextBox::TextBox(const ADS::String& text, Widget* parent)
     setText(text);
 }
 
-void TextBox::onPaintEvent(Event& event)
-{
-    Painter painter(this);
-    painter.drawFilledRect(m_windowRelativeRect, Colors::White);
-    painter.drawRect(m_windowRelativeRect, Colors::Black);
-
-    const int maxVisibleChars = innerRect().width() / fontWidth();
-    const ADS::String visibleText = m_text.substr(m_scrollOffset, ADS::min(static_cast<int>(m_text.length()) - m_scrollOffset, maxVisibleChars));
-    painter.drawText(innerRect(), visibleText, TextAlignment::Left, Colors::Black);
-
-    if (m_isCursorVisible && hasFocus()) {
-        painter.drawFilledRect(cursorRect(), Colors::Black);
-    }
-}
-
-void TextBox::onKeyDownEvent(KeyEvent& event)
-{
-    if (event.key() == Key::Left) {
-        m_cursorPosition = ADS::max(m_cursorPosition - 1, 0);
-        scrollCursorIntoView();
-        return;
-    }
-
-    if (event.key() == Key::Right) {
-        m_cursorPosition = ADS::min(m_cursorPosition + 1, static_cast<int>(m_text.length()));
-        scrollCursorIntoView();
-        return;
-    }
-
-    if (event.key() == Key::Backspace) {
-        if (m_cursorPosition > 0 && m_text.length() > 0) {
-            m_text.erase(--m_cursorPosition, 1);
-            scrollCursorIntoView();
-        }
-        return;
-    }
-
-    m_text.insert(m_cursorPosition++, event.text());
-    scrollCursorIntoView();
-}
-
 void TextBox::setText(const ADS::String& text)
 {
     m_text = text;
@@ -67,22 +26,25 @@ void TextBox::setText(const ADS::String& text)
         scrollCursorIntoView();
 }
 
-void TextBox::onFocusInEvent(FocusEvent& event)
+Rect TextBox::innerRect() const
 {
-    m_isCursorVisible = true;
-    m_blinkTimerId = startTimer(530);
+    const int cursorMargin = static_cast<int>(margin());
+    Rect textRect = m_windowRelativeRect;
+    textRect.moveBy(cursorMargin, 0);
+    textRect.setWidth(textRect.width() - cursorMargin);
+    return textRect;
 }
 
-void TextBox::onFocusOutEvent(FocusEvent& event)
+Rect TextBox::cursorRect() const
 {
-    killTimer(m_blinkTimerId);
-    m_blinkTimerId = 0;
-    m_isCursorVisible = false;
-}
+    Rect cursorRect = innerRect();
+    cursorRect.setHeight(innerRect().height() - (2 * margin()));
+    cursorRect.setWidth(1);
+    const int newCursorX = (m_cursorPosition - m_scrollOffset) * fontWidth();
+    const int newCursorY = (innerRect().height() - cursorRect.height()) / 2;
+    cursorRect.moveBy(newCursorX, newCursorY);
 
-void TextBox::onTimerEvent(TimerEvent& event)
-{
-    m_isCursorVisible = !m_isCursorVisible;
+    return cursorRect;
 }
 
 int TextBox::fontWidth()
@@ -112,30 +74,79 @@ void TextBox::scrollCursorIntoView()
 #endif
 }
 
-Rect TextBox::innerRect() const
+void TextBox::onPaintEvent(Event& event)
 {
-    const int cursorMargin = static_cast<int>(margin());
-    Rect textRect = m_windowRelativeRect;
-    textRect.moveBy(cursorMargin, 0);
-    textRect.setWidth(textRect.width() - cursorMargin);
-    return textRect;
+    Painter painter(this);
+    painter.drawFilledRect(m_windowRelativeRect, Colors::White);
+    painter.drawRect(m_windowRelativeRect, Colors::Black);
+
+    const int maxVisibleChars = innerRect().width() / fontWidth();
+    const ADS::String visibleText = m_text.substr(m_scrollOffset, ADS::min(static_cast<int>(m_text.length()) - m_scrollOffset, maxVisibleChars));
+    painter.drawText(innerRect(), visibleText, TextAlignment::Left, Colors::Black);
+
+    if (m_isCursorVisible && hasFocus()) {
+        painter.drawFilledRect(cursorRect(), Colors::Black);
+    }
 }
 
-Rect TextBox::cursorRect() const
+void TextBox::onKeyDownEvent(KeyEvent& event)
 {
-    Rect cursorRect = innerRect();
-    cursorRect.setHeight(innerRect().height() - (2 * margin()));
-    cursorRect.setWidth(1);
-    const int newCursorX = (m_cursorPosition - m_scrollOffset) * fontWidth();
-    const int newCursorY = (innerRect().height() - cursorRect.height()) / 2;
-    cursorRect.moveBy(newCursorX, newCursorY);
+    if (event.key() == Key::Left) {
+        m_cursorPosition = ADS::max(m_cursorPosition - 1, 0);
+        m_isCursorVisible = true;
+        scrollCursorIntoView();
+        return;
+    }
 
-    return cursorRect;
+    if (event.key() == Key::Right) {
+        m_cursorPosition = ADS::min(m_cursorPosition + 1, static_cast<int>(m_text.length()));
+        m_isCursorVisible = true;
+        scrollCursorIntoView();
+        return;
+    }
+
+    if (event.key() == Key::Backspace) {
+        if (m_cursorPosition > 0 && m_text.length() > 0) {
+            m_text.erase(--m_cursorPosition, 1);
+            m_isCursorVisible = true;
+            scrollCursorIntoView();
+        }
+        return;
+    }
+
+    m_text.insert(m_cursorPosition++, event.text());
+    m_isCursorVisible = true;
+    scrollCursorIntoView();
+}
+
+void TextBox::onFocusInEvent(FocusEvent&)
+{
+    m_isCursorVisible = true;
+    m_blinkTimerId = startTimer(530);
+}
+
+void TextBox::onFocusOutEvent(FocusEvent&)
+{
+    killTimer(m_blinkTimerId);
+    m_blinkTimerId = 0;
+    m_isCursorVisible = false;
+}
+
+void TextBox::onTimerEvent(TimerEvent&)
+{
+    m_isCursorVisible = !m_isCursorVisible;
 }
 
 void TextBox::onResizeEvent(ResizeEvent&)
 {
     scrollCursorIntoView();
+}
+
+void TextBox::onMouseDownEvent(MouseEvent& event)
+{
+    const int newCursorPos = (event.x() / fontWidth()) - 1;
+    m_cursorPosition = m_scrollOffset + newCursorPos;
+    m_isCursorVisible = true;
 }
 
 } // GUI

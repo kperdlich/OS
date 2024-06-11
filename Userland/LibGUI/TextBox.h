@@ -27,6 +27,7 @@ protected:
     virtual void onFocusInEvent(FocusEvent& event) override;
     virtual void onFocusOutEvent(FocusEvent& event) override;
     virtual void onResizeEvent(ResizeEvent& event) override;
+    virtual void onMouseDownEvent(MouseEvent& event) override;
 
     void scrollCursorIntoView();
 
