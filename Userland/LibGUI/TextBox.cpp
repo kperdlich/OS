@@ -22,6 +22,7 @@ void TextBox::setText(const ADS::String& text)
 {
     m_text = text;
     m_cursorPosition = static_cast<int>(m_text.length());
+    m_scrollOffset = 0;
     if (hasFocus())
         scrollCursorIntoView();
 }
@@ -144,8 +145,8 @@ void TextBox::onResizeEvent(ResizeEvent&)
 
 void TextBox::onMouseDownEvent(MouseEvent& event)
 {
-    const int newCursorPos = (event.x() / fontWidth()) - 1;
-    m_cursorPosition = m_scrollOffset + newCursorPos;
+    const int newCursorPos = ADS::max((event.x() / fontWidth()) - 1, 0);
+    m_cursorPosition = ADS::min(m_scrollOffset + newCursorPos, static_cast<int>(m_text.length()));
     m_isCursorVisible = true;
 }
 

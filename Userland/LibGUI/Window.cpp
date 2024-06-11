@@ -33,7 +33,8 @@ bool Window::event(Event& event)
             Widget::HitResult result {};
             if (m_centralWidget->hits(mouseEvent.x(), mouseEvent.y(), result)) {
                 //std::cout << "[Widget::HitResult] " << result.widget->name() << " localX: " << result.localX << " localY: " << result.localY << std::endl;
-                return result.widget->event(event);
+                MouseEvent localWidgetMouseEvent(event.type(), result.localX, result.localY, mouseEvent.button());
+                return result.widget->event(localWidgetMouseEvent);
             }
         }
         return CObject::event(event);
