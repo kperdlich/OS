@@ -63,6 +63,11 @@ void Painter::drawFilledQuad(int x, int y, int size, GUI::Color color)
     drawFilledRect({ x, y, size, size }, color);
 }
 
+void Painter::drawLine(const IntPoint& x, const IntPoint& y, GUI::Color color)
+{
+    drawLine(x.x(), x.y(), y.x(), y.y(), color);
+}
+
 void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
 {
     x0 += m_relativeTranslationX;

@@ -16,10 +16,12 @@ Button::Button(std::function<void()> onClickCallback, Widget* parent)
 
 void Button::onMouseDownEvent(MouseEvent& event)
 {
+    m_isCurrentlyPressed = true;
 }
 
 void Button::onMouseUpEvent(MouseEvent& event)
 {
+    m_isCurrentlyPressed = false;
     if (onClick)
         onClick();
 }
@@ -31,27 +33,33 @@ void Button::onMouseMoveEvent(MouseEvent& event)
 void Button::onPaintEvent(Event& event)
 {
     static const GUI::Color buttonColor = Colors::Grey;
-    static const Color shadowGreyColor { 129, 129, 129, 255 };
-
     Painter painter(this);
-
-    const IntPoint topLeft { 0, 0 };
-    const IntPoint topRight { m_windowRelativeRect.width(), 0 };
-    const IntPoint bottomLeft { 0, m_windowRelativeRect.height() };
-    const IntPoint bottomRight { m_windowRelativeRect.width(), m_windowRelativeRect.height() };
-
     painter.drawFilledRect(rect(), buttonColor);
 
-    painter.drawLine(topLeft.x(), topLeft.y(), topRight.x(), topRight.y(), Colors::White);
-    painter.drawLine(topLeft.x(), topLeft.y(), bottomLeft.x(), bottomLeft.y(), Colors::White);
+    if (m_isCurrentlyPressed) {
+        painter.drawRect(rect(), Colors::Black);
+    } else {
+        static const Color shadowGreyColor { 129, 129, 129, 255 };
 
-    painter.drawLine(topRight.x(), topRight.y(), bottomRight.x(), bottomRight.y(), Colors::Black);
-    painter.drawLine(bottomLeft.x(), bottomLeft.y(), bottomRight.x(), bottomRight.y(), Colors::Black);
+        const IntPoint topLeft { 0, 0 };
+        const IntPoint topRight { m_windowRelativeRect.width(), 0 };
+        const IntPoint bottomLeft { 0, m_windowRelativeRect.height() };
+        const IntPoint bottomRight { m_windowRelativeRect.width(), m_windowRelativeRect.height() };
 
-    painter.drawLine(topRight.x() - 1, topRight.y() + 1, bottomRight.x() - 1, bottomRight.y() - 1, shadowGreyColor);
-    painter.drawLine(bottomLeft.x() + 1, bottomLeft.y() - 1, bottomRight.x() - 1, bottomRight.y() - 1, shadowGreyColor);
+        painter.drawLine(topLeft, topRight, Colors::White);
+        painter.drawLine(topLeft, bottomLeft, Colors::White);
 
-    painter.drawText(rect(), m_text, Alignment::Center, Colors::Black);
+        painter.drawLine(topRight, bottomRight, Colors::Black);
+        painter.drawLine(bottomLeft, bottomRight, Colors::Black);
+
+        painter.drawLine(topRight.x() - 1, topRight.y() + 1, bottomRight.x() - 1, bottomRight.y() - 1, shadowGreyColor);
+        painter.drawLine(bottomLeft.x() + 1, bottomLeft.y() - 1, bottomRight.x() - 1, bottomRight.y() - 1, shadowGreyColor);
+    }
+
+    Rect textRect = rect();
+    if (m_isCurrentlyPressed)
+        textRect.moveBy(1, 1);
+    painter.drawText(textRect, m_text, Alignment::Center, Colors::Black);
 }
 
 void Button::setText(const ADS::String& text)

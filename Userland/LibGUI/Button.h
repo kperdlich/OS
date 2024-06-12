@@ -28,6 +28,7 @@ protected:
 
 private:
     ADS::String m_text;
+    bool m_isCurrentlyPressed { false };
 };
 
 } // GUI

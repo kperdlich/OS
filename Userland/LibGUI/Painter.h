@@ -20,6 +20,7 @@ public:
     void drawFilledRect(const Rect& rect, GUI::Color color);
     void drawRect(const Rect& rect, GUI::Color color);
     void drawFilledQuad(int x, int y, int size, GUI::Color color);
+    void drawLine(const IntPoint& x, const IntPoint& y, GUI::Color color);
     void drawLine(int x0, int y0, int x1, int y1, GUI::Color color);
     void drawText(const Rect& rect, const ADS::String& text, Alignment alignment, GUI::Color color);
     void drawCharacterBitmap(const IntPoint& point, const CharacterBitmap& bitmap, Color color);
