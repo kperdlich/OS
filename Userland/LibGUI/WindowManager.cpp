@@ -38,6 +38,7 @@ static constexpr const char* closeButtonCharacters {
 
 static const CharacterBitmap closeButtonBitmap(closeButtonCharSize, closeButtonCharacters);
 
+static constexpr const int FrameWidthMargin = 1;
 static constexpr const int TaskbarHeight = 20;
 static const GUI::Color TaskbarColor { 190, 190, 190, 0xff };
 static const Rect TaskbarRect { 0, height - TaskbarHeight, width, TaskbarHeight };
@@ -45,19 +46,19 @@ static const Rect TaskbarRect { 0, height - TaskbarHeight, width, TaskbarHeight 
 static Rect windowFrameRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x(), rect.y() - TitleBarHeight, rect.width(), rect.height() + TitleBarHeight };
+    return { rect.x() - FrameWidthMargin, rect.y() - TitleBarHeight - FrameWidthMargin, rect.width() + (2 * FrameWidthMargin), rect.height() + TitleBarHeight };
 }
 
 static Rect windowTitleBarCloseButtonRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x() + rect.width() - TitleBarButtonSize - TitleBarButtonsMargin, rect.y() - TitleBarHeight + TitleBarButtonsMargin, TitleBarButtonSize, TitleBarButtonSize };
+    return { rect.x() + rect.width() + FrameWidthMargin - TitleBarButtonSize - TitleBarButtonsMargin, rect.y() - TitleBarHeight + TitleBarButtonsMargin, TitleBarButtonSize, TitleBarButtonSize };
 }
 
 static Rect windowTitleBarRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x(), rect.y() - TitleBarHeight, rect.width(), TitleBarHeight };
+    return { rect.x() - FrameWidthMargin, rect.y() - TitleBarHeight, rect.width() + (2 * FrameWidthMargin), TitleBarHeight };
 }
 
 static void paintTaskbar()

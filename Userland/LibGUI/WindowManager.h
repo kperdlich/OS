@@ -15,8 +15,6 @@ enum class IteratorResult {
     Break,
 };
 
-class Painter;
-
 class WindowManager final : public CObject {
 public:
     static WindowManager& instance()

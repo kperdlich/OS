@@ -30,7 +30,7 @@ void TextBox::setText(const ADS::String& text)
 Rect TextBox::innerRect() const
 {
     const int cursorMargin = static_cast<int>(margin());
-    Rect textRect = m_windowRelativeRect;
+    Rect textRect = rect();
     textRect.moveBy(cursorMargin, 0);
     textRect.setWidth(textRect.width() - cursorMargin);
     return textRect;
@@ -78,8 +78,8 @@ void TextBox::scrollCursorIntoView()
 void TextBox::onPaintEvent(Event& event)
 {
     Painter painter(this);
-    painter.drawFilledRect(m_windowRelativeRect, Colors::White);
-    painter.drawRect(m_windowRelativeRect, Colors::Black);
+    painter.drawFilledRect(rect(), Colors::White);
+    painter.drawRect(rect(), Colors::Black);
 
     const int maxVisibleChars = innerRect().width() / fontWidth();
     const ADS::String visibleText = m_text.substr(m_scrollOffset, ADS::min(static_cast<int>(m_text.length()) - m_scrollOffset, maxVisibleChars));

@@ -65,11 +65,16 @@ void Painter::drawFilledQuad(int x, int y, int size, GUI::Color color)
 
 void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
 {
+    x0 += m_relativeTranslationX;
+    y0 += m_relativeTranslationY;
+    x1 += m_relativeTranslationX;
+    y1 += m_relativeTranslationY;
+
     // Vertical Line
     if (x0 == x1) {
         const int startY = ADS::min(y0, y1);
         const int endY = ADS::max(y0, y1);
-        for (int i = startY; i < endY; ++i) {
+        for (int i = startY; i <= endY; ++i) {
             Screen::instance().setPixel(x0, i, color);
         }
         return;
@@ -79,7 +84,7 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
     if (y0 == y1) {
         const int startX = ADS::min(x0, x1);
         const int endX = ADS::max(x0, x1);
-        for (int i = startX; i < endX; ++i) {
+        for (int i = startX; i <= endX; ++i) {
             Screen::instance().setPixel(i, y0, color);
         }
         return;

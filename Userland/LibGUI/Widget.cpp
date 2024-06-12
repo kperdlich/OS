@@ -62,7 +62,7 @@ bool Widget::hits(int x, int y, HitResult& result)
         }
     }
 
-    if (m_windowRelativeRect.contains(x, y)) {
+    if (rect().contains(x, y)) {
         result.widget = this;
         result.localX = x;
         result.localY = y;

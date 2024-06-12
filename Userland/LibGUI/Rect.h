@@ -44,16 +44,12 @@ public:
 
     bool contains(int x, int y) const
     {
-        if (x > m_position.x() && x < (m_position.x() + m_size.width()) && y > m_position.y() && y < (m_position.y() + m_size.height()))
-            return true;
-        return false;
+        return x >= m_position.x() && x < (m_position.x() + width()) && y >= m_position.y() && y < (m_position.y() + height());
     }
 
-    bool contains(const Point<int>& point) const
+    bool contains(const IntPoint& point) const
     {
-        if (point.x() > m_position.x() && point.x() < (m_position.x() + m_size.width()) && point.y() > m_position.y() && point.y() < (m_position.y() + m_size.height()))
-            return true;
-        return false;
+        return contains(point.x(), point.y());
     }
 
     Rect clip(const Rect& clipInside) const

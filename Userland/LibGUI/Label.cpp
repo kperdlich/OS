@@ -22,9 +22,9 @@ void Label::onPaintEvent(Event& event)
 {
     Painter painter(this);
 #if 0
-    painter.drawRect(m_windowRelativeRect, Colors::Black);
+    painter.drawFilledRect(rect(), Colors::Black);
 #endif
-    painter.drawText(m_windowRelativeRect, m_text, m_alignment, Colors::Black);
+    painter.drawText(rect(), m_text, m_alignment, Colors::Black);
 }
 
 } // GUI

@@ -15,8 +15,6 @@
 
 namespace GUI {
 
-class Painter;
-
 class Window : public CObject {
 public:
     explicit Window(CObject* parent = nullptr);

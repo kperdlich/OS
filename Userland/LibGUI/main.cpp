@@ -39,7 +39,7 @@ int main()
     GUI::Button* button = new GUI::Button([]() {
         std::cout << "Button clicked" << std::endl;
     });
-    button->setWindowRelativeRect(GUI::Rect { 2, 2, 200, 30 });
+    button->setWindowRelativeRect(GUI::Rect { 0, 0, 200, 30 });
     button->setText("Press me :)");
 
     GUI::Window win1;
@@ -52,19 +52,19 @@ int main()
     container->setWindowRelativeRect(GUI::Rect { 0, 0, 300, 400 });
 
     GUI::TextBox* textBox = new GUI::TextBox("TextBox");
-    textBox->setWindowRelativeRect(GUI::Rect { 2, 2, 200, 30 });
+    textBox->setWindowRelativeRect(GUI::Rect { 0, 0, 200, 30 });
     textBox->setParent(container);
 
     GUI::Button* textBoxButton = new GUI::Button([&]() {
         textBox->setText("");
     });
-    textBoxButton->setWindowRelativeRect(GUI::Rect { 2, 20, 200, 30 });
+    textBoxButton->setWindowRelativeRect(GUI::Rect { 0, textBox->windowRelativeRect().y() + textBox->windowRelativeRect().height(), 200, 30 });
     textBoxButton->setText("Reset");
     textBoxButton->setParent(container);
 
     GUI::Label* label = new GUI::Label(container);
     label->setText("Label");
-    label->setWindowRelativeRect(GUI::Rect { 2, 40, 50, 30 });
+    label->setWindowRelativeRect(GUI::Rect { 0, textBoxButton->windowRelativeRect().y() + textBoxButton->windowRelativeRect().height(), 50, 30 });
 
     GUI::Window win2;
     win2.setRect({ GUI::Rect { 100, 100, 600, 400 } });
