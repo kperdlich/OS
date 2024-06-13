@@ -81,8 +81,6 @@ public:
     void setPosition(int value)
     {
         m_position = value;
-        m_selectionStart = 0;
-        m_selectionEnd = 0;
     };
 
     [[nodiscard]] int position() const { return m_position; };

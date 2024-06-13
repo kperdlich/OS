@@ -22,6 +22,7 @@ void TextBox::setText(const ADS::String& text)
 {
     m_text = text;
     m_cursor.setPosition(static_cast<int>(m_text.length()));
+    m_cursor.clearSelection();
     m_scrollOffset = 0;
     if (hasFocus())
         scrollCursorIntoView();
@@ -136,6 +137,7 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
             }
         } else {
             if (m_cursor.hasSelection()) {
+                m_cursor.clearSelection();
                 m_cursor.setPosition(m_cursor.selectionStart());
             } else if (m_cursor.position() > 0) {
                 m_cursor.moveCursorLeft();
@@ -163,6 +165,7 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
             }
         } else {
             if (m_cursor.hasSelection()) {
+                m_cursor.clearSelection();
                 m_cursor.setPosition(m_cursor.selectionEnd());
             } else if (m_cursor.position() < m_text.length()) {
                 m_cursor.moveCursorRight();
@@ -190,10 +193,25 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
         return;
     }
 
+    if (event.key() == Key::Key_Home) {
+        m_cursor.setPosition(0);
+        m_cursor.clearSelection();
+        scrollCursorIntoView();
+        return;
+    }
+
+    if (event.key() == Key::Key_End) {
+        m_cursor.setPosition(static_cast<int>(m_text.length()));
+        m_cursor.clearSelection();
+        scrollCursorIntoView();
+        return;
+    }
+
     if (event.text().length() > 0) {
         if (m_cursor.hasSelection()) {
             m_text.erase(m_cursor.selectionStart(), m_cursor.selectionEnd() - m_cursor.selectionStart());
             m_cursor.setPosition(m_cursor.selectionStart());
+            m_cursor.clearSelection();
         }
         m_text.insert(m_cursor.position(), event.text());
         m_cursor.moveCursorRight();
@@ -231,6 +249,7 @@ void TextBox::onMouseDownEvent(MouseEvent& event)
 {
     const int newCursorPos = ADS::max((event.x() / fontWidth()) - 1, 0);
     m_cursor.setPosition(ADS::min(m_scrollOffset + newCursorPos, static_cast<int>(m_text.length())));
+    m_cursor.clearSelection();
     m_isCursorVisible = true;
     m_inSelection = true;
 }
@@ -260,6 +279,7 @@ void TextBox::removeSelectedText()
     const int newCursorPos = m_cursor.selectionStart();
     m_text.erase(m_cursor.selectionStart(), m_cursor.selectionEnd() - m_cursor.selectionStart());
     m_cursor.setPosition(newCursorPos);
+    m_cursor.clearSelection();
     scrollCursorIntoView();
 }
 

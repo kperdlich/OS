@@ -147,6 +147,12 @@ private:
         case SDLK_a:
             key = Key::Key_A;
             break;
+        case SDLK_HOME:
+            key = Key::Key_Home;
+            break;
+        case SDLK_END:
+            key = Key::Key_End;
+            break;
         }
 
         if (event.keysym.sym > SDLK_UNKNOWN && event.keysym.sym <= SDLK_z) {
