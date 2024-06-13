@@ -120,6 +120,8 @@ void TextBox::onPaintEvent(Event& event)
 
 void TextBox::onKeyDownEvent(KeyEvent& event)
 {
+    m_isCursorVisible = true;
+
     if (event.key() == Key::Key_Left) {
         if (event.shift()) {
             if (m_cursor.position() > 0) {
@@ -137,13 +139,12 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
             }
         } else {
             if (m_cursor.hasSelection()) {
-                m_cursor.clearSelection();
                 m_cursor.setPosition(m_cursor.selectionStart());
+                m_cursor.clearSelection();
             } else if (m_cursor.position() > 0) {
                 m_cursor.moveCursorLeft();
             }
         }
-        m_isCursorVisible = true;
         scrollCursorIntoView();
         return;
     }
@@ -165,13 +166,12 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
             }
         } else {
             if (m_cursor.hasSelection()) {
-                m_cursor.clearSelection();
                 m_cursor.setPosition(m_cursor.selectionEnd());
+                m_cursor.clearSelection();
             } else if (m_cursor.position() < m_text.length()) {
                 m_cursor.moveCursorRight();
             }
         }
-        m_isCursorVisible = true;
         scrollCursorIntoView();
         return;
     }
@@ -184,7 +184,6 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
             m_text.erase(m_cursor.position(), 1);
             m_scrollOffset = ADS::max(m_scrollOffset - 1, 0);
         }
-        m_isCursorVisible = true;
         return;
     }
 
@@ -215,7 +214,6 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
         }
         m_text.insert(m_cursor.position(), event.text());
         m_cursor.moveCursorRight();
-        m_isCursorVisible = true;
         scrollCursorIntoView();
     }
 }
@@ -260,8 +258,18 @@ void TextBox::onMouseMoveEvent(MouseEvent& event)
         m_isCursorVisible = true;
         const int visibleCursorPos = ADS::max((event.x() / fontWidth()), 0);
         const int selectionCursorPos = ADS::min(m_scrollOffset + visibleCursorPos, static_cast<int>(m_text.length()));
-        m_cursor.setSelectionStart(ADS::min(selectionCursorPos, m_cursor.position()));
-        m_cursor.setSelectionEnd(ADS::max(selectionCursorPos, m_cursor.position()));
+        if (m_cursor.hasSelection()) {
+            if (m_cursor.position() == m_cursor.selectionStart()) {
+                m_cursor.setSelectionStart(selectionCursorPos);
+            } else {
+                m_cursor.setSelectionEnd(selectionCursorPos);
+            }
+            m_cursor.setPosition(selectionCursorPos);
+        } else {
+            m_cursor.setSelectionStart(ADS::min(selectionCursorPos, m_cursor.position()));
+            m_cursor.setSelectionEnd(ADS::max(selectionCursorPos, m_cursor.position()));
+            m_cursor.setPosition(selectionCursorPos);
+        }
 #if 0
         std::cout << "m_selectionRange: start: " << m_cursor.start() << " end: " << m_cursor.end() << std::endl;
 #endif
