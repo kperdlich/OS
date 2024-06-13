@@ -23,14 +23,40 @@ public:
     {
     }
 
-    void moveLeft()
+    void moveCursorLeft()
     {
-        setPosition(m_position - 1);
+        --m_position;
     }
 
-    void moveRight()
+    void moveCursorRight()
     {
-        setPosition(m_position + 1);
+        ++m_position;
+    }
+
+    void reduceSelectionLeft()
+    {
+        ++m_selectionStart;
+    }
+
+    void expandSelectionLeft()
+    {
+        --m_selectionStart;
+    }
+
+    void expandSelectionRight()
+    {
+        ++m_selectionEnd;
+    }
+
+    void reduceSelectionRight()
+    {
+        --m_selectionEnd;
+    }
+
+    void clearSelection()
+    {
+        m_selectionEnd = 0;
+        m_selectionStart = 0;
     }
 
     // Inclusive

@@ -50,7 +50,10 @@ Rect TextBox::cursorRect() const
 
 Rect TextBox::selectionRect() const
 {
-    const int selectedChars = ADS::min(m_cursor.selectionEnd() - m_cursor.selectionStart(), maxVisibleChars());
+    const int firstVisibleSelectedChar = ADS::max(m_cursor.selectionStart(), m_scrollOffset);
+    const int lastVisibleSelectedChar = ADS::min(m_cursor.selectionEnd(), m_scrollOffset + maxVisibleChars());
+    const int selectedChars = lastVisibleSelectedChar - firstVisibleSelectedChar;
+
     Rect selectionRect = innerRect();
     selectionRect.setHeight(innerRect().height() - (2 * margin()));
     selectionRect.setWidth(selectedChars * fontWidth());
@@ -98,12 +101,9 @@ void TextBox::onPaintEvent(Event& event)
 
     if (m_cursor.hasSelection()) {
         painter.drawFilledRect(selectionRect(), Colors::Blue);
-    } else if (m_isCursorVisible && hasFocus()) {
-        painter.drawFilledRect(cursorRect(), Colors::Black);
     }
 
     const ADS::String visibleText = m_text.substr(m_scrollOffset, ADS::min(static_cast<int>(m_text.length()) - m_scrollOffset, maxVisibleChars()));
-
     for (size_t i = 0; i < visibleText.length(); ++i) {
         Rect charRect = innerRect();
         charRect.moveBy(static_cast<int>(i) * fontWidth(), 0);
@@ -111,15 +111,35 @@ void TextBox::onPaintEvent(Event& event)
         const ADS::String character { visibleText[i] };
         painter.drawText(charRect, character, Alignment::Left, m_cursor.selectionIncludes(i + m_scrollOffset) ? Colors::White : Colors::Black);
     }
+
+    if (m_isCursorVisible && hasFocus()) {
+        painter.drawFilledRect(cursorRect(), Colors::Black);
+    }
 }
 
 void TextBox::onKeyDownEvent(KeyEvent& event)
 {
     if (event.key() == Key::Key_Left) {
-        if (m_cursor.hasSelection()) {
-            m_cursor.setPosition(m_cursor.selectionStart());
-        } else if (m_cursor.position() > 0) {
-            m_cursor.moveLeft();
+        if (event.shift()) {
+            if (m_cursor.position() > 0) {
+                if (m_cursor.hasSelection()) {
+                    if (m_cursor.selectionStart() == m_cursor.position()) {
+                        m_cursor.expandSelectionLeft();
+                    } else {
+                        m_cursor.reduceSelectionRight();
+                    }
+                } else {
+                    m_cursor.setSelectionStart(m_cursor.position() - 1);
+                    m_cursor.setSelectionEnd(m_cursor.position());
+                }
+                m_cursor.moveCursorLeft();
+            }
+        } else {
+            if (m_cursor.hasSelection()) {
+                m_cursor.setPosition(m_cursor.selectionStart());
+            } else if (m_cursor.position() > 0) {
+                m_cursor.moveCursorLeft();
+            }
         }
         m_isCursorVisible = true;
         scrollCursorIntoView();
@@ -127,10 +147,26 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
     }
 
     if (event.key() == Key::Key_Right) {
-        if (m_cursor.hasSelection()) {
-            m_cursor.setPosition(m_cursor.selectionEnd());
-        } else if (m_cursor.position() < m_text.length()) {
-            m_cursor.moveRight();
+        if (event.shift()) {
+            if (m_cursor.position() < m_text.length()) {
+                if (m_cursor.hasSelection()) {
+                    if (m_cursor.selectionEnd() == m_cursor.position()) {
+                        m_cursor.expandSelectionRight();
+                    } else {
+                        m_cursor.reduceSelectionLeft();
+                    }
+                } else {
+                    m_cursor.setSelectionStart(m_cursor.position());
+                    m_cursor.setSelectionEnd(m_cursor.position() + 1);
+                }
+                m_cursor.moveCursorRight();
+            }
+        } else {
+            if (m_cursor.hasSelection()) {
+                m_cursor.setPosition(m_cursor.selectionEnd());
+            } else if (m_cursor.position() < m_text.length()) {
+                m_cursor.moveCursorRight();
+            }
         }
         m_isCursorVisible = true;
         scrollCursorIntoView();
@@ -141,7 +177,7 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
         if (m_cursor.hasSelection()) {
             removeSelectedText();
         } else if (m_cursor.position() > 0 && m_text.length() > 0) {
-            m_cursor.moveLeft();
+            m_cursor.moveCursorLeft();
             m_text.erase(m_cursor.position(), 1);
             m_scrollOffset = ADS::max(m_scrollOffset - 1, 0);
         }
@@ -160,7 +196,7 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
             m_cursor.setPosition(m_cursor.selectionStart());
         }
         m_text.insert(m_cursor.position(), event.text());
-        m_cursor.moveRight();
+        m_cursor.moveCursorRight();
         m_isCursorVisible = true;
         scrollCursorIntoView();
     }
@@ -177,6 +213,8 @@ void TextBox::onFocusOutEvent(FocusEvent&)
     killTimer(m_blinkTimerId);
     m_blinkTimerId = 0;
     m_isCursorVisible = false;
+    m_inSelection = false;
+    m_cursor.clearSelection();
 }
 
 void TextBox::onTimerEvent(TimerEvent&)
