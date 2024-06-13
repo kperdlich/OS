@@ -28,6 +28,9 @@ public:
     inline int x() const { return m_position.x(); }
     inline int y() const { return m_position.y(); }
 
+    void setX(int value) { m_position.setX(value); }
+    void setY(int value) { m_position.setY(value); }
+
     inline Size size() const { return m_size; }
 
     inline Point<int> position() const { return m_position; }

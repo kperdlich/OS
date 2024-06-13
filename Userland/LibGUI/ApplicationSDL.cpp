@@ -86,7 +86,7 @@ private:
     {
         if (event.keysym.sym >= 'a' && event.keysym.sym <= 'z')
             return static_cast<char>(event.keysym.sym - 32); // to ASCII uppercase
-        
+
         switch (event.keysym.sym) {
         case '1':
             return '!';
@@ -144,17 +144,19 @@ private:
         case SDLK_RETURN:
             key = Key::Key_Return;
             break;
-        default:
-            if (event.keysym.sym > SDLK_UNKNOWN && event.keysym.sym <= SDLK_z) {
-                if (event.keysym.mod & KMOD_SHIFT) {
-                    text = handleShift(event);
-                } else if (event.keysym.mod & KMOD_RALT) {
-                    text = handleAlt(event);
-                } else {
-                    text = static_cast<char>(event.keysym.sym);
-                }
-            }
+        case SDLK_a:
+            key = Key::Key_A;
             break;
+        }
+
+        if (event.keysym.sym > SDLK_UNKNOWN && event.keysym.sym <= SDLK_z) {
+            if (event.keysym.mod & KMOD_SHIFT) {
+                text = handleShift(event);
+            } else if (event.keysym.mod & KMOD_RALT) {
+                text = handleAlt(event);
+            } else {
+                text = static_cast<char>(event.keysym.sym);
+            }
         }
 
         unsigned int modifier = KeyboardModifier::NoModifier;
