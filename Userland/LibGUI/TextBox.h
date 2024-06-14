@@ -126,6 +126,10 @@ private:
     Rect cursorRect() const;
     Rect selectionRect() const;
 
+    void handleKeyLeft(KeyEvent& event);
+    void handleKeyRight(KeyEvent& event);
+    void handleKeyBackspace(KeyEvent& event);
+
     void removeSelectedText();
 
 private:
