@@ -15,19 +15,16 @@ public:
     {
         while (true) {
             processSDLEvents();
+            updateTimer();
+
             if (!m_eventQueue.empty()) {
-                ADS::Vector<QueuedEvent> queue;
-                {
-                    const ADS::LockGuard<ADS::Mutex> mutex(m_mutex);
-                    queue = std::move(m_eventQueue);
-                }
+                ADS::Vector<QueuedEvent> queue = std::move(m_eventQueue);
                 for (auto& queuedEvent : queue) {
                     if (queuedEvent.receiver) {
                         queuedEvent.receiver->event(*queuedEvent.event);
                     } else {
-                        if (queuedEvent.event->type() == Event::Type::Quit) {
+                        if (queuedEvent.event->type() == Event::Type::Quit)
                             return 0;
-                        }
                         std::cerr << "event type " << static_cast<int>(queuedEvent.event->type()) << " has no receiver." << std::endl;
                         return 1;
                     }
@@ -38,8 +35,30 @@ public:
 
     void postEvent(CObject* receiver, ADS::UniquePtr<Event>&& event)
     {
-        const ADS::LockGuard<ADS::Mutex> mutex(m_mutex);
         m_eventQueue.push_back({ receiver, std::move(event) });
+    }
+
+    int startTimer(int intervalMs, CObject& object)
+    {
+        const Timer timer {
+            .timerId = m_nextTimerId,
+            .intervalMs = intervalMs,
+            .timeout = std::chrono::steady_clock::now() + std::chrono::milliseconds(intervalMs),
+            .owner = &object
+        };
+        m_timers[timer.timerId] = timer;
+
+        // FIXME: Handle overflow
+        ++m_nextTimerId;
+        return timer.timerId;
+    }
+
+    void killTimer(int timerId)
+    {
+        if (!m_timers.contains(timerId))
+            return;
+
+        m_timers.erase(timerId);
     }
 
 private:
@@ -180,13 +199,32 @@ private:
         }
     }
 
+    void updateTimer()
+    {
+        for (auto& timerEntry : m_timers) {
+            Timer& timer = timerEntry.second;
+            if (timer.timeout > std::chrono::steady_clock::now())
+                continue;
+            postEvent(timer.owner, ADS::UniquePtr<TimerEvent>(new TimerEvent()));
+            timer.timeout = std::chrono::milliseconds(timer.intervalMs) + std::chrono::steady_clock::now();
+        }
+    }
+
     struct QueuedEvent {
         CObject* receiver { nullptr };
         ADS::UniquePtr<Event> event;
     };
 
+    struct Timer {
+        int timerId {};
+        int intervalMs {};
+        std::chrono::steady_clock::time_point timeout;
+        CObject* owner {};
+    };
+
     ADS::Vector<QueuedEvent> m_eventQueue;
-    ADS::Mutex m_mutex;
+    ADS::HashMap<int, Timer> m_timers;
+    int m_nextTimerId { 0 };
 };
 
 static Application* s_instance = nullptr;
@@ -214,6 +252,16 @@ int Application::exec()
 void Application::postEvent(CObject* receiver, ADS::UniquePtr<Event>&& event)
 {
     m_impl->postEvent(receiver, std::move(event));
+}
+
+int Application::startTimer(int intervalMs, CObject& object)
+{
+    return m_impl->startTimer(intervalMs, object);
+}
+
+void Application::killTimer(int timerId)
+{
+    m_impl->killTimer(timerId);
 }
 
 } // GUI

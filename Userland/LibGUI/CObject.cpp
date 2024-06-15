@@ -5,7 +5,6 @@
 #include "CObject.h"
 #include "Application.h"
 #include "Event.h"
-#include "TimerManager.h"
 
 namespace GUI {
 
@@ -45,12 +44,12 @@ bool CObject::event(Event& event)
 
 int CObject::startTimer(int intervalMs)
 {
-    return TimerManager::instance().startTimer(intervalMs, *this);
+    return Application::instance().startTimer(intervalMs, *this);
 }
 
 void CObject::killTimer(int id)
 {
-    TimerManager::instance().killTimer(id);
+    Application::instance().killTimer(id);
 }
 
 void CObject::addChild(CObject& child)

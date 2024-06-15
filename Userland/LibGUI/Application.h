@@ -19,6 +19,8 @@ public:
     int exec();
 
     void postEvent(CObject* receiver, ADS::UniquePtr<Event>&& event);
+    int startTimer(int intervalMs, CObject& object);
+    void killTimer(int timerId);
 
 private:
     class EventLoopImpl;

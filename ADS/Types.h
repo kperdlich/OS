@@ -11,6 +11,7 @@
 #include <optional>
 #include <thread>
 #include <vector>
+#include <unordered_map>
 
 #define ASSERT(X) assert(X)
 
@@ -35,6 +36,9 @@ using Vector = std::vector<T>;
 
 template<typename T>
 using LockGuard = std::lock_guard<T>;
+
+template<typename Key, typename Value>
+using HashMap = std::unordered_map<Key, Value>;
 
 using Mutex = std::mutex;
 
