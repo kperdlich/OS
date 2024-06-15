@@ -25,9 +25,13 @@ public:
         FocusIn,
         FocusOut,
         Resize,
+        Layout,
         Paint,
+        Show,
+        Hide,
         Timer,
         Quit,
+        DeferredDestroy,
     };
 
     explicit Event(Type type)

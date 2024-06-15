@@ -21,7 +21,7 @@ public:
     void setAlignment(Alignment alignment) { m_alignment = alignment; }
     [[nodiscard]] Alignment alignment() const { return m_alignment; }
 
-    virtual const char* name() const override { return "Label"; }
+    virtual const char* className() const override { return "Label"; }
 
 protected:
     virtual void onPaintEvent(Event& event) override;

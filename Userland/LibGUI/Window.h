@@ -24,6 +24,9 @@ public:
     virtual bool isWindowType() const override;
 
     void show();
+    void hide();
+    void close();
+
     inline bool isVisible() { return m_isVisible; }
 
     bool contains(IntPoint position);

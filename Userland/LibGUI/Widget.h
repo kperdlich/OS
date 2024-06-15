@@ -12,10 +12,13 @@
 namespace GUI {
 
 class Window;
+class Layout;
 
 class Widget : public CObject {
 public:
     explicit Widget(Widget* parent = nullptr);
+
+    virtual const char* className() const { return "Widget"; }
 
     virtual bool event(Event& event) override;
     virtual bool isWidgetType() const override;
@@ -39,9 +42,17 @@ public:
     bool hasFocus() const;
     void setFocus(FocusReason reason);
 
-    virtual const char* name() const { return "Widget"; }
+    bool isVisible() const { return m_isVisible; }
+    void setIsVisible(bool value) { m_isVisible = value; }
+
+    Layout* layout() const { return m_layout; }
+    void setLayout(Layout* layout);
+
+    Widget* parentWidget() const;
 
 protected:
+    virtual void onShowEvent(Event& event);
+    virtual void onHideEvent(Event& event);
     virtual void onPaintEvent(Event& event);
     virtual void onMouseMoveEvent(MouseEvent& event);
     virtual void onMouseDownEvent(MouseEvent& event);
@@ -52,9 +63,14 @@ protected:
     virtual void onFocusOutEvent(FocusEvent& event);
     virtual void onResizeEvent(ResizeEvent& event);
 
+private:
+    void updateLayout();
+
 protected:
     Window* m_window;
     Rect m_windowRelativeRect;
+    Layout* m_layout;
+    bool m_isVisible { true };
 };
 
 } // GUI

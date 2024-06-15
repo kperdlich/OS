@@ -3,6 +3,7 @@
 //
 
 #include "Widget.h"
+#include "Layout.h"
 #include "Window.h"
 
 namespace GUI {
@@ -37,16 +38,39 @@ bool Widget::event(Event& event)
         onFocusOutEvent(static_cast<FocusEvent&>(event));
         return true;
     case Event::Type::Resize:
+        updateLayout();
         onResizeEvent(static_cast<ResizeEvent&>(event));
         return true;
     case Event::Type::Paint:
         for (auto& child : m_children) {
             if (child->isWidgetType()) {
                 Widget* childWidget = static_cast<Widget*>(child);
-                childWidget->onPaintEvent(event);
+                childWidget->event(event);
             }
         }
-        onPaintEvent(event);
+        if (isVisible())
+            onPaintEvent(event);
+        return true;
+    case Event::Type::Show:
+        for (auto& child : m_children) {
+            if (child->isWidgetType()) {
+                Widget* childWidget = static_cast<Widget*>(child);
+                childWidget->event(event);
+            }
+        }
+        onShowEvent(event);
+        return true;
+    case Event::Type::Hide:
+        for (auto& child : m_children) {
+            if (child->isWidgetType()) {
+                Widget* childWidget = static_cast<Widget*>(child);
+                childWidget->event(event);
+            }
+        }
+        onHideEvent(event);
+        return true;
+    case Event::Type::Layout:
+        updateLayout();
         return true;
     default:
         return CObject::event(event);
@@ -70,6 +94,25 @@ bool Widget::hits(int x, int y, HitResult& result)
     }
 
     return false;
+}
+
+void Widget::updateLayout()
+{
+    if (!m_isVisible)
+        return;
+
+    if (m_layout)
+        m_layout->activate();
+}
+
+void Widget::onShowEvent(Event& event)
+{
+    std::cout << "onShowEvent[" << className() << "]" << std::endl;
+}
+
+void Widget::onHideEvent(Event& event)
+{
+    std::cout << "onHideEvent[" << className() << "]" << std::endl;
 }
 
 void Widget::onPaintEvent(Event& event)
@@ -102,7 +145,6 @@ void Widget::setWindowRelativeRect(const Rect& rect)
         ResizeEvent resizeEvent(newSize, oldSize);
         event(resizeEvent);
     }
-
 }
 
 void Widget::setWindow(Window* window)
@@ -150,6 +192,27 @@ void Widget::onFocusInEvent(FocusEvent& event)
 
 void Widget::onResizeEvent(ResizeEvent& event)
 {
+}
+
+void Widget::setLayout(Layout* layout)
+{
+    if (layout) {
+        if (layout->parentWidget() && layout->parentWidget() != this) {
+            std::cout << "[Warning] Layout: " << layout->className() << " has a different parent widget: " << layout->parentWidget()->className() << std::endl;
+            std::cout << "[Warning] Re-parenting to " << className() << std::endl;
+        }
+        layout->setParent(this);
+    }
+
+    m_layout = layout;
+}
+
+Widget* Widget::parentWidget() const
+{
+    if (parent() && parent()->isWidgetType())
+        return static_cast<Widget*>(parent());
+
+    return nullptr;
 }
 
 } // GUI

@@ -18,7 +18,7 @@ public:
 
     void setText(const ADS::String& text);
 
-    virtual const char* name() const override { return "Button"; }
+    virtual const char* className() const override { return "Button"; }
 
 protected:
     virtual void onPaintEvent(Event& event) override;

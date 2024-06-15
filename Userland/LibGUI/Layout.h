@@ -1,0 +1,33 @@
+//
+// Created by n3dry on 15.06.24.
+//
+
+#pragma once
+
+#include "Widget.h"
+
+namespace GUI {
+
+struct LayoutItem {
+    Widget* widget;
+};
+
+class Layout : public Widget {
+public:
+    explicit Layout(Widget* parent = nullptr);
+
+    virtual const char* className() const override { return "Layout"; }
+    virtual bool isWidgetType() const override { return false; };
+
+    virtual void activate() = 0;
+    void addWidget(Widget& widget);
+
+    int spacing() const { return m_spacing; };
+    void setSpacing(int value);
+
+protected:
+    ADS::Vector<LayoutItem> m_layoutItems;
+    int m_spacing { 0 };
+};
+
+} // GUI

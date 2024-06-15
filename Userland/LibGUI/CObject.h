@@ -19,11 +19,13 @@ public:
     virtual bool isWidgetType() const;
     virtual bool isWindowType() const;
 
+    void deleteLater();
+
     int startTimer(int intervalMs);
     void killTimer(int id);
 
     void setParent(CObject* parent);
-    inline CObject* parent() { return m_parent; };
+    CObject* parent() const { return m_parent; };
 
 protected:
     void addChild(CObject& child);

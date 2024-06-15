@@ -176,20 +176,18 @@ void TextBox::onFocusInEvent(FocusEvent&)
 
 void TextBox::onFocusOutEvent(FocusEvent&)
 {
-    killTimer(m_blinkTimerId);
-    m_blinkTimerId = 0;
-    m_isCursorVisible = false;
-    m_inSelection = false;
-    m_cursor.clearSelection();
+   cleanup();
 }
 
-void TextBox::onTimerEvent(TimerEvent&)
+void TextBox::onTimerEvent(TimerEvent& event)
 {
+    Widget::onTimerEvent(event);
     m_isCursorVisible = !m_isCursorVisible;
 }
 
-void TextBox::onResizeEvent(ResizeEvent&)
+void TextBox::onResizeEvent(ResizeEvent& event)
 {
+    Widget::onResizeEvent(event);
     scrollCursorIntoView();
 }
 
@@ -317,6 +315,15 @@ void TextBox::handleKeyBackspace(KeyEvent& event)
         m_text.erase(m_cursor.position(), 1);
         m_scrollOffset = ADS::max(m_scrollOffset - 1, 0);
     }
+}
+
+void TextBox::cleanup()
+{
+    killTimer(m_blinkTimerId);
+    m_blinkTimerId = 0;
+    m_isCursorVisible = false;
+    m_inSelection = false;
+    m_cursor.clearSelection();
 }
 
 } // GUI

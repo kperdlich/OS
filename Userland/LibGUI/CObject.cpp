@@ -3,6 +3,8 @@
 //
 
 #include "CObject.h"
+#include "Application.h"
+#include "Event.h"
 #include "TimerManager.h"
 
 namespace GUI {
@@ -32,6 +34,9 @@ bool CObject::event(Event& event)
     switch (event.type()) {
     case Event::Type::Timer:
         onTimerEvent(static_cast<TimerEvent&>(event));
+        return true;
+    case Event::Type::DeferredDestroy:
+        delete this;
         return true;
     }
 
@@ -90,6 +95,11 @@ bool CObject::isWidgetType() const
 bool CObject::isWindowType() const
 {
     return false;
+}
+
+void CObject::deleteLater()
+{
+    Application::instance().postEvent(this, ADS::UniquePtr<Event>(new Event(Event::Type::DeferredDestroy)));
 }
 
 } // GUI

@@ -96,10 +96,10 @@ public:
     explicit TextBox(Widget* parent = nullptr);
     TextBox(const ADS::String& text, Widget* parent = nullptr);
 
+    virtual const char* className() const override { return "TextBox"; }
+
     void setText(const ADS::String& text);
     ADS::String text() const { return m_text; }
-
-    virtual const char* name() const override { return "TextBox"; }
 
     void selectAll();
 
@@ -129,9 +129,8 @@ private:
     void handleKeyLeft(KeyEvent& event);
     void handleKeyRight(KeyEvent& event);
     void handleKeyBackspace(KeyEvent& event);
-
     void removeSelectedText();
-
+    void cleanup();
 private:
     ADS::String m_text;
     Cursor m_cursor;

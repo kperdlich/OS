@@ -17,12 +17,19 @@ Window::Window(CObject* parent)
 
 Window::~Window()
 {
+    GUI::WindowManager::instance().remove(*this);
+
     if (m_centralWidget) {
         delete m_centralWidget;
         m_centralWidget = nullptr;
     }
+}
 
+void Window::close()
+{
+    hide();
     GUI::WindowManager::instance().remove(*this);
+    deleteLater();
 }
 
 bool Window::event(Event& event)
@@ -32,7 +39,7 @@ bool Window::event(Event& event)
         if (m_centralWidget) {
             Widget::HitResult result {};
             if (m_centralWidget->hits(mouseEvent.x(), mouseEvent.y(), result)) {
-                //std::cout << "[Widget::HitResult] " << result.widget->name() << " localX: " << result.localX << " localY: " << result.localY << std::endl;
+                // std::cout << "[Widget::HitResult] " << result.widget->name() << " localX: " << result.localX << " localY: " << result.localY << std::endl;
                 MouseEvent localWidgetMouseEvent(event.type(), result.localX, result.localY, mouseEvent.button());
                 return result.widget->event(localWidgetMouseEvent);
             }
@@ -95,6 +102,19 @@ void Window::setCentralWidget(Widget& widget)
 void Window::show()
 {
     GUI::WindowManager::instance().add(*this);
+    if (m_centralWidget) {
+        Event showEvent(Event::Type::Show);
+        m_centralWidget->event(showEvent);
+    }
+}
+
+void Window::hide()
+{
+    if (m_centralWidget) {
+        Event hideEvent(Event::Type::Hide);
+        m_centralWidget->event(hideEvent);
+    }
+    m_isVisible = false;
 }
 
 void Window::setFocusedWidget(Widget* widget, FocusReason reason)

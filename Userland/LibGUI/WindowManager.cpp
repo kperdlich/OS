@@ -146,7 +146,7 @@ void WindowManager::processMouseEvent(MouseEvent& event)
         if (event.type() == Event::Type::MouseDown) {
             if (windowTitleBarRect(window).contains(event.position())) {
                 if (windowTitleBarCloseButtonRect(window).contains(event.position())) {
-                    remove(window);
+                    closeWindow(window);
                     return IteratorResult::Break;
                 }
 
@@ -217,6 +217,12 @@ void WindowManager::onWindowTaskBarMouseDown(Window& window, int x, int y)
         m_lastMouseDragPos = { x, y };
         m_isDraggingWindow = true;
     }
+}
+
+void WindowManager::closeWindow(Window& window)
+{
+    makeActive(nullptr);
+    window.close();
 }
 
 } // GUI

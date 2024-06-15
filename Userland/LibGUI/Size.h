@@ -27,6 +27,13 @@ public:
             && m_height == other.m_height;
     }
 
+    Size& operator-=(const Size& other)
+    {
+        m_height -= other.m_height;
+        m_width -= other.m_width;
+        return *this;
+    }
+
 private:
     int m_width {};
     int m_height {};

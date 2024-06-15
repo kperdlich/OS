@@ -45,6 +45,7 @@ private:
 
     void onWindowTaskBarMouseDown(Window& window, int x, int y);
     void paintWindow(Window& window, Event& event);
+    void closeWindow(Window& window);
 
 private:
     ADS::Vector<Window*> m_windows;
