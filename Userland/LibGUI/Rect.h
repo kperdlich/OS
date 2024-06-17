@@ -19,6 +19,12 @@ public:
     {
     }
 
+    Rect(int x, int y, Size size)
+        : m_position(x, y)
+        , m_size(size)
+    {
+    }
+
     inline int width() const { return m_size.width(); }
     inline int height() const { return m_size.height(); }
 
@@ -31,6 +37,7 @@ public:
     void setX(int value) { m_position.setX(value); }
     void setY(int value) { m_position.setY(value); }
 
+    void setSize(Size value) { m_size = value; }
     inline Size size() const { return m_size; }
 
     inline Point<int> position() const { return m_position; }

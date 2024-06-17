@@ -43,48 +43,52 @@ int main()
         GUI::Button* button = new GUI::Button([]() {
             std::cout << "Button clicked" << std::endl;
         });
-        button->setWindowRelativeRect(GUI::Rect { 0, 0, 200, 30 });
         button->setText("Press me :)");
+        button->setFixedSize({ 100, 30 });
 
         GUI::Window* win1 = new GUI::Window();
-        win1->setRect(GUI::Rect { 50, 50, 600, 400 });
         win1->setCentralWidget(*button);
         win1->setTitle("Window 1");
         win1->show();
     }
 
     {
-        GUI::Widget* container = new GUI::Widget();
-        container->setWindowRelativeRect(GUI::Rect { 0, 0, 300, 400 });
 
-        GUI::BoxLayout* layout = new GUI::BoxLayout(GUI::BoxLayout::Direction::Vertical);
-        layout->setSpacing(10);
+        GUI::BoxLayout* containerLayout = new GUI::BoxLayout(GUI::BoxLayout::Direction::Vertical);
+        containerLayout->setSpacing(10);
 
-        container->setLayout(layout);
-        GUI::TextBox* textBox = new GUI::TextBox("TextBox");
-        textBox->setWindowRelativeRect(GUI::Rect { 0, 0, 200, 30 });
-        textBox->setParent(container);
+        GUI::Widget* root = new GUI::Widget();
+        root->setLayout(containerLayout);
 
-        GUI::Button* textBoxButton = new GUI::Button([&]() {
-            textBox->setText("");
-        });
-        textBoxButton->setWindowRelativeRect(GUI::Rect { 0, textBox->windowRelativeRect().y() + textBox->windowRelativeRect().height(), 200, 30 });
+        GUI::Widget* formWidget = new GUI::Widget(root);
+        GUI::BoxLayout* formLayout = new GUI::BoxLayout(GUI::BoxLayout::Direction::Horizontal);
+        formWidget->setLayout(formLayout);
+
+        GUI::TextBox* textBox = new GUI::TextBox("TextBox", formWidget);
+        textBox->setFixedSize({ 100, 30 });
+
+        GUI::Label* label = new GUI::Label("Label", formWidget);
+        label->setFixedSize({ 30, 30 });
+        label->setAlignment(GUI::Alignment::Center);
+        label->shrinkToFit();
+
+        GUI::Button* textBoxButton = new GUI::Button(
+            [&]() {
+                textBox->setText("");
+            },
+            root);
         textBoxButton->setText("Reset");
-        textBoxButton->setParent(container);
-
-        GUI::Label* label = new GUI::Label(container);
-        label->setText("Label");
-        label->setWindowRelativeRect(GUI::Rect { 0, textBoxButton->windowRelativeRect().y() + textBoxButton->windowRelativeRect().height(), 50, 30 });
 
         //// Layout stuff
-        layout->addWidget(*textBox);
-        layout->addWidget(*textBoxButton);
-        layout->addWidget(*label);
+        formLayout->addWidget(*label);
+        formLayout->addWidget(*textBox);
+
+        containerLayout->addWidget(*formWidget);
+        containerLayout->addWidget(*textBoxButton);
 
         GUI::Window* win2 = new GUI::Window();
-        win2->setRect({ GUI::Rect { 100, 100, 600, 400 } });
         win2->setTitle("Window 2");
-        win2->setCentralWidget(*container);
+        win2->setCentralWidget(*root);
         win2->show();
     }
 

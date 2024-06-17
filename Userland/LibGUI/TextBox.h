@@ -103,6 +103,8 @@ public:
 
     void selectAll();
 
+    virtual bool acceptsFocus() const { return true; }
+
 protected:
     virtual void onPaintEvent(Event& event) override;
     virtual void onTimerEvent(TimerEvent& event) override;

@@ -8,22 +8,23 @@
 namespace GUI {
 
 Layout::Layout(Widget* parent)
-    : Widget(parent)
+    : CObject(parent)
 {
 }
 
 void Layout::addWidget(Widget& widget)
 {
+    ASSERT(widget.isWidgetType());
     m_layoutItems.emplace_back(LayoutItem { .widget = &widget });
-    if (Widget* parent = parentWidget())
-        Application::instance().postEvent(parent, ADS::UniquePtr<Event>(new Event(Event::Type::Layout)));
+    if (parent() && parent()->isWidgetType())
+        Application::instance().postEvent(parent(), ADS::UniquePtr<Event>(new Event(Event::Type::Layout)));
 }
 
 void Layout::setSpacing(int value)
 {
     m_spacing = value;
-    if (Widget* parent = parentWidget())
-        Application::instance().postEvent(parent, ADS::UniquePtr<Event>(new Event(Event::Type::Layout)));
+    if (parent() && parent()->isWidgetType())
+        Application::instance().postEvent(parent(), ADS::UniquePtr<Event>(new Event(Event::Type::Layout)));
 }
 
 } // GUI

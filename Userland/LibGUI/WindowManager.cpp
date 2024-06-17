@@ -89,7 +89,7 @@ bool WindowManager::event(Event& event)
     return CObject::event(event);
 }
 
-void WindowManager::add(Window& window)
+void WindowManager::show(Window& window)
 {
     m_windows.emplace_back(&window);
 }
@@ -115,15 +115,15 @@ void WindowManager::makeActive(Window* window)
     // FIXME: Handle z-sorting better
     if (window) {
         remove(*window);
-        add(*window);
+        show(*window);
     }
 
-    if (m_activeWindow)
+    if (m_activeWindow && m_activeWindow->focusedWidget())
         Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusOut, FocusReason::ActiveWindow)));
 
     m_activeWindow = window;
 
-    if (m_activeWindow)
+    if (m_activeWindow && m_activeWindow->focusedWidget())
         Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusIn, FocusReason::ActiveWindow)));
 }
 

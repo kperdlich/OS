@@ -20,11 +20,15 @@ public:
 
     virtual const char* className() const override { return "Button"; }
 
+    virtual bool acceptsFocus() const { return true; }
+
 protected:
     virtual void onPaintEvent(Event& event) override;
     virtual void onMouseDownEvent(MouseEvent& event) override;
     virtual void onMouseUpEvent(MouseEvent& event) override;
     virtual void onMouseMoveEvent(MouseEvent& event) override;
+
+    static int fontWidth();
 
 private:
     ADS::String m_text;

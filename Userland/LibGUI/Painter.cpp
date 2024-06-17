@@ -145,6 +145,7 @@ void Painter::drawText(const Rect& rect, const ADS::String& text, Alignment alig
     // Center horizontal by default
     translated.moveBy(0, (rect.height() - s_defaultFont.height()) / 2);
 
+    const auto clippedRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() }.clip(translated);
     for (size_t i = 0; i < text.size(); ++i) {
         const char asciiChar = text[i];
         if (asciiChar == ' ') {
@@ -162,8 +163,8 @@ void Painter::drawText(const Rect& rect, const ADS::String& text, Alignment alig
                 const size_t index = (y * s_defaultFont.width()) + x;
                 if (font[index] == '#') {
                     // FIXME: Fix clipping here
-                    const int xPos = translated.x() + x + (i * s_defaultFont.width());
-                    const int yPos = translated.y() + y;
+                    const int xPos = clippedRect.x() + x + (i * s_defaultFont.width());
+                    const int yPos = clippedRect.y() + y;
                     Screen::instance().setPixel(xPos, yPos, color);
                 }
             }

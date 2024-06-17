@@ -23,7 +23,7 @@ public:
         return instance;
     }
 
-    void add(Window& window);
+    void show(Window& window);
     void makeActive(Window* window);
     void remove(Window& window);
 

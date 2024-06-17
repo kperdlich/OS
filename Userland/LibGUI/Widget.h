@@ -19,12 +19,11 @@ public:
     explicit Widget(Widget* parent = nullptr);
 
     virtual const char* className() const { return "Widget"; }
-
     virtual bool event(Event& event) override;
     virtual bool isWidgetType() const override;
 
     void setWindow(Window* window);
-    Window* window() const { return m_window; }
+    [[nodiscard]] Window* window() const { return m_window; }
 
     void setWindowRelativeRect(const Rect& rect);
     Rect windowRelativeRect() { return m_windowRelativeRect; }
@@ -37,18 +36,34 @@ public:
         int localY;
     };
 
-    bool hits(int x, int y, HitResult& result);
+    enum class SizePolicy {
+        Fixed,
+        Ignore,
+    };
 
-    bool hasFocus() const;
+    [[nodiscard]] bool hits(int x, int y, HitResult& result);
+
+    [[nodiscard]] bool hasFocus() const;
     void setFocus(FocusReason reason);
 
-    bool isVisible() const { return m_isVisible; }
+    [[nodiscard]] bool isVisible() const { return m_isVisible; }
     void setIsVisible(bool value) { m_isVisible = value; }
 
     Layout* layout() const { return m_layout; }
     void setLayout(Layout* layout);
 
-    Widget* parentWidget() const;
+    [[nodiscard]] Widget* parentWidget() const;
+
+    virtual bool acceptsFocus() const { return false; }
+
+    void setFixedSize(Size value);
+    [[nodiscard]] Size fixedSize() const { return m_fixedSize; }
+
+    void setVerticalSizePolicy(SizePolicy value) { m_verticalSizePolicy = value; }
+    void setHorizontalSizePolicy(SizePolicy value) { m_horizontalSizePolicy = value; }
+
+    [[nodiscard]] SizePolicy verticalSizePolicy() const { return m_verticalSizePolicy; }
+    SizePolicy horizontalSizePolicy() const { return m_horizontalSizePolicy; }
 
 protected:
     virtual void onShowEvent(Event& event);
@@ -67,9 +82,12 @@ private:
     void updateLayout();
 
 protected:
-    Window* m_window;
+    Window* m_window { nullptr };
+    Layout* m_layout { nullptr };
     Rect m_windowRelativeRect;
-    Layout* m_layout;
+    Size m_fixedSize;
+    SizePolicy m_verticalSizePolicy { SizePolicy::Ignore };
+    SizePolicy m_horizontalSizePolicy { SizePolicy::Ignore };
     bool m_isVisible { true };
 };
 

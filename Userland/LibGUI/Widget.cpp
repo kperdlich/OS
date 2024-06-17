@@ -16,7 +16,8 @@ bool Widget::event(Event& event)
 {
     switch (event.type()) {
     case Event::Type::MouseDown:
-        setFocus(FocusReason::Mouse);
+        if (acceptsFocus())
+            setFocus(FocusReason::Mouse);
         onMouseDownEvent(static_cast<MouseEvent&>(event));
         return true;
     case Event::Type::MouseUp:
@@ -80,6 +81,8 @@ bool Widget::event(Event& event)
 bool Widget::hits(int x, int y, HitResult& result)
 {
     for (auto& child : m_children) {
+        if (!child->isWidgetType())
+            continue;
         Widget* childWidget = static_cast<Widget*>(child);
         if (childWidget->hits(x - childWidget->windowRelativeRect().x(), y - childWidget->windowRelativeRect().y(), result)) {
             return true;
@@ -197,10 +200,8 @@ void Widget::onResizeEvent(ResizeEvent& event)
 void Widget::setLayout(Layout* layout)
 {
     if (layout) {
-        if (layout->parentWidget() && layout->parentWidget() != this) {
-            std::cout << "[Warning] Layout: " << layout->className() << " has a different parent widget: " << layout->parentWidget()->className() << std::endl;
-            std::cout << "[Warning] Re-parenting to " << className() << std::endl;
-        }
+        if (layout->parent() && layout->parent() != this)
+            std::cout << "[Warning] Layout: has a different parent widget. Re-parenting to " << className() << std::endl;
         layout->setParent(this);
     }
 
@@ -213,6 +214,11 @@ Widget* Widget::parentWidget() const
         return static_cast<Widget*>(parent());
 
     return nullptr;
+}
+
+void Widget::setFixedSize(Size value)
+{
+    m_fixedSize = value;
 }
 
 } // GUI

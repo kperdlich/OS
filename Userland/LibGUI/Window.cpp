@@ -39,7 +39,9 @@ bool Window::event(Event& event)
         if (m_centralWidget) {
             Widget::HitResult result {};
             if (m_centralWidget->hits(mouseEvent.x(), mouseEvent.y(), result)) {
-                // std::cout << "[Widget::HitResult] " << result.widget->name() << " localX: " << result.localX << " localY: " << result.localY << std::endl;
+#if 0
+                std::cout << "[Widget::HitResult] " << result.widget->className() << " localX: " << result.localX << " localY: " << result.localY << std::endl;
+#endif
                 MouseEvent localWidgetMouseEvent(event.type(), result.localX, result.localY, mouseEvent.button());
                 return result.widget->event(localWidgetMouseEvent);
             }
@@ -79,8 +81,12 @@ void Window::moveBy(int x, int y)
 
 void Window::setRect(const Rect& rect)
 {
-    // FIXME: Handle resize event?
+    Size oldSize = m_rect.size();
     m_rect = rect;
+    if (m_centralWidget) {
+        ResizeEvent event(m_rect.size(), oldSize);
+        m_centralWidget->event(event);
+    }
 }
 
 void Window::setCentralWidget(Widget& widget)
@@ -95,13 +101,27 @@ void Window::setCentralWidget(Widget& widget)
     m_centralWidget->setParent(this);
     m_centralWidget->setWindow(this);
 
-    if (!m_focusedWidget)
+    Rect newRect = rect();
+    if (m_centralWidget->verticalSizePolicy() == Widget::SizePolicy::Fixed) {
+        ASSERT(!m_centralWidget->fixedSize().isInvalid());
+        newRect.setHeight(m_centralWidget->fixedSize().height());
+    }
+
+    if (m_centralWidget->horizontalSizePolicy() == Widget::SizePolicy::Fixed) {
+        ASSERT(!m_centralWidget->fixedSize().isInvalid());
+        newRect.setWidth(m_centralWidget->fixedSize().width());
+    }
+
+    setRect(newRect);
+    m_centralWidget->setWindowRelativeRect({ 0, 0, newRect.width(), newRect.height() });
+
+    if (!m_focusedWidget && m_centralWidget->acceptsFocus())
         m_focusedWidget = m_centralWidget;
 }
 
 void Window::show()
 {
-    GUI::WindowManager::instance().add(*this);
+    GUI::WindowManager::instance().show(*this);
     if (m_centralWidget) {
         Event showEvent(Event::Type::Show);
         m_centralWidget->event(showEvent);

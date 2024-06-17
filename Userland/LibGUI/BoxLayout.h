@@ -10,7 +10,6 @@ namespace GUI {
 
 class BoxLayout : public Layout {
 public:
-
     enum class Direction {
         Vertical,
         Horizontal

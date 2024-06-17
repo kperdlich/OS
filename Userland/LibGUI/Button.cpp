@@ -67,4 +67,20 @@ void Button::setText(const ADS::String& text)
     m_text = text;
 }
 
+/*Size Button::preferredSize() const
+{
+    Size size { 133, 22 };
+    if (m_text.empty())
+        return size;
+
+    size.setWidth(size.width() + (static_cast<int>(m_text.length()) * fontWidth()) + (2 * 5));
+    return size;
+}*/
+
+int Button::fontWidth()
+{
+    // FIXME: get this from the font
+    return 8;
+}
+
 } // GUI

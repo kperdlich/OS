@@ -176,7 +176,7 @@ void TextBox::onFocusInEvent(FocusEvent&)
 
 void TextBox::onFocusOutEvent(FocusEvent&)
 {
-   cleanup();
+    cleanup();
 }
 
 void TextBox::onTimerEvent(TimerEvent& event)
@@ -325,5 +325,15 @@ void TextBox::cleanup()
     m_inSelection = false;
     m_cursor.clearSelection();
 }
+
+/*Size TextBox::preferredSize() const
+{
+    Size size { 133, 22 };
+    if (m_text.empty())
+        return size;
+
+    size.setWidth(size.width() + (static_cast<int>(m_text.length()) * fontWidth()) + (2 * margin()));
+    return size;
+}*/
 
 } // GUI

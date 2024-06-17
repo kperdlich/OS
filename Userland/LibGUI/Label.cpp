@@ -27,4 +27,21 @@ void Label::onPaintEvent(Event& event)
     painter.drawText(rect(), m_text, m_alignment, Colors::Black);
 }
 
+void Label::shrinkToFit()
+{
+    setHorizontalSizePolicy(Widget::SizePolicy::Fixed);
+    setVerticalSizePolicy(Widget::SizePolicy::Ignore);
+    setFixedSize(Size { rect().width() + (static_cast<int>(m_text.length()) * 8) + (2 * 8), 0 });
+}
+
+/*Size Label::preferredSize() const
+{
+    Size size { 22, 22 };
+    if (m_text.empty())
+        return size;
+
+    size.setWidth(size.width() + (static_cast<int>(m_text.length()) * 8) + (2 * 8));
+    return size;
+}*/
+
 } // GUI

@@ -23,6 +23,8 @@ public:
 
     virtual const char* className() const override { return "Label"; }
 
+    void shrinkToFit();
+
 protected:
     virtual void onPaintEvent(Event& event) override;
 

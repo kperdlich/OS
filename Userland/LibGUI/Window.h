@@ -7,11 +7,11 @@
 #include "Button.h"
 #include "CObject.h"
 #include "Event.h"
-#include "Point.h"
+#include "FocusReason.h"
 #include "Painter.h"
+#include "Point.h"
 #include "Rect.h"
 #include "Size.h"
-#include "FocusReason.h"
 
 namespace GUI {
 
@@ -48,7 +48,7 @@ public:
 
 private:
     ADS::String m_title {};
-    Rect m_rect;
+    Rect m_rect { 100, 100, 600, 400 };
     Widget* m_centralWidget { nullptr };
     Widget* m_focusedWidget { nullptr };
     bool m_isVisible = true;

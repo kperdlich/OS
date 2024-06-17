@@ -12,12 +12,9 @@ struct LayoutItem {
     Widget* widget;
 };
 
-class Layout : public Widget {
+class Layout : public CObject {
 public:
     explicit Layout(Widget* parent = nullptr);
-
-    virtual const char* className() const override { return "Layout"; }
-    virtual bool isWidgetType() const override { return false; };
 
     virtual void activate() = 0;
     void addWidget(Widget& widget);
