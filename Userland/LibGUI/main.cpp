@@ -64,10 +64,10 @@ int main()
         GUI::BoxLayout* formLayout = new GUI::BoxLayout(GUI::BoxLayout::Direction::Horizontal);
         formWidget->setLayout(formLayout);
 
-        GUI::TextBox* textBox = new GUI::TextBox("TextBox", formWidget);
+        GUI::TextBox* textBox = new GUI::TextBox("TextBox");
         textBox->setFixedSize({ 100, 30 });
 
-        GUI::Label* label = new GUI::Label("Label", formWidget);
+        GUI::Label* label = new GUI::Label("Label");
         label->setFixedSize({ 30, 30 });
         label->setAlignment(GUI::Alignment::Center);
         label->shrinkToFit();

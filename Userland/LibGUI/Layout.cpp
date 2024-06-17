@@ -14,16 +14,20 @@ Layout::Layout(Widget* parent)
 
 void Layout::addWidget(Widget& widget)
 {
-    ASSERT(widget.isWidgetType());
+    ASSERT(parent());
+    ASSERT(parent()->isWidgetType());
+
     m_layoutItems.emplace_back(LayoutItem { .widget = &widget });
-    if (parent() && parent()->isWidgetType())
+    widget.setParent(parent());
+
+    if (parent())
         Application::instance().postEvent(parent(), ADS::UniquePtr<Event>(new Event(Event::Type::Layout)));
 }
 
 void Layout::setSpacing(int value)
 {
     m_spacing = value;
-    if (parent() && parent()->isWidgetType())
+    if (parent())
         Application::instance().postEvent(parent(), ADS::UniquePtr<Event>(new Event(Event::Type::Layout)));
 }
 
