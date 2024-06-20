@@ -5,6 +5,7 @@
 #include "Widget.h"
 #include "Layout.h"
 #include "Window.h"
+#include "WindowManager.h"
 
 namespace GUI {
 Widget::Widget(Widget* parent)
@@ -234,6 +235,16 @@ Size Widget::minSizeHint() const
     std::cerr << "[Widget::minSizeHint] used for " << className() << " where no layout is provided. Probably you forgot to override minSizeHint()." << std::endl;
     ASSERT(false);
     return Size::Invalid();
+}
+
+void Widget::grabMouse()
+{
+    WindowManager::instance().setMouseGrabbedWidget(*this);
+}
+
+void Widget::releaseMouse()
+{
+    WindowManager::instance().releaseMouseGrabbedWidget();
 }
 
 } // GUI

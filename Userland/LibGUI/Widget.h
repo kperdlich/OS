@@ -46,6 +46,9 @@ public:
     [[nodiscard]] bool hasFocus() const;
     void setFocus(FocusReason reason);
 
+    void grabMouse();
+    void releaseMouse();
+
     [[nodiscard]] bool isVisible() const { return m_isVisible; }
     void setIsVisible(bool value) { m_isVisible = value; }
 

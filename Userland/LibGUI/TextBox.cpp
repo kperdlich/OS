@@ -89,8 +89,7 @@ void TextBox::scrollCursorIntoView()
     }
 
 #if 0
-    std::cout << "cursor position " << m_cursor.position() << std::endl;
-    std::cout << "m_scrollOffset " << m_scrollOffset << std::endl;
+    std::cout << "cursor position " << m_cursor.position() << " m_scrollOffset " << m_scrollOffset << std::endl;
 #endif
 }
 
@@ -197,6 +196,7 @@ void TextBox::onMouseDownEvent(MouseEvent& event)
     m_cursor.clearSelection();
     m_isCursorVisible = true;
     m_inSelection = true;
+    grabMouse();
 }
 
 void TextBox::onMouseMoveEvent(MouseEvent& event)
@@ -205,28 +205,36 @@ void TextBox::onMouseMoveEvent(MouseEvent& event)
         return;
 
     m_isCursorVisible = true;
-    const int visibleCursorPos = ADS::max((event.x() / fontWidth()), 0);
-    const int selectionCursorPos = ADS::min(m_scrollOffset + visibleCursorPos, static_cast<int>(m_text.length()));
+    const int cursorPos = event.x() / fontWidth();
+    const int newCursorPos = ADS::clamp(m_scrollOffset + cursorPos, 0, static_cast<int>(m_text.length()));
+
     if (m_cursor.hasSelection()) {
-        if (m_cursor.position() == m_cursor.selectionStart()) {
-            m_cursor.setSelectionStart(selectionCursorPos);
-        } else {
-            m_cursor.setSelectionEnd(selectionCursorPos);
-        }
-        m_cursor.setPosition(selectionCursorPos);
+        if (m_cursor.position() == m_cursor.selectionStart())
+            m_cursor.setSelectionStart(newCursorPos);
+        else
+            m_cursor.setSelectionEnd(newCursorPos);
+
+        const int selectionStart = m_cursor.selectionStart();
+        const int selectionEnd = m_cursor.selectionEnd();
+        m_cursor.setSelectionStart(ADS::min(selectionStart, selectionEnd));
+        m_cursor.setSelectionEnd(ADS::max(selectionStart, selectionEnd));
+        m_cursor.setPosition(newCursorPos);
     } else {
-        m_cursor.setSelectionStart(ADS::min(selectionCursorPos, m_cursor.position()));
-        m_cursor.setSelectionEnd(ADS::max(selectionCursorPos, m_cursor.position()));
-        m_cursor.setPosition(selectionCursorPos);
+        m_cursor.setSelectionStart(ADS::min(newCursorPos, m_cursor.position()));
+        m_cursor.setSelectionEnd(ADS::max(newCursorPos, m_cursor.position()));
+        m_cursor.setPosition(newCursorPos);
     }
+    scrollCursorIntoView();
+
 #if 0
-        std::cout << "m_selectionRange: start: " << m_cursor.start() << " end: " << m_cursor.end() << std::endl;
+    std::cout << "cursor " << m_cursor.position() << " m_selectionRange: start: " << m_cursor.selectionStart() << " end: " << m_cursor.selectionEnd() << std::endl;
 #endif
 }
 
 void TextBox::onMouseUpEvent(MouseEvent& event)
 {
     m_inSelection = false;
+    releaseMouse();
 }
 
 void TextBox::removeSelectedText()

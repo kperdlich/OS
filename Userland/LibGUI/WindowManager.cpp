@@ -129,6 +129,15 @@ void WindowManager::makeActive(Window* window)
 
 void WindowManager::processMouseEvent(MouseEvent& event)
 {
+    if (m_mouseGrabbedWidget && m_mouseGrabbedWidget->isVisible()) {
+        ASSERT(m_mouseGrabbedWidget->window());
+        const Rect widgetWindowRelativePosition = m_mouseGrabbedWidget->windowRelativeRect();
+        const Rect windowPosition = m_mouseGrabbedWidget->window()->rect();
+        MouseEvent localWidgetMouseEvent(event.type(), event.x() - windowPosition.x() - widgetWindowRelativePosition.x(), event.y() - windowPosition.y() - widgetWindowRelativePosition.y(), event.button());
+        m_mouseGrabbedWidget->event(localWidgetMouseEvent);
+        return;
+    }
+
     if (event.type() == Event::Type::MouseMove && m_isDraggingWindow) {
         const int deltaX = event.x() - m_lastMouseDragPos.width();
         const int deltaY = event.y() - m_lastMouseDragPos.height();
@@ -223,6 +232,16 @@ void WindowManager::closeWindow(Window& window)
 {
     makeActive(nullptr);
     window.close();
+}
+
+void WindowManager::releaseMouseGrabbedWidget()
+{
+    m_mouseGrabbedWidget = nullptr;
+}
+
+void WindowManager::setMouseGrabbedWidget(Widget& widget)
+{
+    m_mouseGrabbedWidget = &widget;
 }
 
 } // GUI

@@ -37,6 +37,8 @@ public:
 
     Window* activeWindow() const { return m_activeWindow; }
 
+    void setMouseGrabbedWidget(Widget& widget);
+    void releaseMouseGrabbedWidget();
 private:
     void processMouseEvent(MouseEvent& event);
     void processPaintEvent(Event& event);
@@ -50,7 +52,7 @@ private:
 private:
     ADS::Vector<Window*> m_windows;
     Window* m_activeWindow { nullptr };
-
+    Widget* m_mouseGrabbedWidget { nullptr };
     Size m_lastMouseDragPos { 0, 0 };
     bool m_isDraggingWindow { false };
 };
