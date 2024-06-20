@@ -21,6 +21,8 @@ public:
     virtual const char* className() const override { return "Button"; }
 
     virtual bool acceptsFocus() const { return true; }
+    virtual Size preferredSizeHint() const override;
+    virtual Size minSizeHint() const override;
 
 protected:
     virtual void onPaintEvent(Event& event) override;

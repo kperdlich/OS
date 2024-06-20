@@ -8,7 +8,7 @@ namespace GUI {
 
 enum class FocusReason {
     Mouse,
-    ActiveWindow
+    ActiveWindow,
 };
 
 }

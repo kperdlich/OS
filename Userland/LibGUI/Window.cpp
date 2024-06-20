@@ -18,11 +18,6 @@ Window::Window(CObject* parent)
 Window::~Window()
 {
     GUI::WindowManager::instance().remove(*this);
-
-    if (m_centralWidget) {
-        delete m_centralWidget;
-        m_centralWidget = nullptr;
-    }
 }
 
 void Window::close()
@@ -94,29 +89,23 @@ void Window::setCentralWidget(Widget& widget)
     if (&widget == m_centralWidget)
         return;
 
-    if (m_centralWidget)
-        m_centralWidget->setParent(nullptr);
-
     m_centralWidget = &widget;
     m_centralWidget->setParent(this);
     m_centralWidget->setWindow(this);
 
     Rect newRect = rect();
-    if (m_centralWidget->verticalSizePolicy() == Widget::SizePolicy::Fixed) {
-        ASSERT(!m_centralWidget->fixedSize().isInvalid());
-        newRect.setHeight(m_centralWidget->fixedSize().height());
-    }
+    if (m_centralWidget->verticalSizePolicy() == Widget::SizePolicy::Fixed)
+        newRect.setHeight(m_centralWidget->size().height());
+    else
+        newRect.setHeight(m_centralWidget->preferredSizeHint().height());
 
-    if (m_centralWidget->horizontalSizePolicy() == Widget::SizePolicy::Fixed) {
-        ASSERT(!m_centralWidget->fixedSize().isInvalid());
-        newRect.setWidth(m_centralWidget->fixedSize().width());
-    }
+    if (m_centralWidget->horizontalSizePolicy() == Widget::SizePolicy::Fixed)
+        newRect.setWidth(m_centralWidget->size().width());
+    else
+        newRect.setWidth(m_centralWidget->preferredSizeHint().width());
 
     setRect(newRect);
     m_centralWidget->setWindowRelativeRect({ 0, 0, newRect.width(), newRect.height() });
-
-    if (!m_focusedWidget && m_centralWidget->acceptsFocus())
-        m_focusedWidget = m_centralWidget;
 }
 
 void Window::show()

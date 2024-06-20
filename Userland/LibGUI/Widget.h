@@ -38,7 +38,7 @@ public:
 
     enum class SizePolicy {
         Fixed,
-        Ignore,
+        Automatic,
     };
 
     [[nodiscard]] bool hits(int x, int y, HitResult& result);
@@ -56,14 +56,18 @@ public:
 
     virtual bool acceptsFocus() const { return false; }
 
-    void setFixedSize(Size value);
-    [[nodiscard]] Size fixedSize() const { return m_fixedSize; }
+    void setFixedSize(Size value) { m_windowRelativeRect.setSize(value); }
+
+    [[nodiscard]] Size size() const { return m_windowRelativeRect.size(); }
 
     void setVerticalSizePolicy(SizePolicy value) { m_verticalSizePolicy = value; }
     void setHorizontalSizePolicy(SizePolicy value) { m_horizontalSizePolicy = value; }
 
     [[nodiscard]] SizePolicy verticalSizePolicy() const { return m_verticalSizePolicy; }
     SizePolicy horizontalSizePolicy() const { return m_horizontalSizePolicy; }
+
+    virtual Size preferredSizeHint() const;
+    virtual Size minSizeHint() const;
 
 protected:
     virtual void onShowEvent(Event& event);
@@ -85,9 +89,8 @@ protected:
     Window* m_window { nullptr };
     Layout* m_layout { nullptr };
     Rect m_windowRelativeRect;
-    Size m_fixedSize;
-    SizePolicy m_verticalSizePolicy { SizePolicy::Ignore };
-    SizePolicy m_horizontalSizePolicy { SizePolicy::Ignore };
+    SizePolicy m_verticalSizePolicy { SizePolicy::Automatic };
+    SizePolicy m_horizontalSizePolicy { SizePolicy::Automatic };
     bool m_isVisible { true };
 };
 

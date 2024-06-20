@@ -22,31 +22,27 @@ void BoxLayout::activate()
     ASSERT(parent()->isWidgetType());
     Widget& owner = static_cast<Widget&>(*parent());
     const Size maxAvailableSize = owner.rect().size();
-
     Size availableSize = maxAvailableSize;
     int visibleItems = 0;
     int fixedItems = 0;
-    int preferredItems = 0;
     for (auto& item : m_layoutItems) {
         if (!item.widget || !item.widget->isVisible())
             continue;
         Widget& widget = *item.widget;
         ++visibleItems;
-
-        const bool isWidgetWithFixedSize = (m_direction == Direction::Vertical && widget.verticalSizePolicy() == Widget::SizePolicy::Fixed)
+        const bool hasFixedSize = (m_direction == Direction::Vertical && widget.verticalSizePolicy() == Widget::SizePolicy::Fixed)
             || (m_direction == Direction::Horizontal && widget.horizontalSizePolicy() == Widget::SizePolicy::Fixed);
-        if (isWidgetWithFixedSize) {
-            availableSize -= widget.fixedSize();
+        if (hasFixedSize) {
+            availableSize -= widget.size();
             ++fixedItems;
         }
-
         availableSize -= Size { spacing(), spacing() };
     }
     // No spacing at the end
     availableSize += Size { spacing(), spacing() };
 
-    const int automaticItems = visibleItems - preferredItems - fixedItems;
-    const Size automaticSize = automaticItems > 0 ? Size { availableSize.width() / automaticItems, availableSize.height() / automaticItems } : Size {};
+    const int automaticSizeItems = visibleItems - fixedItems;
+    const Size automaticItemSize = automaticSizeItems > 0 ? Size { availableSize.width() / automaticSizeItems, availableSize.height() / automaticSizeItems } : Size {};
 
     int currentX = owner.rect().x();
     int currentY = owner.rect().y();
@@ -61,24 +57,24 @@ void BoxLayout::activate()
         // FIXME: Add margin
         if (m_direction == Direction::Vertical) {
             if (widget.horizontalSizePolicy() == Widget::SizePolicy::Fixed)
-                rect.setWidth(widget.fixedSize().width());
+                rect.setWidth(widget.size().width());
             else
                 rect.setWidth(maxAvailableSize.width());
 
             if (widget.verticalSizePolicy() == Widget::SizePolicy::Fixed)
-                rect.setHeight(widget.fixedSize().height());
+                rect.setHeight(widget.size().height());
             else
-                rect.setHeight(automaticSize.height());
+                rect.setHeight(automaticItemSize.height());
 
             currentY += rect.height() + spacing();
         } else {
             if (widget.horizontalSizePolicy() == Widget::SizePolicy::Fixed)
-                rect.setWidth(widget.fixedSize().width());
+                rect.setWidth(widget.size().width());
             else
-                rect.setWidth(automaticSize.width());
+                rect.setWidth(automaticItemSize.width());
 
             if (widget.verticalSizePolicy() == Widget::SizePolicy::Fixed)
-                rect.setHeight(widget.fixedSize().height());
+                rect.setHeight(widget.size().height());
             else
                 rect.setHeight(maxAvailableSize.height());
 
@@ -86,6 +82,32 @@ void BoxLayout::activate()
         }
         item.widget->setWindowRelativeRect(rect);
     }
+}
+
+Size BoxLayout::preferredSizeHint() const
+{
+    Size preferredSize {};
+    for (auto& items : m_layoutItems) {
+        if (!items.widget || !items.widget->isWidgetType())
+            continue;
+        preferredSize += items.widget->preferredSizeHint();
+        preferredSize += { spacing(), spacing() };
+    }
+    preferredSize -= { spacing(), spacing() };
+    return preferredSize;
+}
+
+Size BoxLayout::minSizeHint() const
+{
+    Size minSize {};
+    for (auto& items : m_layoutItems) {
+        if (!items.widget || !items.widget->isWidgetType())
+            continue;
+        minSize += items.widget->minSizeHint();
+        minSize += { spacing(), spacing() };
+    }
+    minSize -= { spacing(), spacing() };
+    return minSize;
 }
 
 } // GUI

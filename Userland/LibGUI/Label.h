@@ -22,11 +22,15 @@ public:
     [[nodiscard]] Alignment alignment() const { return m_alignment; }
 
     virtual const char* className() const override { return "Label"; }
+    virtual Size preferredSizeHint() const override;
+    virtual Size minSizeHint() const override;
 
     void shrinkToFit();
-
 protected:
     virtual void onPaintEvent(Event& event) override;
+
+private:
+    static int fontWidth();
 
 private:
     ADS::String m_text;

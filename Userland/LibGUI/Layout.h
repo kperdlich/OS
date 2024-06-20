@@ -22,6 +22,9 @@ public:
     int spacing() const { return m_spacing; };
     void setSpacing(int value);
 
+    virtual Size preferredSizeHint() const = 0;
+    virtual Size minSizeHint() const = 0;
+
 protected:
     ADS::Vector<LayoutItem> m_layoutItems;
     int m_spacing { 0 };

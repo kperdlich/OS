@@ -17,6 +17,8 @@ public:
 
     BoxLayout(Direction direction, Widget* parent = nullptr);
     virtual void activate() override;
+    virtual Size preferredSizeHint() const override;
+    virtual Size minSizeHint() const override;
 
 private:
     Direction m_direction;

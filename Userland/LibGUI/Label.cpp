@@ -18,6 +18,12 @@ Label::Label(const ADS::String& text, Widget* parent)
 {
 }
 
+int Label::fontWidth()
+{
+    // FIXME: get this from the font
+    return 8;
+}
+
 void Label::onPaintEvent(Event& event)
 {
     Painter painter(this);
@@ -30,18 +36,23 @@ void Label::onPaintEvent(Event& event)
 void Label::shrinkToFit()
 {
     setHorizontalSizePolicy(Widget::SizePolicy::Fixed);
-    setVerticalSizePolicy(Widget::SizePolicy::Ignore);
-    setFixedSize(Size { rect().width() + (static_cast<int>(m_text.length()) * 8) + (2 * 8), 0 });
+    setVerticalSizePolicy(Widget::SizePolicy::Automatic);
+    setFixedSize(Size { rect().width() + (static_cast<int>(m_text.length()) * fontWidth()) + (2 * 5), 0 });
 }
 
-/*Size Label::preferredSize() const
+Size Label::preferredSizeHint() const
 {
-    Size size { 22, 22 };
     if (m_text.empty())
-        return size;
+        return minSizeHint();
 
-    size.setWidth(size.width() + (static_cast<int>(m_text.length()) * 8) + (2 * 8));
+    Size size = minSizeHint();
+    size.setWidth(ADS::max((static_cast<int>(m_text.length()) * fontWidth()) + (2 * 5), size.width()));
     return size;
-}*/
+}
+
+Size Label::minSizeHint() const
+{
+    return { 22, 22 };
+}
 
 } // GUI

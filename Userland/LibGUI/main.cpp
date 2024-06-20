@@ -44,7 +44,6 @@ int main()
             std::cout << "Button clicked" << std::endl;
         });
         button->setText("Press me :)");
-        button->setFixedSize({ 100, 30 });
 
         GUI::Window* win1 = new GUI::Window();
         win1->setCentralWidget(*button);
@@ -65,10 +64,8 @@ int main()
         formWidget->setLayout(formLayout);
 
         GUI::TextBox* textBox = new GUI::TextBox("TextBox");
-        textBox->setFixedSize({ 100, 30 });
 
         GUI::Label* label = new GUI::Label("Label");
-        label->setFixedSize({ 30, 30 });
         label->setAlignment(GUI::Alignment::Center);
         label->shrinkToFit();
 
@@ -85,6 +82,7 @@ int main()
 
         containerLayout->addWidget(*formWidget);
         containerLayout->addWidget(*textBoxButton);
+        containerLayout->addWidget(*new GUI::TextBox("Test"));
 
         GUI::Window* win2 = new GUI::Window();
         win2->setTitle("Window 2");

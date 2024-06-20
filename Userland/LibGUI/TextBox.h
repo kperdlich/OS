@@ -104,6 +104,8 @@ public:
     void selectAll();
 
     virtual bool acceptsFocus() const { return true; }
+    virtual Size preferredSizeHint() const override;
+    virtual Size minSizeHint() const override;
 
 protected:
     virtual void onPaintEvent(Event& event) override;
@@ -133,6 +135,7 @@ private:
     void handleKeyBackspace(KeyEvent& event);
     void removeSelectedText();
     void cleanup();
+
 private:
     ADS::String m_text;
     Cursor m_cursor;

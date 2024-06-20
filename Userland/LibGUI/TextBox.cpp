@@ -188,7 +188,6 @@ void TextBox::onTimerEvent(TimerEvent& event)
 void TextBox::onResizeEvent(ResizeEvent& event)
 {
     Widget::onResizeEvent(event);
-    scrollCursorIntoView();
 }
 
 void TextBox::onMouseDownEvent(MouseEvent& event)
@@ -326,14 +325,18 @@ void TextBox::cleanup()
     m_cursor.clearSelection();
 }
 
-/*Size TextBox::preferredSize() const
+Size TextBox::preferredSizeHint() const
 {
-    Size size { 133, 22 };
     if (m_text.empty())
-        return size;
+        return minSizeHint();
 
-    size.setWidth(size.width() + (static_cast<int>(m_text.length()) * fontWidth()) + (2 * margin()));
+    Size size = minSizeHint();
+    size.setWidth(ADS::max((static_cast<int>(m_text.length()) * fontWidth()) + (2 * margin()), size.width()));
     return size;
-}*/
+}
+Size TextBox::minSizeHint() const
+{
+    return { 133, 22 };
+}
 
 } // GUI

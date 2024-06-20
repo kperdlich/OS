@@ -8,6 +8,8 @@ namespace GUI {
 
 class Size {
 public:
+    static Size Invalid() { return { -1, -1 }; }
+
     Size() = default;
     Size(int width, int height)
         : m_width(width)
