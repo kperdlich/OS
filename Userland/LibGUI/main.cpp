@@ -4,6 +4,7 @@
 #include "BoxLayout.h"
 #include "Label.h"
 #include "Rect.h"
+#include "ScrollArea.h"
 #include "TextBox.h"
 #include "Vector.h"
 #include "Window.h"
@@ -45,8 +46,12 @@ int main()
         });
         button->setText("Press me :)");
 
+        GUI::ScrollArea* scrollArea = new GUI::ScrollArea();
+        scrollArea->setWidget(*button);
+        scrollArea->setContentSize({200, 200});
+
         GUI::Window* win1 = new GUI::Window();
-        win1->setCentralWidget(*button);
+        win1->setCentralWidget(*scrollArea);
         win1->setTitle("Window 1");
         win1->show();
     }

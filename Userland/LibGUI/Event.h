@@ -124,7 +124,7 @@ private:
 class ResizeEvent : public Event {
 public:
     ResizeEvent(const Size& size, const Size& oldSize)
-        : m_size()
+        : m_size(size)
         , m_oldSize(oldSize)
         , Event(Type::Resize)
     {

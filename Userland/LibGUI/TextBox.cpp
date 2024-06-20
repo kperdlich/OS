@@ -195,13 +195,13 @@ void TextBox::onMouseDownEvent(MouseEvent& event)
     m_cursor.setPosition(ADS::min(m_scrollOffset + newCursorPos, static_cast<int>(m_text.length())));
     m_cursor.clearSelection();
     m_isCursorVisible = true;
-    m_inSelection = true;
+    m_inSelectionMode = true;
     grabMouse();
 }
 
 void TextBox::onMouseMoveEvent(MouseEvent& event)
 {
-    if (!m_inSelection)
+    if (!m_inSelectionMode)
         return;
 
     m_isCursorVisible = true;
@@ -233,7 +233,7 @@ void TextBox::onMouseMoveEvent(MouseEvent& event)
 
 void TextBox::onMouseUpEvent(MouseEvent& event)
 {
-    m_inSelection = false;
+    m_inSelectionMode = false;
     releaseMouse();
 }
 
@@ -329,7 +329,7 @@ void TextBox::cleanup()
     killTimer(m_blinkTimerId);
     m_blinkTimerId = 0;
     m_isCursorVisible = false;
-    m_inSelection = false;
+    m_inSelectionMode = false;
     m_cursor.clearSelection();
 }
 
@@ -342,6 +342,7 @@ Size TextBox::preferredSizeHint() const
     size.setWidth(ADS::max((static_cast<int>(m_text.length()) * fontWidth()) + (2 * margin()), size.width()));
     return size;
 }
+
 Size TextBox::minSizeHint() const
 {
     return { 133, 22 };

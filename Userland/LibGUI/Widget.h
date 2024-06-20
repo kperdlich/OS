@@ -30,6 +30,9 @@ public:
 
     Rect rect() const { return { 0, 0, m_windowRelativeRect.width(), m_windowRelativeRect.height() }; }
 
+    int width() const { return m_windowRelativeRect.width(); };
+    int height() const { return m_windowRelativeRect.height(); };
+
     struct HitResult {
         Widget* widget;
         int localX;

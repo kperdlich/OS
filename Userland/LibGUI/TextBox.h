@@ -142,7 +142,7 @@ private:
     int m_scrollOffset { 0 };
     int m_blinkTimerId { 0 };
     bool m_isCursorVisible { false };
-    bool m_inSelection { false };
+    bool m_inSelectionMode { false };
 };
 
 } // GUI
