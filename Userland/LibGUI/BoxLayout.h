@@ -24,4 +24,20 @@ private:
     Direction m_direction;
 };
 
+class HBoxLayout : public BoxLayout {
+public:
+    explicit HBoxLayout(Widget* parent = nullptr)
+        : BoxLayout(Direction::Horizontal, parent)
+    {
+    }
+};
+
+class VBoxLayout : public BoxLayout {
+public:
+    explicit VBoxLayout(Widget* parent = nullptr)
+        : BoxLayout(Direction::Vertical, parent)
+    {
+    }
+};
+
 } // GUI
