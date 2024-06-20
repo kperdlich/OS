@@ -87,10 +87,23 @@ void BoxLayout::activate()
 Size BoxLayout::preferredSizeHint() const
 {
     Size preferredSize {};
-    for (auto& items : m_layoutItems) {
-        if (!items.widget || !items.widget->isWidgetType())
+    for (auto& item : m_layoutItems) {
+        if (!item.widget || !item.widget->isWidgetType())
             continue;
-        preferredSize += items.widget->preferredSizeHint();
+
+        int width { 0 };
+        if (item.widget->horizontalSizePolicy() == Widget::SizePolicy::Fixed)
+            width = item.widget->size().width();
+        else
+            width = item.widget->preferredSizeHint().width();
+
+        int height { 0 };
+        if (item.widget->verticalSizePolicy() == Widget::SizePolicy::Fixed)
+            height = item.widget->size().height();
+        else
+            height = item.widget->preferredSizeHint().height();
+
+        preferredSize += { width, height };
         preferredSize += { spacing(), spacing() };
     }
     preferredSize -= { spacing(), spacing() };
