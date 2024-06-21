@@ -29,6 +29,7 @@ private:
     Size m_contentSize;
     Widget* m_widget { nullptr };
     ScrollBar* m_verticalScrollBar { nullptr };
+    ScrollBar* m_horizontalScrollBar { nullptr };
 };
 
 } // GUI

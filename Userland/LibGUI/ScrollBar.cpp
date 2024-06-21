@@ -7,8 +7,9 @@
 
 namespace GUI {
 
-ScrollBar::ScrollBar(Widget* parent)
-    : Widget(parent)
+ScrollBar::ScrollBar(Orientation orientation, Widget* parent)
+    : m_orientation(orientation)
+    , Widget(parent)
 {
 }
 
@@ -74,11 +75,36 @@ void ScrollBar::onMouseUpEvent(MouseEvent& event)
     releaseMouse();
 }
 
+void ScrollBar::setRange(int min, int max)
+{
+    ASSERT(max > min);
+    m_min = min;
+    m_max = max;
+
+    const int oldValue = m_sliderValue;
+    m_sliderValue = ADS::clamp(m_sliderValue, m_min, m_max);
+    if (m_sliderValue != oldValue && onValueChanged)
+        onValueChanged(m_sliderValue);
+}
+
+void ScrollBar::setValue(int value)
+{
+    if (value == m_sliderValue)
+        return;
+
+    const int oldValue = m_sliderValue;
+    m_sliderValue = ADS::clamp(value, m_min, m_max);
+    if (m_sliderValue != oldValue && onValueChanged)
+        onValueChanged(m_sliderValue);
+}
+
 int ScrollBar::calculateDraggingDelta(const IntPoint& newPosition) const
 {
-    const int positionDelta = newPosition.y() - m_draggingStartPosition.y();
+    const int positionDelta = m_orientation == Orientation::Vertical
+        ? newPosition.y() - m_draggingStartPosition.y()
+        : newPosition.x() - m_draggingStartPosition.x();
     const int range = m_max - m_min;
-    const int sliderRange = height() - scrollUpButtonRect().height() - scrollDownButtonRect().height() - sliderLength();
+    const int sliderRange = availableRange() - sliderLength();
     ASSERT(sliderRange >= 0);
     return (positionDelta * range) / sliderRange;
 }
@@ -86,40 +112,55 @@ int ScrollBar::calculateDraggingDelta(const IntPoint& newPosition) const
 int ScrollBar::sliderLength() const
 {
     const int range = m_max - m_min;
-    const int availableSize = height() - scrollUpButtonRect().height() - scrollDownButtonRect().height();
     ASSERT(range >= 0);
-    const int length = (m_pageStep * availableSize) / range;
+    const int length = (m_pageStep * availableRange()) / range;
     return length;
 }
 
-Size ScrollBar::preferredSizeHint() const
+int ScrollBar::availableRange() const
 {
-    // FIXME: depends on direction
-    return { 15, 15 };
-}
+    if (m_orientation == Orientation::Vertical)
+        return height() - scrollUpButtonRect().height() - scrollDownButtonRect().height();
 
-Size ScrollBar::minSizeHint() const
-{
-    return Size::Invalid();
+    return width() - scrollUpButtonRect().width() - scrollDownButtonRect().width();
 }
 
 Rect ScrollBar::scrollUpButtonRect() const
 {
-    return { 0, 0, width(), width() };
+    return { 0, 0, scrollButtonSize(), scrollButtonSize() };
 }
 
 Rect ScrollBar::scrollDownButtonRect() const
 {
-    return { 0, height() - width(), width(), width() };
+    if (m_orientation == Orientation::Vertical)
+        return { 0, height() - scrollButtonSize(), scrollButtonSize(), scrollButtonSize() };
+
+    return { width() - scrollButtonSize(), 0, scrollButtonSize(), scrollButtonSize() };
 }
 
 Rect ScrollBar::sliderRect() const
 {
     const int range = m_max - m_min;
     ASSERT(range >= 0);
-    const int sliderRange = height() - scrollUpButtonRect().height() - scrollDownButtonRect().height() - sliderLength();
+    const int sliderRange = availableRange() - sliderLength();
     const int sliderPos = ((m_sliderValue - m_min) * sliderRange) / range;
-    return { 0, scrollUpButtonRect().height() + sliderPos, preferredSizeHint().width(), sliderLength() };
+    if (m_orientation == Orientation::Vertical)
+        return { 0, scrollUpButtonRect().height() + sliderPos, preferredSizeHint().width(), sliderLength() };
+
+    return { scrollUpButtonRect().width() + sliderPos, 0, sliderLength(), preferredSizeHint().height() };
+}
+
+Size ScrollBar::preferredSizeHint() const
+{
+    if (m_orientation == Orientation::Vertical)
+        return { 15, 0 };
+
+    return { 0, 15 };
+}
+
+Size ScrollBar::minSizeHint() const
+{
+    return Size::Invalid();
 }
 
 } // GUI

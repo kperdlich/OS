@@ -10,12 +10,30 @@ namespace GUI {
 ScrollArea::ScrollArea(Widget* parent)
     : Widget(parent)
 {
-    m_verticalScrollBar = new ScrollBar(this);
+    m_verticalScrollBar = new ScrollBar(Orientation::Vertical, this);
+    m_horizontalScrollBar = new ScrollBar(Orientation::Horizontal, this);
 }
 
 void ScrollArea::onResizeEvent(ResizeEvent& event)
 {
-    m_verticalScrollBar->setWindowRelativeRect({ event.size().width() - m_verticalScrollBar->preferredSizeHint().width() - 1, 0, m_verticalScrollBar->preferredSizeHint().width(), event.size().height() - 2 });
+    const int heightRequiredByHorizontalScrollBar = m_horizontalScrollBar->isVisible()
+        ? m_horizontalScrollBar->height()
+        : 0;
+    const int widthRequiredByVerticalScrollBar = m_verticalScrollBar->isVisible()
+        ? m_verticalScrollBar->width()
+        : 0;
+
+    m_verticalScrollBar->setWindowRelativeRect(
+        { event.size().width() - m_verticalScrollBar->preferredSizeHint().width(),
+            0,
+            m_verticalScrollBar->preferredSizeHint().width(),
+            event.size().height() - heightRequiredByHorizontalScrollBar });
+
+    m_horizontalScrollBar->setWindowRelativeRect(
+        { 0,
+            event.size().height() - m_horizontalScrollBar->preferredSizeHint().height(),
+            event.size().width() - widthRequiredByVerticalScrollBar,
+            m_horizontalScrollBar->preferredSizeHint().height() });
 }
 
 void ScrollArea::onPaintEvent(Event& event)

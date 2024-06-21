@@ -2,6 +2,7 @@
 // Created by n3dry on 20.06.24.
 //
 
+#include "Orientation.h"
 #include "Types.h"
 #include "Widget.h"
 
@@ -9,24 +10,20 @@ namespace GUI {
 
 class ScrollBar : public Widget {
 public:
-    explicit ScrollBar(Widget* parent = nullptr);
+    explicit ScrollBar(Orientation orientation, Widget* parent = nullptr);
 
-    virtual const char* className() const override { return "ScrollBar"; }
-    virtual Size preferredSizeHint() const override;
-    virtual Size minSizeHint() const override;
+    [[nodiscard]] virtual const char* className() const override { return "ScrollBar"; }
+    [[nodiscard]] virtual Size preferredSizeHint() const override;
+    [[nodiscard]] virtual Size minSizeHint() const override;
 
-    int singleStep() const { return m_singleStep; }
-    int pageStep() const { return m_pageStep; }
-    int value() const { return m_sliderValue; }
+    [[nodiscard]] int singleStep() const { return m_singleStep; }
+    [[nodiscard]] int pageStep() const { return m_pageStep; }
+    [[nodiscard]] int value() const { return m_sliderValue; }
 
     void setSingleStep(int value) { m_singleStep = value; }
     void setPageStep(int value) { m_pageStep = value; }
-    void setRange(int min, int max)
-    {
-        ASSERT(max > min);
-        m_min = min;
-        m_max = max;
-    }
+    void setRange(int min, int max);
+    void setValue(int value);
 
     ADS::Function<void(int)> onValueChanged { nullptr };
 
@@ -37,13 +34,16 @@ protected:
     virtual void onMouseUpEvent(MouseEvent& event) override;
 
 private:
-    int sliderLength() const;
-    int calculateDraggingDelta(const IntPoint& newPosition) const;
-    Rect scrollUpButtonRect() const;
-    Rect scrollDownButtonRect() const;
-    Rect sliderRect() const;
+    [[nodiscard]] int sliderLength() const;
+    [[nodiscard]] int calculateDraggingDelta(const IntPoint& newPosition) const;
+    [[nodiscard]] Rect scrollUpButtonRect() const;
+    [[nodiscard]] Rect scrollDownButtonRect() const;
+    [[nodiscard]] Rect sliderRect() const;
+    [[nodiscard]] int availableRange() const;
+    [[nodiscard]] int scrollButtonSize() const { return m_orientation == Orientation::Vertical ? width() : height(); }
 
 private:
+    Orientation m_orientation;
     int m_min { 0 };
     int m_max { 99 };
     int m_singleStep { 1 };
