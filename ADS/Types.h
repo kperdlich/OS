@@ -6,18 +6,22 @@
 
 #include <cassert>
 #include <cstring>
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <optional>
 #include <thread>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #define ASSERT(X) assert(X)
 
 namespace ADS {
 
 using String = std::string;
+
+template<typename T>
+using Function = std::function<T>;
 
 template<typename T>
 using WeakPtr = std::weak_ptr<T>;

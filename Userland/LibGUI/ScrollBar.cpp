@@ -32,37 +32,64 @@ void ScrollBar::onMouseMoveEvent(MouseEvent& event)
     if (!m_isDragging)
         return;
 
-    /*const int sliderLengthInPixel = height() - scrollDownButtonRect().height() - scrollUpButtonRect().height();
-    const int amountOfSteps = (m_max - m_min) / sliderLengthInPixel;
-    const int newSliderValue = ADS::clamp(sliderLengthInPixel / event.y(), 0, amountOfSteps + 1);
-    const int newValue = m_max - (newSliderValue * m_stepSize);
-    m_value = newValue;
-    const int delta = event.y() - m_draggingStart.y();
-    std::cout << "delta: " << delta << " steps: " << amountOfSteps <<  std::endl;*/
+    const int delta = calculateDraggingDelta(event.position());
+    const int newSliderValue = ADS::clamp(m_draggingStartValue + delta, m_min, m_max);
+    if (newSliderValue == m_sliderValue)
+        return;
+
+    m_sliderValue = newSliderValue;
+    if (onValueChanged)
+        onValueChanged(m_sliderValue);
 }
 
 void ScrollBar::onMouseDownEvent(MouseEvent& event)
 {
     if (scrollUpButtonRect().contains(event.position())) {
-        doSingleStepUp();
+        m_sliderValue = ADS::max(m_sliderValue - m_singleStep, m_min);
         return;
     }
 
     if (scrollDownButtonRect().contains(event.position())) {
-        doSingleStepDown();
+        m_sliderValue = ADS::min(m_sliderValue + m_singleStep, m_max);
         return;
     }
 
     if (sliderRect().contains(event.position())) {
         m_isDragging = true;
-        m_draggingStart = event.position();
+        m_draggingStartPosition = event.position();
+        m_draggingStartValue = value();
+        grabMouse();
         return;
     }
+
+    if (sliderRect().y() < event.y())
+        m_sliderValue = ADS::min(m_sliderValue + m_pageStep, m_max);
+    else
+        m_sliderValue = ADS::max(m_sliderValue - m_pageStep, m_min);
 }
 
 void ScrollBar::onMouseUpEvent(MouseEvent& event)
 {
     m_isDragging = false;
+    releaseMouse();
+}
+
+int ScrollBar::calculateDraggingDelta(const IntPoint& newPosition) const
+{
+    const int positionDelta = newPosition.y() - m_draggingStartPosition.y();
+    const int range = m_max - m_min;
+    const int sliderRange = height() - scrollUpButtonRect().height() - scrollDownButtonRect().height() - sliderLength();
+    ASSERT(sliderRange >= 0);
+    return (positionDelta * range) / sliderRange;
+}
+
+int ScrollBar::sliderLength() const
+{
+    const int range = m_max - m_min;
+    const int availableSize = height() - scrollUpButtonRect().height() - scrollDownButtonRect().height();
+    ASSERT(range >= 0);
+    const int length = (m_pageStep * availableSize) / range;
+    return length;
 }
 
 Size ScrollBar::preferredSizeHint() const
@@ -88,21 +115,11 @@ Rect ScrollBar::scrollDownButtonRect() const
 
 Rect ScrollBar::sliderRect() const
 {
-    const int sliderLengthInPixel = height() - scrollDownButtonRect().height() - scrollUpButtonRect().height();
-    const int amountOfSteps = (m_max - m_min) / m_stepSize;
-    const int sliderHeight = sliderLengthInPixel / amountOfSteps;
-
-    return Rect(0, scrollUpButtonRect().height() + value(), preferredSizeHint().width(), sliderHeight);
-}
-
-void ScrollBar::doSingleStepUp()
-{
-    m_value = ADS::max(m_value - 1, m_min);
-}
-
-void ScrollBar::doSingleStepDown()
-{
-    m_value = ADS::min(m_value + 1, m_max);
+    const int range = m_max - m_min;
+    ASSERT(range >= 0);
+    const int sliderRange = height() - scrollUpButtonRect().height() - scrollDownButtonRect().height() - sliderLength();
+    const int sliderPos = ((m_sliderValue - m_min) * sliderRange) / range;
+    return { 0, scrollUpButtonRect().height() + sliderPos, preferredSizeHint().width(), sliderLength() };
 }
 
 } // GUI
