@@ -48,7 +48,7 @@ public:
 
 private:
     ADS::String m_title {};
-    Rect m_rect { 100, 100, 300, 100 };
+    Rect m_rect { 100, 100, 640, 480 };
     Widget* m_centralWidget { nullptr };
     Widget* m_focusedWidget { nullptr };
     bool m_isVisible = true;

@@ -33,11 +33,11 @@ bool Window::event(Event& event)
         MouseEvent& mouseEvent = static_cast<MouseEvent&>(event);
         if (m_centralWidget) {
             Widget::HitResult result {};
-            if (m_centralWidget->hits(mouseEvent.x(), mouseEvent.y(), result)) {
-#if 0
-                std::cout << "[Widget::HitResult] " << result.widget->className() << " localX: " << result.localX << " localY: " << result.localY << std::endl;
+            if (m_centralWidget->hits(mouseEvent.position(), result)) {
+#if 1
+                std::cout << "[Widget::HitResult] " << result.widget->className() << " localX: " << result.localPosition.x() << " localY: " << result.localPosition.y() << std::endl;
 #endif
-                MouseEvent localWidgetMouseEvent(event.type(), result.localX, result.localY, mouseEvent.button());
+                MouseEvent localWidgetMouseEvent(event.type(), result.localPosition.x(), result.localPosition.y(), mouseEvent.button());
                 return result.widget->event(localWidgetMouseEvent);
             }
         }
@@ -95,17 +95,17 @@ void Window::setCentralWidget(Widget& widget)
 
     Rect newRect = rect();
     if (m_centralWidget->verticalSizePolicy() == Widget::SizePolicy::Fixed)
-        newRect.setHeight(m_centralWidget->size().height());
+        newRect.setHeight(m_centralWidget->minimumSize().height());
     else
         newRect.setHeight(m_centralWidget->preferredSizeHint().height());
 
     if (m_centralWidget->horizontalSizePolicy() == Widget::SizePolicy::Fixed)
-        newRect.setWidth(m_centralWidget->size().width());
+        newRect.setWidth(m_centralWidget->minimumSize().width());
     else
         newRect.setWidth(m_centralWidget->preferredSizeHint().width());
 
     setRect(newRect);
-    m_centralWidget->setWindowRelativeRect({ 0, 0, newRect.width(), newRect.height() });
+    m_centralWidget->resize(newRect.width(), newRect.height());
 }
 
 void Window::show()

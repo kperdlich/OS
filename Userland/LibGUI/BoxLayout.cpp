@@ -21,7 +21,7 @@ void BoxLayout::activate()
 
     ASSERT(parent()->isWidgetType());
     Widget& owner = static_cast<Widget&>(*parent());
-    const Size maxAvailableSize = owner.rect().size();
+    const Size maxAvailableSize = owner.size();
     Size availableSize = maxAvailableSize;
     int visibleItems = 0;
     int fixedItems = 0;
@@ -33,7 +33,7 @@ void BoxLayout::activate()
         const bool hasFixedSize = (m_direction == Direction::Vertical && widget.verticalSizePolicy() == Widget::SizePolicy::Fixed)
             || (m_direction == Direction::Horizontal && widget.horizontalSizePolicy() == Widget::SizePolicy::Fixed);
         if (hasFixedSize) {
-            availableSize -= widget.size();
+            availableSize -= widget.minimumSize();
             ++fixedItems;
         }
         availableSize -= Size { spacing(), spacing() };
@@ -44,8 +44,8 @@ void BoxLayout::activate()
     const int automaticSizeItems = visibleItems - fixedItems;
     const Size automaticItemSize = automaticSizeItems > 0 ? Size { availableSize.width() / automaticSizeItems, availableSize.height() / automaticSizeItems } : Size {};
 
-    int currentX = owner.rect().x();
-    int currentY = owner.rect().y();
+    int currentX = 0;
+    int currentY = 0;
 
     for (auto& item : m_layoutItems) {
         if (!item.widget || !item.widget->isVisible())
@@ -57,30 +57,30 @@ void BoxLayout::activate()
         // FIXME: Add margin
         if (m_direction == Direction::Vertical) {
             if (widget.horizontalSizePolicy() == Widget::SizePolicy::Fixed)
-                rect.setWidth(widget.size().width());
+                rect.setWidth(widget.minimumSize().width());
             else
                 rect.setWidth(maxAvailableSize.width());
 
             if (widget.verticalSizePolicy() == Widget::SizePolicy::Fixed)
-                rect.setHeight(widget.size().height());
+                rect.setHeight(widget.minimumSize().height());
             else
                 rect.setHeight(automaticItemSize.height());
 
             currentY += rect.height() + spacing();
         } else {
             if (widget.horizontalSizePolicy() == Widget::SizePolicy::Fixed)
-                rect.setWidth(widget.size().width());
+                rect.setWidth(widget.minimumSize().width());
             else
                 rect.setWidth(automaticItemSize.width());
 
             if (widget.verticalSizePolicy() == Widget::SizePolicy::Fixed)
-                rect.setHeight(widget.size().height());
+                rect.setHeight(widget.minimumSize().height());
             else
                 rect.setHeight(maxAvailableSize.height());
 
             currentX += rect.width() + spacing();
         }
-        item.widget->setWindowRelativeRect(rect);
+        item.widget->setRelativeRect(rect);
     }
 }
 
@@ -93,13 +93,13 @@ Size BoxLayout::preferredSizeHint() const
 
         int width { 0 };
         if (item.widget->horizontalSizePolicy() == Widget::SizePolicy::Fixed)
-            width = item.widget->size().width();
+            width = item.widget->minimumSize().width();
         else
             width = item.widget->preferredSizeHint().width();
 
         int height { 0 };
         if (item.widget->verticalSizePolicy() == Widget::SizePolicy::Fixed)
-            height = item.widget->size().height();
+            height = item.widget->minimumSize().height();
         else
             height = item.widget->preferredSizeHint().height();
 

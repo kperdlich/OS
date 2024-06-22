@@ -19,6 +19,12 @@ public:
     {
     }
 
+    Rect(const IntPoint& point, Size size)
+        : m_position(point)
+        , m_size(size)
+    {
+    }
+
     Rect(int x, int y, Size size)
         : m_position(x, y)
         , m_size(size)

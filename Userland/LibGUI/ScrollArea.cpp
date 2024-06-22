@@ -3,6 +3,7 @@
 //
 
 #include "ScrollArea.h"
+#include "Layout.h"
 #include "Painter.h"
 
 namespace GUI {
@@ -23,17 +24,28 @@ void ScrollArea::onResizeEvent(ResizeEvent& event)
         ? m_verticalScrollBar->width()
         : 0;
 
-    m_verticalScrollBar->setWindowRelativeRect(
-        { event.size().width() - m_verticalScrollBar->preferredSizeHint().width(),
+    m_verticalScrollBar->setRelativeRect(
+        {  event.size().width() - m_verticalScrollBar->preferredSizeHint().width(),
             0,
             m_verticalScrollBar->preferredSizeHint().width(),
             event.size().height() - heightRequiredByHorizontalScrollBar });
 
-    m_horizontalScrollBar->setWindowRelativeRect(
+    m_horizontalScrollBar->setRelativeRect(
         { 0,
             event.size().height() - m_horizontalScrollBar->preferredSizeHint().height(),
             event.size().width() - widthRequiredByVerticalScrollBar,
             m_horizontalScrollBar->preferredSizeHint().height() });
+
+    updateWidgetSize();
+}
+
+void ScrollArea::updateWidgetSize()
+{
+    if (!m_widget)
+        return;
+
+    const Size newSize = m_widget->preferredSizeHint();
+    m_widget->resize(newSize);
 }
 
 void ScrollArea::onPaintEvent(Event& event)
@@ -56,30 +68,41 @@ void ScrollArea::onMouseUpEvent(MouseEvent& event)
     Widget::onMouseUpEvent(event);
 }
 
-void ScrollArea::setWidget(Widget& widget)
+void ScrollArea::setWidget(Widget* widget)
 {
-    widget.setParent(this);
-    m_widget = &widget;
+    if (m_widget == widget)
+        return;
+
+    if (m_widget)
+        removeChild(*m_widget);
+
+    m_widget = widget;
+
+    if (m_widget)
+        m_widget->setParent(this);
+
+    updateWidgetSize();
 }
 
 Size ScrollArea::preferredSizeHint() const
 {
-    if (!m_contentSize.isInvalid())
-        return m_contentSize;
+    if (!m_widget)
+        return Widget::preferredSizeHint();
 
-    if (m_widget)
-        return m_widget->preferredSizeHint();
-    return Widget::preferredSizeHint();
+    Size size = m_widget->preferredSizeHint();
+    if (m_widget->verticalSizePolicy() == Widget::SizePolicy::Fixed)
+        size.setHeight(m_widget->minimumSize().height());
+    if (m_widget->horizontalSizePolicy() == Widget::SizePolicy::Fixed)
+        size.setWidth(m_widget->minimumSize().width());
+
+    size += m_horizontalScrollBar->preferredSizeHint();
+    size += m_verticalScrollBar->preferredSizeHint();
+    return size;
 }
 
 Size ScrollArea::minSizeHint() const
 {
     return Widget::minSizeHint();
-}
-
-void ScrollArea::setContentSize(Size contentSize)
-{
-    m_contentSize = contentSize;
 }
 
 } // GUI

@@ -41,17 +41,32 @@ int main()
     GUI::Application app;
 
     {
-        GUI::Button* button = new GUI::Button([]() {
-            std::cout << "Button clicked" << std::endl;
-        });
-        button->setText("Press me :)");
+        GUI::Widget* buttonListLayoutWidget = new GUI::Widget();
+        GUI::VBoxLayout* buttonList = new GUI::VBoxLayout(buttonListLayoutWidget);
+        buttonList->setSpacing(10);
+        buttonList->addWidget(*new GUI::Button("Btn1"));
+        buttonList->addWidget(*new GUI::Button("Btn2"));
+        buttonList->addWidget(*new GUI::Button("Btn3"));
+        buttonList->addWidget(*new GUI::Button("Btn4"));
+        buttonList->addWidget(*new GUI::Button("Btn5"));
+        buttonListLayoutWidget->setLayout(buttonList);
 
         GUI::ScrollArea* scrollArea = new GUI::ScrollArea();
-        scrollArea->setWidget(*button);
-        scrollArea->setContentSize({200, 200});
+        scrollArea->setWidget(buttonListLayoutWidget);
+
+        GUI::Widget* rootWidget = new GUI::Widget();
+        GUI::VBoxLayout* rootLayout = new GUI::VBoxLayout(rootWidget);
+        GUI::Button* button = new GUI::Button(rootWidget);
+        button->setText("Press me :)");
+        button->onClick = []() {
+            std::cout << "Button clicked" << std::endl;
+        };
+        rootLayout->addWidget(*button);
+        rootLayout->addWidget(*scrollArea);
+        rootWidget->setLayout(rootLayout);
 
         GUI::Window* win1 = new GUI::Window();
-        win1->setCentralWidget(*scrollArea);
+        win1->setCentralWidget(*rootWidget);
         win1->setTitle("Window 1");
         win1->show();
     }
@@ -66,6 +81,7 @@ int main()
 
         GUI::Widget* formWidget = new GUI::Widget(root);
         GUI::BoxLayout* formLayout = new GUI::BoxLayout(GUI::BoxLayout::Direction::Horizontal);
+        formLayout->setSpacing(10);
         formWidget->setLayout(formLayout);
 
         GUI::TextBox* textBox = new GUI::TextBox("TextBox");
@@ -85,8 +101,8 @@ int main()
         formLayout->addWidget(*label);
         formLayout->addWidget(*textBox);
 
-        containerLayout->addWidget(*formWidget);
         containerLayout->addWidget(*textBoxButton);
+        containerLayout->addWidget(*formWidget);
         containerLayout->addWidget(*new GUI::TextBox("Test"));
 
         GUI::Window* win2 = new GUI::Window();

@@ -14,8 +14,7 @@ public:
     virtual Size preferredSizeHint() const override;
     virtual Size minSizeHint() const override;
 
-    void setWidget(Widget& widget);
-    void setContentSize(Size contentSize);
+    void setWidget(Widget* widget);
     virtual bool acceptsFocus() const override { return false; }
 
 protected:
@@ -23,10 +22,12 @@ protected:
     virtual void onMouseMoveEvent(MouseEvent& event) override;
     virtual void onMouseDownEvent(MouseEvent& event) override;
     virtual void onMouseUpEvent(MouseEvent& event) override;
-    void onResizeEvent(ResizeEvent& event) override;
+    virtual void onResizeEvent(ResizeEvent& event) override;
 
 private:
-    Size m_contentSize;
+    void updateWidgetSize();
+
+private:
     Widget* m_widget { nullptr };
     ScrollBar* m_verticalScrollBar { nullptr };
     ScrollBar* m_horizontalScrollBar { nullptr };

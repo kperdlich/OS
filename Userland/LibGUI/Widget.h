@@ -25,18 +25,23 @@ public:
     void setWindow(Window* window);
     [[nodiscard]] Window* window() const { return m_window; }
 
-    void setWindowRelativeRect(const Rect& rect);
-    Rect windowRelativeRect() { return m_windowRelativeRect; }
+    [[nodiscard]] Rect windowRelativeRect() const;
 
-    Rect rect() const { return { 0, 0, m_windowRelativeRect.width(), m_windowRelativeRect.height() }; }
+    void resize(int width, int height);
+    void resize(const Size& newSize);
 
-    int width() const { return m_windowRelativeRect.width(); };
-    int height() const { return m_windowRelativeRect.height(); };
+    [[nodiscard]] IntPoint relativePosition() const { return m_relativeRect.position(); }
+    [[nodiscard]] Rect relativeRect() const { return m_relativeRect; }
+    void setRelativeRect(const Rect& rect);
+
+    Rect rect() const { return { 0, 0, m_relativeRect.width(), m_relativeRect.height() }; }
+
+    int width() const { return m_relativeRect.width(); };
+    int height() const { return m_relativeRect.height(); };
 
     struct HitResult {
         Widget* widget;
-        int localX;
-        int localY;
+        IntPoint localPosition;
     };
 
     enum class SizePolicy {
@@ -44,7 +49,7 @@ public:
         Automatic,
     };
 
-    [[nodiscard]] bool hits(int x, int y, HitResult& result);
+    [[nodiscard]] bool hits(const IntPoint& point, HitResult& result);
 
     [[nodiscard]] bool hasFocus() const;
     void setFocus(FocusReason reason);
@@ -62,9 +67,9 @@ public:
 
     virtual bool acceptsFocus() const { return false; }
 
-    void setFixedSize(Size value) { m_windowRelativeRect.setSize(value); }
+    void setFixedSize(const Size& value);
 
-    [[nodiscard]] Size size() const { return m_windowRelativeRect.size(); }
+    [[nodiscard]] Size size() const { return m_relativeRect.size(); }
 
     void setVerticalSizePolicy(SizePolicy value) { m_verticalSizePolicy = value; }
     void setHorizontalSizePolicy(SizePolicy value) { m_horizontalSizePolicy = value; }
@@ -72,8 +77,12 @@ public:
     [[nodiscard]] SizePolicy verticalSizePolicy() const { return m_verticalSizePolicy; }
     SizePolicy horizontalSizePolicy() const { return m_horizontalSizePolicy; }
 
+    [[nodiscard]] Size minimumSize() const { return m_minimumSize; }
+
     virtual Size preferredSizeHint() const;
     virtual Size minSizeHint() const;
+
+    void updateLayout();
 
 protected:
     virtual void onShowEvent(Event& event);
@@ -88,13 +97,11 @@ protected:
     virtual void onFocusOutEvent(FocusEvent& event);
     virtual void onResizeEvent(ResizeEvent& event);
 
-private:
-    void updateLayout();
-
 protected:
     Window* m_window { nullptr };
     Layout* m_layout { nullptr };
-    Rect m_windowRelativeRect;
+    Rect m_relativeRect;
+    Size m_minimumSize {};
     SizePolicy m_verticalSizePolicy { SizePolicy::Automatic };
     SizePolicy m_horizontalSizePolicy { SizePolicy::Automatic };
     bool m_isVisible { true };

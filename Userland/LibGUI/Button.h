@@ -13,8 +13,11 @@ namespace GUI {
 
 class Button : public Widget {
 public:
+    explicit Button(Widget* parent = nullptr);
+    explicit Button(const ADS::String& text, Widget* parent = nullptr);
     Button(std::function<void()> onClickCallback, Widget* parent = nullptr);
-    std::function<void()> onClick;
+
+    std::function<void()> onClick { nullptr };
 
     void setText(const ADS::String& text);
 

@@ -8,8 +8,19 @@
 
 namespace GUI {
 
+Button::Button(Widget* parent)
+    : Widget(parent)
+{
+}
+
 Button::Button(std::function<void()> onClickCallback, Widget* parent)
     : onClick(std::move(onClickCallback))
+    , Widget(parent)
+{
+}
+
+Button::Button(const ADS::String& text, Widget* parent)
+    : m_text(text)
     , Widget(parent)
 {
 }
@@ -42,9 +53,9 @@ void Button::onPaintEvent(Event& event)
         static const Color shadowGreyColor { 129, 129, 129, 255 };
 
         const IntPoint topLeft { 0, 0 };
-        const IntPoint topRight { m_windowRelativeRect.width(), 0 };
-        const IntPoint bottomLeft { 0, m_windowRelativeRect.height() };
-        const IntPoint bottomRight { m_windowRelativeRect.width(), m_windowRelativeRect.height() };
+        const IntPoint topRight { width(), 0 };
+        const IntPoint bottomLeft { 0, height() };
+        const IntPoint bottomRight { width(), height() };
 
         painter.drawLine(topLeft, topRight, Colors::White);
         painter.drawLine(topLeft, bottomLeft, Colors::White);

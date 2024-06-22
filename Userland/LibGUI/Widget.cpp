@@ -79,21 +79,20 @@ bool Widget::event(Event& event)
     }
 }
 
-bool Widget::hits(int x, int y, HitResult& result)
+bool Widget::hits(const IntPoint& point, HitResult& result)
 {
     for (auto& child : m_children) {
         if (!child->isWidgetType())
             continue;
         Widget* childWidget = static_cast<Widget*>(child);
-        if (childWidget->hits(x - childWidget->windowRelativeRect().x(), y - childWidget->windowRelativeRect().y(), result)) {
+        if (childWidget->hits(point - childWidget->relativePosition(), result)) {
             return true;
         }
     }
 
-    if (rect().contains(x, y)) {
+    if (rect().contains(point)) {
         result.widget = this;
-        result.localX = x;
-        result.localY = y;
+        result.localPosition = point;
         return true;
     }
 
@@ -135,15 +134,15 @@ void Widget::onMouseUpEvent(MouseEvent& event)
 {
 }
 
-void Widget::setWindowRelativeRect(const Rect& rect)
+void Widget::setRelativeRect(const Rect& rect)
 {
-    if (rect == m_windowRelativeRect)
+    if (rect == m_relativeRect)
         return;
 
-    const Size oldSize = m_windowRelativeRect.size();
+    const Size oldSize = m_relativeRect.size();
     const Size newSize = rect.size();
 
-    m_windowRelativeRect = rect;
+    m_relativeRect = rect;
 
     if (oldSize != newSize) {
         ResizeEvent resizeEvent(newSize, oldSize);
@@ -207,6 +206,7 @@ void Widget::setLayout(Layout* layout)
     }
 
     m_layout = layout;
+    updateLayout();
 }
 
 Widget* Widget::parentWidget() const
@@ -223,7 +223,7 @@ Size Widget::preferredSizeHint() const
         return m_layout->preferredSizeHint();
 
     std::cerr << "[Widget::preferredSizeHint] used for " << className() << " where no layout is provided. Probably you forgot to override preferredSizeHint()" << std::endl;
-    ASSERT(false);
+    // ASSERT(false);
     return Size::Invalid();
 }
 
@@ -233,7 +233,7 @@ Size Widget::minSizeHint() const
         return m_layout->minSizeHint();
 
     std::cerr << "[Widget::minSizeHint] used for " << className() << " where no layout is provided. Probably you forgot to override minSizeHint()." << std::endl;
-    ASSERT(false);
+    // ASSERT(false);
     return Size::Invalid();
 }
 
@@ -245,6 +245,30 @@ void Widget::grabMouse()
 void Widget::releaseMouse()
 {
     WindowManager::instance().releaseMouseGrabbedWidget();
+}
+
+void Widget::resize(int width, int height)
+{
+    resize({ width, height });
+}
+
+void Widget::resize(const Size& newSize)
+{
+    setRelativeRect({ relativePosition(), newSize });
+}
+
+void Widget::setFixedSize(const Size& value)
+{
+    m_minimumSize = value;
+    updateLayout();
+}
+
+Rect Widget::windowRelativeRect() const
+{
+    Rect currentRect = m_relativeRect;
+    for (Widget* parent = parentWidget(); parent; parent = parent->parentWidget())
+        currentRect.moveBy(parent->relativePosition());
+    return currentRect;
 }
 
 } // GUI
