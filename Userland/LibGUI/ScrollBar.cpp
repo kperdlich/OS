@@ -46,12 +46,18 @@ void ScrollBar::onMouseMoveEvent(MouseEvent& event)
 void ScrollBar::onMouseDownEvent(MouseEvent& event)
 {
     if (scrollUpButtonRect().contains(event.position())) {
+        const int oldValue = m_sliderValue;
         m_sliderValue = ADS::max(m_sliderValue - m_singleStep, m_min);
+        if (m_sliderValue != oldValue && onValueChanged)
+            onValueChanged(m_sliderValue);
         return;
     }
 
     if (scrollDownButtonRect().contains(event.position())) {
+        const int oldValue = m_sliderValue;
         m_sliderValue = ADS::min(m_sliderValue + m_singleStep, m_max);
+        if (m_sliderValue != oldValue && onValueChanged)
+            onValueChanged(m_sliderValue);
         return;
     }
 
@@ -63,10 +69,18 @@ void ScrollBar::onMouseDownEvent(MouseEvent& event)
         return;
     }
 
-    if (sliderRect().y() < event.y())
+    if (sliderRect().y() < event.y()) {
+        const int oldValue = m_sliderValue;
         m_sliderValue = ADS::min(m_sliderValue + m_pageStep, m_max);
-    else
+        if (m_sliderValue != oldValue && onValueChanged)
+            onValueChanged(m_sliderValue);
+    }
+    else {
+        const int oldValue = m_sliderValue;
         m_sliderValue = ADS::max(m_sliderValue - m_pageStep, m_min);
+        if (m_sliderValue != oldValue && onValueChanged)
+            onValueChanged(m_sliderValue);
+    }
 }
 
 void ScrollBar::onMouseUpEvent(MouseEvent& event)
@@ -112,7 +126,7 @@ int ScrollBar::calculateDraggingDelta(const IntPoint& newPosition) const
 int ScrollBar::sliderLength() const
 {
     const int range = m_max - m_min;
-    ASSERT(range >= 0);
+    ASSERT(range > 0);
     const int length = (m_pageStep * availableRange()) / range;
     return length;
 }

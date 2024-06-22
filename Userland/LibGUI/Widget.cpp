@@ -85,6 +85,8 @@ bool Widget::hits(const IntPoint& point, HitResult& result)
         if (!child->isWidgetType())
             continue;
         Widget* childWidget = static_cast<Widget*>(child);
+        if (!childWidget->isVisible())
+            continue;
         if (childWidget->hits(point - childWidget->relativePosition(), result)) {
             return true;
         }
@@ -269,6 +271,12 @@ Rect Widget::windowRelativeRect() const
     for (Widget* parent = parentWidget(); parent; parent = parent->parentWidget())
         currentRect.moveBy(parent->relativePosition());
     return currentRect;
+}
+
+void Widget::moveTo(int x, int y)
+{
+    m_relativeRect.setY(y);
+    m_relativeRect.setX(x);
 }
 
 } // GUI

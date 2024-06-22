@@ -19,13 +19,12 @@ public:
 
 protected:
     virtual void onPaintEvent(Event& event) override;
-    virtual void onMouseMoveEvent(MouseEvent& event) override;
-    virtual void onMouseDownEvent(MouseEvent& event) override;
-    virtual void onMouseUpEvent(MouseEvent& event) override;
     virtual void onResizeEvent(ResizeEvent& event) override;
 
 private:
+    void updateScrollBars();
     void updateWidgetSize();
+    Size availableContentSize() const;
 
 private:
     Widget* m_widget { nullptr };

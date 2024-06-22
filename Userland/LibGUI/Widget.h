@@ -71,6 +71,8 @@ public:
 
     [[nodiscard]] Size size() const { return m_relativeRect.size(); }
 
+    void moveTo(int x, int y);
+
     void setVerticalSizePolicy(SizePolicy value) { m_verticalSizePolicy = value; }
     void setHorizontalSizePolicy(SizePolicy value) { m_horizontalSizePolicy = value; }
 

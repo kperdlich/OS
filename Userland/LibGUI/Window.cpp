@@ -34,7 +34,7 @@ bool Window::event(Event& event)
         if (m_centralWidget) {
             Widget::HitResult result {};
             if (m_centralWidget->hits(mouseEvent.position(), result)) {
-#if 1
+#if 0
                 std::cout << "[Widget::HitResult] " << result.widget->className() << " localX: " << result.localPosition.x() << " localY: " << result.localPosition.y() << std::endl;
 #endif
                 MouseEvent localWidgetMouseEvent(event.type(), result.localPosition.x(), result.localPosition.y(), mouseEvent.button());
