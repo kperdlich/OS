@@ -46,6 +46,11 @@ public:
     void setSize(Size value) { m_size = value; }
     inline Size size() const { return m_size; }
 
+    int left() const { return x(); }
+    int right() const { return x() + width(); }
+    int top() const { return y(); }
+    int bottom() const { return y() + height(); }
+
     inline Point<int> position() const { return m_position; }
 
     inline void moveBy(int x, int y)
@@ -66,6 +71,37 @@ public:
     bool contains(const IntPoint& point) const
     {
         return contains(point.x(), point.y());
+    }
+
+    void intersect(const Rect& other)
+    {
+        const int _left = ADS::max(left(), other.left());
+        const int _right = ADS::min(right(), other.right());
+        const int _top = ADS::max(top(), other.top());
+        const int _bottom = ADS::min(bottom(), other.bottom());
+
+        if (_left < _right && _top < _bottom) {
+            m_position.setX(_left);
+            m_position.setY(_top);
+            m_size.setWidth(_right - _left);
+            m_size.setHeight(_bottom - _top);
+        } else {
+            m_position = {};
+            m_size = {};
+        }
+    }
+
+    Rect intersectRect(const Rect& other) const
+    {
+        Rect copy = *this;
+        copy.intersect(other);
+        return copy;
+    }
+
+    bool intersects(const Rect& other) const
+    {
+        return ADS::max(left(), other.left()) < ADS::min(right(), other.right())
+            && ADS::max(top(), other.top()) < ADS::min(bottom(), other.bottom());
     }
 
     Rect clip(const Rect& clipInside) const

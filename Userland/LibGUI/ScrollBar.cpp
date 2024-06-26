@@ -13,9 +13,11 @@ ScrollBar::ScrollBar(Orientation orientation, Widget* parent)
 {
 }
 
-void ScrollBar::onPaintEvent(Event& event)
+void ScrollBar::onPaintEvent(PaintEvent& event)
 {
     Painter painter(this);
+    painter.setClipRect(event.rect());
+
     painter.drawRect(rect(), Colors::Black);
 
     painter.drawFilledRect(scrollUpButtonRect(), Colors::DarkGrey);

@@ -74,10 +74,6 @@ void ScrollArea::updateWidgetSize()
     m_widget->resize(newSize);
 }
 
-void ScrollArea::onPaintEvent(Event& event)
-{
-    Painter painter(this);
-}
 
 Size ScrollArea::availableContentSize() const
 {

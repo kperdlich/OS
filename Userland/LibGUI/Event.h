@@ -7,6 +7,7 @@
 #include "FocusReason.h"
 #include "Key.h"
 #include "Point.h"
+#include "Rect.h"
 #include "Size.h"
 #include "Types.h"
 
@@ -97,6 +98,20 @@ private:
     Key m_key;
     KeyboardModifier m_modifier;
     ADS::String m_text;
+};
+
+class PaintEvent : public Event {
+public:
+    PaintEvent(const Rect& paintRect)
+        : m_rect(paintRect)
+        , Event(Type::Paint)
+    {
+    }
+
+    [[nodiscard]] Rect rect() const { return m_rect; }
+
+private:
+    Rect m_rect;
 };
 
 class TimerEvent : public Event {

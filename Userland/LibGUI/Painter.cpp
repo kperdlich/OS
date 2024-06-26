@@ -14,16 +14,24 @@ static ASCIIFont s_defaultFont(DefaultFont::font, DefaultFont::firstCharacter, D
 
 Painter::Painter(Widget* widget)
 {
-    if (!widget)
-        return;
+    if (widget) {
+        m_relativeTranslationX = widget->windowRelativeRect().x();
+        m_relativeTranslationY = widget->windowRelativeRect().y();
 
-    m_relativeTranslationX = widget->windowRelativeRect().x();
-    m_relativeTranslationY = widget->windowRelativeRect().y();
-
-    if (const Window* window = widget->window()) {
-        m_relativeTranslationX += window->rect().x();
-        m_relativeTranslationY += window->rect().y();
+        if (const Window* window = widget->window()) {
+            m_relativeTranslationX += window->rect().x();
+            m_relativeTranslationY += window->rect().y();
+        }
     }
+
+    m_clipRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() };
+}
+
+void Painter::setClipRect(const Rect& clipRect)
+{
+    Rect translated = clipRect;
+    translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
+    m_clipRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() }.intersectRect(translated);
 }
 
 void Painter::drawFilledRect(const Rect& rect, GUI::Color color)
@@ -31,7 +39,7 @@ void Painter::drawFilledRect(const Rect& rect, GUI::Color color)
     Rect translated = rect;
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
 
-    const auto clippedRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() }.clip(translated);
+    const auto clippedRect = m_clipRect.intersectRect(translated);
     for (int y = 0; y < clippedRect.height(); ++y) {
         for (int x = 0; x < clippedRect.width(); ++x) {
             if (clippedRect.contains(clippedRect.x() + x, clippedRect.y() + y))
@@ -45,7 +53,7 @@ void Painter::drawRect(const Rect& rect, GUI::Color color)
     Rect translated = rect;
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
 
-    const auto clippedRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() }.clip(translated);
+    const auto clippedRect = m_clipRect.intersectRect(translated);
     for (int y = 0; y < clippedRect.height(); ++y) {
         if (y == 0 || y == clippedRect.height() - 1) {
             for (int x = 0; x < clippedRect.width(); ++x) {
@@ -77,7 +85,7 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
     x1 += m_relativeTranslationX;
     y1 += m_relativeTranslationY;
 
-    const Rect clippedRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() };
+    const Rect clippedRect = m_clipRect;
 
     // Vertical Line
     if (x0 == x1) {
@@ -152,7 +160,7 @@ void Painter::drawText(const Rect& rect, const ADS::String& text, Alignment alig
     // Center horizontal by default
     translated.moveBy(0, (rect.height() - s_defaultFont.height()) / 2);
 
-    const auto clippedRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() }.clip(translated);
+    const auto clippedRect = m_clipRect.intersectRect(translated);
     for (size_t i = 0; i < text.size(); ++i) {
         const char asciiChar = text[i];
         if (asciiChar == ' ') {
@@ -185,7 +193,7 @@ void Painter::drawCharacterBitmap(const IntPoint& point, const CharacterBitmap& 
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
 
     const char* data = bitmap.data();
-    const Rect clippedRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() }.clip(translated);
+    const Rect clippedRect = m_clipRect.intersectRect(translated);
 
     for (int y = 0; y < clippedRect.height(); ++y) {
         for (int x = 0; x < clippedRect.width(); ++x) {

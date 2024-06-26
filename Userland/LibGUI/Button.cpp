@@ -41,10 +41,12 @@ void Button::onMouseMoveEvent(MouseEvent& event)
 {
 }
 
-void Button::onPaintEvent(Event& event)
+void Button::onPaintEvent(PaintEvent& event)
 {
     static const GUI::Color buttonColor = Colors::Grey;
     Painter painter(this);
+    painter.setClipRect(event.rect());
+
     painter.drawFilledRect(rect(), buttonColor);
 
     if (m_isCurrentlyPressed) {

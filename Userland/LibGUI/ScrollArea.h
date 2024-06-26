@@ -18,7 +18,6 @@ public:
     virtual bool acceptsFocus() const override { return false; }
 
 protected:
-    virtual void onPaintEvent(Event& event) override;
     virtual void onResizeEvent(ResizeEvent& event) override;
 
 private:

@@ -89,7 +89,7 @@ public:
 protected:
     virtual void onShowEvent(Event& event);
     virtual void onHideEvent(Event& event);
-    virtual void onPaintEvent(Event& event);
+    virtual void onPaintEvent(PaintEvent& event);
     virtual void onMouseMoveEvent(MouseEvent& event);
     virtual void onMouseDownEvent(MouseEvent& event);
     virtual void onMouseUpEvent(MouseEvent& event);

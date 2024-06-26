@@ -28,7 +28,7 @@ public:
     ADS::Function<void(int)> onValueChanged { nullptr };
 
 protected:
-    virtual void onPaintEvent(Event& event) override;
+    virtual void onPaintEvent(PaintEvent& event) override;
     virtual void onMouseMoveEvent(MouseEvent& event) override;
     virtual void onMouseDownEvent(MouseEvent& event) override;
     virtual void onMouseUpEvent(MouseEvent& event) override;

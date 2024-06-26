@@ -17,6 +17,7 @@ class Painter {
 public:
     explicit Painter(Widget* widget = nullptr);
 
+    void setClipRect(const Rect& clipRect);
     void drawFilledRect(const Rect& rect, GUI::Color color);
     void drawRect(const Rect& rect, GUI::Color color);
     void drawFilledQuad(int x, int y, int size, GUI::Color color);
@@ -28,6 +29,7 @@ public:
 private:
     int m_relativeTranslationX {};
     int m_relativeTranslationY {};
+    Rect m_clipRect;
 };
 
 } // GUI

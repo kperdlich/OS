@@ -89,7 +89,8 @@ private:
         }
 
         // FIXME: Don't repaint every "frame"
-        Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<Event>(new Event(Event::Type::Paint)));
+        const Rect paintRect { 0, 0, GUI::Screen::instance().width(), GUI::Screen::instance().height() };
+        Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<PaintEvent>(new PaintEvent(paintRect)));
     }
 
     char handleAlt(const SDL_KeyboardEvent& event)

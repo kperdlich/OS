@@ -24,9 +24,10 @@ int Label::fontWidth()
     return 8;
 }
 
-void Label::onPaintEvent(Event& event)
+void Label::onPaintEvent(PaintEvent& event)
 {
     Painter painter(this);
+    painter.setClipRect(event.rect());
 #if 0
     painter.drawFilledRect(rect(), Colors::Black);
 #endif

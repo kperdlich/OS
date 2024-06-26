@@ -27,7 +27,7 @@ public:
 
     void shrinkToFit();
 protected:
-    virtual void onPaintEvent(Event& event) override;
+    virtual void onPaintEvent(PaintEvent& event) override;
 
 private:
     static int fontWidth();

@@ -108,7 +108,7 @@ public:
     virtual Size minSizeHint() const override;
 
 protected:
-    virtual void onPaintEvent(Event& event) override;
+    virtual void onPaintEvent(PaintEvent& event) override;
     virtual void onTimerEvent(TimerEvent& event) override;
     virtual void onKeyDownEvent(KeyEvent& event) override;
     virtual void onFocusInEvent(FocusEvent& event) override;

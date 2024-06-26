@@ -43,16 +43,25 @@ bool Widget::event(Event& event)
         updateLayout();
         onResizeEvent(static_cast<ResizeEvent&>(event));
         return true;
-    case Event::Type::Paint:
-        for (auto& child : m_children) {
-            if (child->isWidgetType()) {
-                Widget* childWidget = static_cast<Widget*>(child);
-                childWidget->event(event);
-            }
-        }
+    case Event::Type::Paint: {
+        PaintEvent& paintEvent = static_cast<PaintEvent&>(event);
         if (isVisible())
-            onPaintEvent(event);
+            onPaintEvent(paintEvent);
+        for (auto& child : m_children) {
+            if (!child->isWidgetType())
+                continue;
+            Widget* childWidget = static_cast<Widget*>(child);
+            if (!childWidget->isVisible())
+                continue;
+            if (!childWidget->relativeRect().intersects(paintEvent.rect()))
+                continue;
+            Rect localIntersectionArea = paintEvent.rect().intersectRect(childWidget->relativeRect());
+            localIntersectionArea.moveBy(-childWidget->relativePosition());
+            PaintEvent localPaintEvent(localIntersectionArea);
+            childWidget->event(localPaintEvent);
+        }
         return true;
+    }
     case Event::Type::Show:
         for (auto& child : m_children) {
             if (child->isWidgetType()) {
@@ -120,7 +129,7 @@ void Widget::onHideEvent(Event& event)
     std::cout << "onHideEvent[" << className() << "]" << std::endl;
 }
 
-void Widget::onPaintEvent(Event& event)
+void Widget::onPaintEvent(PaintEvent& event)
 {
 }
 
