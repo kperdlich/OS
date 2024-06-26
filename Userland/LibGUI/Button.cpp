@@ -28,11 +28,17 @@ Button::Button(const ADS::String& text, Widget* parent)
 void Button::onMouseDownEvent(MouseEvent& event)
 {
     m_isCurrentlyPressed = true;
+    grabMouse();
 }
 
 void Button::onMouseUpEvent(MouseEvent& event)
 {
     m_isCurrentlyPressed = false;
+    releaseMouse();
+
+    if (!rect().contains(event.position()))
+        return;
+
     if (onClick)
         onClick();
 }
