@@ -34,7 +34,8 @@ void Painter::drawFilledRect(const Rect& rect, GUI::Color color)
     const auto clippedRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() }.clip(translated);
     for (int y = 0; y < clippedRect.height(); ++y) {
         for (int x = 0; x < clippedRect.width(); ++x) {
-            Screen::instance().setPixel(clippedRect.x() + x, clippedRect.y() + y, color);
+            if (clippedRect.contains(clippedRect.x() + x, clippedRect.y() + y))
+                Screen::instance().setPixel(clippedRect.x() + x, clippedRect.y() + y, color);
         }
     }
 }
@@ -51,9 +52,10 @@ void Painter::drawRect(const Rect& rect, GUI::Color color)
                 Screen::instance().setPixel(clippedRect.x() + x, clippedRect.y() + y, color);
             }
         } else {
-            // FIXME: Fix clipping here
-            Screen::instance().setPixel(clippedRect.x(), clippedRect.y() + y, color);
-            Screen::instance().setPixel(clippedRect.x() + clippedRect.width() - 1, clippedRect.y() + y, color);
+            if (clippedRect.contains(clippedRect.x(), clippedRect.y() + y))
+                Screen::instance().setPixel(clippedRect.x(), clippedRect.y() + y, color);
+            if (clippedRect.contains(clippedRect.x() + clippedRect.width() - 1, clippedRect.y() + y))
+                Screen::instance().setPixel(clippedRect.x() + clippedRect.width() - 1, clippedRect.y() + y, color);
         }
     }
 }
@@ -75,12 +77,15 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
     x1 += m_relativeTranslationX;
     y1 += m_relativeTranslationY;
 
+    const Rect clippedRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() };
+
     // Vertical Line
     if (x0 == x1) {
         const int startY = ADS::min(y0, y1);
         const int endY = ADS::max(y0, y1);
         for (int i = startY; i <= endY; ++i) {
-            Screen::instance().setPixel(x0, i, color);
+            if (clippedRect.contains(x0, i))
+                Screen::instance().setPixel(x0, i, color);
         }
         return;
     }
@@ -90,7 +95,8 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
         const int startX = ADS::min(x0, x1);
         const int endX = ADS::max(x0, x1);
         for (int i = startX; i <= endX; ++i) {
-            Screen::instance().setPixel(i, y0, color);
+            if (clippedRect.contains(i, y0))
+                Screen::instance().setPixel(i, y0, color);
         }
         return;
     }
@@ -105,7 +111,8 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
     int y = y0;
 
     while (true) {
-        Screen::instance().setPixel(x, y, color);
+        if (clippedRect.contains(x, y))
+            Screen::instance().setPixel(x, y, color);
         if (x == x1 && y == y1)
             break;
         const int error2 = 2 * error;
@@ -162,10 +169,10 @@ void Painter::drawText(const Rect& rect, const ADS::String& text, Alignment alig
             for (int y = 0; y < s_defaultFont.height(); ++y) {
                 const size_t index = (y * s_defaultFont.width()) + x;
                 if (font[index] == '#') {
-                    // FIXME: Fix clipping here
-                    const int xPos = clippedRect.x() + x + (i * s_defaultFont.width());
-                    const int yPos = clippedRect.y() + y;
-                    Screen::instance().setPixel(xPos, yPos, color);
+                    const int xPos = translated.x() + x + (i * s_defaultFont.width());
+                    const int yPos = translated.y() + y;
+                    if (clippedRect.contains(xPos, yPos))
+                        Screen::instance().setPixel(xPos, yPos, color);
                 }
             }
         }
@@ -178,15 +185,16 @@ void Painter::drawCharacterBitmap(const IntPoint& point, const CharacterBitmap& 
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
 
     const char* data = bitmap.data();
-
     const Rect clippedRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() }.clip(translated);
 
     for (int y = 0; y < clippedRect.height(); ++y) {
         for (int x = 0; x < clippedRect.width(); ++x) {
             const int index = (y * clippedRect.width()) + x;
             if (data[index] == '#') {
-                // FIXME: Fix clipping here
-                Screen::instance().setPixel(translated.x() + x, translated.y() + y, color);
+                const int xPos = translated.x() + x;
+                const int yPos = translated.y() + y;
+                if (clippedRect.contains(xPos, yPos))
+                    Screen::instance().setPixel(xPos, yPos, color);
             }
         }
     }
