@@ -27,6 +27,8 @@ public:
 
     [[nodiscard]] Rect windowRelativeRect() const;
 
+    void update();
+
     void resize(int width, int height);
     void resize(const Size& newSize);
 
@@ -107,6 +109,7 @@ protected:
     SizePolicy m_verticalSizePolicy { SizePolicy::Automatic };
     SizePolicy m_horizontalSizePolicy { SizePolicy::Automatic };
     bool m_isVisible { true };
+    bool m_isDirty { false };
 };
 
 } // GUI

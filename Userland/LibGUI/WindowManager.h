@@ -39,6 +39,8 @@ public:
 
     void setMouseGrabbedWidget(Widget& widget);
     void releaseMouseGrabbedWidget();
+
+    void invalidateRect(Window& window, const Rect& rect);
 private:
     void processMouseEvent(MouseEvent& event);
     void processPaintEvent(Event& event);

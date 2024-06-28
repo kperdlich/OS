@@ -24,6 +24,8 @@ Screen::Screen()
 
     auto framebuffer = new uint32_t[internalWidth * internalHeight];
     m_framebuffer = GUI::Bitmap::createFrom(GUI::BitmapFormat::RGBA32, { internalWidth, internalHeight }, (char*)framebuffer);
+
+    fill(GUI::Colors::White);
 }
 
 Screen::~Screen()
@@ -44,7 +46,7 @@ void Screen::setPixel(int x, int y, GUI::Color color)
     m_framebuffer->setPixel(x, y, color);
 }
 
-void Screen::update()
+void Screen::present()
 {
     SDL_UpdateTexture(m_texture, nullptr, m_framebuffer->data(), m_framebuffer->size().width() * sizeof(uint32_t));
 

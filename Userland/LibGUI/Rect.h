@@ -51,6 +51,11 @@ public:
     int top() const { return y(); }
     int bottom() const { return y() + height(); }
 
+    bool isEmpty() const
+    {
+        return width() == 0 || height() == 0;
+    }
+
     inline Point<int> position() const { return m_position; }
 
     inline void moveBy(int x, int y)
@@ -71,6 +76,14 @@ public:
     bool contains(const IntPoint& point) const
     {
         return contains(point.x(), point.y());
+    }
+
+    bool contains(const Rect& other) const
+    {
+        return left() <= other.left()
+            && right() >= other.right()
+            && top() <= other.top()
+            && bottom() >= other.bottom();
     }
 
     void intersect(const Rect& other)
@@ -104,6 +117,8 @@ public:
             && ADS::max(top(), other.top()) < ADS::min(bottom(), other.bottom());
     }
 
+    Rect united(const Rect& other) const;
+
     Rect clip(const Rect& clipInside) const
     {
         const int clippedX = ADS::clamp(clipInside.x(), m_position.x(), m_position.x() + m_size.width());
@@ -117,6 +132,12 @@ public:
     {
         return m_position == other.m_position
             && m_size == other.m_size;
+    }
+
+    ADS::String toString() const
+    {
+        // FIXME: use format
+        return ADS::String("[") + std::to_string(x()) + "," + std::to_string(y()) + " " + std::to_string(width()) + "x" + std::to_string(height()) + "]";
     }
 
 private:

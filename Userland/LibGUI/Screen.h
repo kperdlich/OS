@@ -21,7 +21,7 @@ public:
     void fill(GUI::Color color);
     void setPixel(int x, int y, GUI::Color color);
 
-    void update();
+    void present();
 
     inline int width() const { return m_framebuffer->size().width(); }
     inline int height() const { return m_framebuffer->size().height(); };

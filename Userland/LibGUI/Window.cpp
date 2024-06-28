@@ -51,9 +51,18 @@ bool Window::event(Event& event)
     }
 
     if (event.isPaintEvent()) {
-        if (m_centralWidget)
+        PaintEvent& paintEvent = static_cast<PaintEvent&>(event);
+        if (m_centralWidget && m_centralWidget->windowRelativeRect().intersects(paintEvent.rect()))
             return m_centralWidget->event(event);
         return CObject::event(event);
+    }
+
+    if (event.type() == Event::Type::UpdateRequest) {
+        const UpdateEvent& updateEvent = static_cast<UpdateEvent&>(event);
+        const Rect widgetRect = updateEvent.widget()->windowRelativeRect();
+        std::cout << "Window[" << title() << "] UpdateRequest from " << updateEvent.widget()->className() << " Rect: " << widgetRect.toString() << std::endl;
+        WindowManager::instance().invalidateRect(*this, widgetRect);
+        return true;
     }
 
     return CObject::event(event);

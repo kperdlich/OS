@@ -39,6 +39,7 @@ void Label::shrinkToFit()
     setHorizontalSizePolicy(Widget::SizePolicy::Fixed);
     setVerticalSizePolicy(Widget::SizePolicy::Automatic);
     setFixedSize(Size { rect().width() + (static_cast<int>(m_text.length()) * fontWidth()) + (2 * 5), 0 });
+    update();
 }
 
 Size Label::preferredSizeHint() const

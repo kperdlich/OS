@@ -32,6 +32,7 @@ public:
         Hide,
         Timer,
         Quit,
+        UpdateRequest,
         DeferredDestroy,
     };
 
@@ -100,9 +101,25 @@ private:
     ADS::String m_text;
 };
 
+class Widget;
+
+class UpdateEvent : public Event {
+public:
+    explicit UpdateEvent(Widget& widget)
+        : m_widget(&widget)
+        , Event(Event::Type::UpdateRequest)
+    {
+    }
+
+    [[nodiscard]] Widget* widget() const { return m_widget; }
+
+private:
+    Widget* m_widget { nullptr };
+};
+
 class PaintEvent : public Event {
 public:
-    PaintEvent(const Rect& paintRect)
+    explicit PaintEvent(const Rect& paintRect)
         : m_rect(paintRect)
         , Event(Type::Paint)
     {

@@ -14,6 +14,7 @@ public:
     int exec()
     {
         while (true) {
+            GUI::Screen::instance().present();
             processSDLEvents();
             updateTimer();
 
@@ -67,6 +68,13 @@ private:
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
+            case SDL_WINDOWEVENT: {
+                if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
+                    const Rect paintRect { 0, 0, GUI::Screen::instance().width(), GUI::Screen::instance().height() };
+                    Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<PaintEvent>(new PaintEvent(paintRect)));
+                }
+                break;
+            }
             case SDL_QUIT:
                 Application::instance().postEvent(nullptr, ADS::UniquePtr<Event>(new Event(Event::Type::Quit)));
                 break;
@@ -87,10 +95,6 @@ private:
                 break;
             }
         }
-
-        // FIXME: Don't repaint every "frame"
-        const Rect paintRect { 0, 0, GUI::Screen::instance().width(), GUI::Screen::instance().height() };
-        Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<PaintEvent>(new PaintEvent(paintRect)));
     }
 
     char handleAlt(const SDL_KeyboardEvent& event)

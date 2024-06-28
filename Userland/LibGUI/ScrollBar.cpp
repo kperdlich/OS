@@ -18,6 +18,7 @@ void ScrollBar::onPaintEvent(PaintEvent& event)
     Painter painter(this);
     painter.setClipRect(event.rect());
 
+    painter.drawFilledRect(rect(), Colors::White);
     painter.drawRect(rect(), Colors::Black);
 
     painter.drawFilledRect(scrollUpButtonRect(), Colors::DarkGrey);
@@ -43,6 +44,7 @@ void ScrollBar::onMouseMoveEvent(MouseEvent& event)
     m_sliderValue = newSliderValue;
     if (onValueChanged)
         onValueChanged(m_sliderValue);
+    update();
 }
 
 void ScrollBar::onMouseDownEvent(MouseEvent& event)
@@ -52,6 +54,7 @@ void ScrollBar::onMouseDownEvent(MouseEvent& event)
         m_sliderValue = ADS::max(m_sliderValue - m_singleStep, m_min);
         if (m_sliderValue != oldValue && onValueChanged)
             onValueChanged(m_sliderValue);
+        update();
         return;
     }
 
@@ -60,6 +63,7 @@ void ScrollBar::onMouseDownEvent(MouseEvent& event)
         m_sliderValue = ADS::min(m_sliderValue + m_singleStep, m_max);
         if (m_sliderValue != oldValue && onValueChanged)
             onValueChanged(m_sliderValue);
+        update();
         return;
     }
 
@@ -68,6 +72,7 @@ void ScrollBar::onMouseDownEvent(MouseEvent& event)
         m_draggingStartPosition = event.position();
         m_draggingStartValue = value();
         grabMouse();
+        update();
         return;
     }
 
@@ -76,12 +81,14 @@ void ScrollBar::onMouseDownEvent(MouseEvent& event)
         m_sliderValue = ADS::min(m_sliderValue + m_pageStep, m_max);
         if (m_sliderValue != oldValue && onValueChanged)
             onValueChanged(m_sliderValue);
+        update();
     }
     else {
         const int oldValue = m_sliderValue;
         m_sliderValue = ADS::max(m_sliderValue - m_pageStep, m_min);
         if (m_sliderValue != oldValue && onValueChanged)
             onValueChanged(m_sliderValue);
+        update();
     }
 }
 
@@ -89,6 +96,7 @@ void ScrollBar::onMouseUpEvent(MouseEvent& event)
 {
     m_isDragging = false;
     releaseMouse();
+    update();
 }
 
 void ScrollBar::setRange(int min, int max)
@@ -101,6 +109,7 @@ void ScrollBar::setRange(int min, int max)
     m_sliderValue = ADS::clamp(m_sliderValue, m_min, m_max);
     if (m_sliderValue != oldValue && onValueChanged)
         onValueChanged(m_sliderValue);
+    update();
 }
 
 void ScrollBar::setValue(int value)
@@ -112,6 +121,7 @@ void ScrollBar::setValue(int value)
     m_sliderValue = ADS::clamp(value, m_min, m_max);
     if (m_sliderValue != oldValue && onValueChanged)
         onValueChanged(m_sliderValue);
+    update();
 }
 
 int ScrollBar::calculateDraggingDelta(const IntPoint& newPosition) const

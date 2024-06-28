@@ -29,12 +29,14 @@ void Button::onMouseDownEvent(MouseEvent& event)
 {
     m_isCurrentlyPressed = true;
     grabMouse();
+    update();
 }
 
 void Button::onMouseUpEvent(MouseEvent& event)
 {
     m_isCurrentlyPressed = false;
     releaseMouse();
+    update();
 
     if (!rect().contains(event.position()))
         return;
@@ -84,6 +86,7 @@ void Button::onPaintEvent(PaintEvent& event)
 void Button::setText(const ADS::String& text)
 {
     m_text = text;
+    update();
 }
 
 int Button::fontWidth()

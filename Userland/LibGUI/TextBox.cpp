@@ -26,6 +26,7 @@ void TextBox::setText(const ADS::String& text)
     m_scrollOffset = 0;
     if (hasFocus())
         scrollCursorIntoView();
+    update();
 }
 
 Rect TextBox::innerRect() const
@@ -147,6 +148,7 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
         m_cursor.setPosition(0);
         m_cursor.clearSelection();
         scrollCursorIntoView();
+        update();
         return;
     }
 
@@ -154,6 +156,7 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
         m_cursor.setPosition(static_cast<int>(m_text.length()));
         m_cursor.clearSelection();
         scrollCursorIntoView();
+        update();
         return;
     }
 
@@ -166,6 +169,7 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
         m_text.insert(m_cursor.position(), event.text());
         m_cursor.moveCursorRight();
         scrollCursorIntoView();
+        update();
     }
 }
 
@@ -173,17 +177,20 @@ void TextBox::onFocusInEvent(FocusEvent&)
 {
     m_isCursorVisible = true;
     m_blinkTimerId = startTimer(530);
+    update();
 }
 
 void TextBox::onFocusOutEvent(FocusEvent&)
 {
     cleanup();
+    update();
 }
 
 void TextBox::onTimerEvent(TimerEvent& event)
 {
     Widget::onTimerEvent(event);
     m_isCursorVisible = !m_isCursorVisible;
+    update();
 }
 
 void TextBox::onResizeEvent(ResizeEvent& event)
@@ -199,6 +206,7 @@ void TextBox::onMouseDownEvent(MouseEvent& event)
     m_isCursorVisible = true;
     m_inSelectionMode = true;
     grabMouse();
+    update();
 }
 
 void TextBox::onMouseMoveEvent(MouseEvent& event)
@@ -227,6 +235,7 @@ void TextBox::onMouseMoveEvent(MouseEvent& event)
         m_cursor.setPosition(newCursorPos);
     }
     scrollCursorIntoView();
+    update();
 
 #if 0
     std::cout << "cursor " << m_cursor.position() << " m_selectionRange: start: " << m_cursor.selectionStart() << " end: " << m_cursor.selectionEnd() << std::endl;
@@ -237,6 +246,7 @@ void TextBox::onMouseUpEvent(MouseEvent& event)
 {
     m_inSelectionMode = false;
     releaseMouse();
+    update();
 }
 
 void TextBox::removeSelectedText()
@@ -247,6 +257,7 @@ void TextBox::removeSelectedText()
     m_cursor.setPosition(newCursorPos);
     m_cursor.clearSelection();
     scrollCursorIntoView();
+    update();
 }
 
 void TextBox::selectAll()
@@ -259,6 +270,7 @@ void TextBox::selectAll()
     m_cursor.setSelectionStart(0);
     m_cursor.setSelectionEnd(textLength);
     scrollCursorIntoView();
+    update();
 }
 
 void TextBox::handleKeyLeft(KeyEvent& event)
@@ -286,6 +298,7 @@ void TextBox::handleKeyLeft(KeyEvent& event)
         }
     }
     scrollCursorIntoView();
+    update();
 }
 
 void TextBox::handleKeyRight(KeyEvent& event)
@@ -313,6 +326,7 @@ void TextBox::handleKeyRight(KeyEvent& event)
         }
     }
     scrollCursorIntoView();
+    update();
 }
 
 void TextBox::handleKeyBackspace(KeyEvent& event)
@@ -324,6 +338,7 @@ void TextBox::handleKeyBackspace(KeyEvent& event)
         m_text.erase(m_cursor.position(), 1);
         m_scrollOffset = ADS::max(m_scrollOffset - 1, 0);
     }
+    update();
 }
 
 void TextBox::cleanup()

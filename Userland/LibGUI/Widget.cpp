@@ -44,6 +44,7 @@ bool Widget::event(Event& event)
         onResizeEvent(static_cast<ResizeEvent&>(event));
         return true;
     case Event::Type::Paint: {
+        m_isDirty = false;
         PaintEvent& paintEvent = static_cast<PaintEvent&>(event);
         if (isVisible())
             onPaintEvent(paintEvent);
@@ -286,6 +287,18 @@ void Widget::moveTo(int x, int y)
 {
     m_relativeRect.setY(y);
     m_relativeRect.setX(x);
+}
+
+void Widget::update()
+{
+    if (m_isDirty)
+        return;
+
+    m_isDirty = true;
+    if (Window* widgetWindow = window()) {
+        UpdateEvent event(*this);
+        widgetWindow->event(event);
+    }
 }
 
 } // GUI

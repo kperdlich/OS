@@ -48,6 +48,7 @@ public:
 
 private:
     ADS::String m_title {};
+    Rect m_dirtyRect;
     Rect m_rect { 100, 100, 640, 480 };
     Widget* m_centralWidget { nullptr };
     Widget* m_focusedWidget { nullptr };

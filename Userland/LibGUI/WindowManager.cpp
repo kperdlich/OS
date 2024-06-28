@@ -184,18 +184,12 @@ void WindowManager::processMouseEvent(MouseEvent& event)
 
 void WindowManager::processPaintEvent(Event& event)
 {
-    // FIXME: handle outside of windows manager
-    GUI::Screen::instance().fill(GUI::Colors::White);
-
     forEachVisibleWindowBackToFront([&](GUI::Window& window) -> GUI::IteratorResult {
         paintWindow(window, event);
         return GUI::IteratorResult::Continue;
     });
 
     paintTaskbar();
-
-    // FIXME: handle outside of windows manager;
-    GUI::Screen::instance().update();
 }
 
 void WindowManager::paintWindow(Window& window, Event& event)
@@ -242,6 +236,12 @@ void WindowManager::releaseMouseGrabbedWidget()
 void WindowManager::setMouseGrabbedWidget(Widget& widget)
 {
     m_mouseGrabbedWidget = &widget;
+}
+
+void WindowManager::invalidateRect(Window& window, const Rect& rect)
+{
+    // TODO: Handle window specific actions (dragging, close etc.)
+    Application::instance().postEvent(&window, ADS::UniquePtr<PaintEvent>(new PaintEvent(rect)));
 }
 
 } // GUI
