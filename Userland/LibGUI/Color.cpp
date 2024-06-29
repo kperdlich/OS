@@ -19,6 +19,9 @@ Color::Color(Colors color)
     case Colors::White:
         m_rgba = { 255, 255, 255, 255 };
         break;
+    case Colors::Red:
+        m_rgba = { 255, 0, 0, 255 };
+        break;
     case Colors::LightWhite:
         m_rgba = { 234, 233, 233, 255 };
         break;

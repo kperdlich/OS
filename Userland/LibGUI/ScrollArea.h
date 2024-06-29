@@ -19,6 +19,7 @@ public:
 
 protected:
     virtual void onResizeEvent(ResizeEvent& event) override;
+    void onPaintEvent(PaintEvent& event) override;
 
 private:
     void updateScrollBars();

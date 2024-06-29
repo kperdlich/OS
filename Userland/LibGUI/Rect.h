@@ -46,6 +46,11 @@ public:
     void setSize(Size value) { m_size = value; }
     inline Size size() const { return m_size; }
 
+    void setPosition(const IntPoint& position)
+    {
+        m_position = position;
+    }
+
     void setLeft(int value)
     {
         setX(value);
@@ -53,7 +58,7 @@ public:
 
     void setRight(int value)
     {
-        setWidth(value - x() + 1);
+        setWidth(value - x());
     }
 
     void setTop(int value)
@@ -63,7 +68,7 @@ public:
 
     void setBottom(int value)
     {
-        setHeight(value - y() + 1);
+        setHeight(value - y());
     }
 
     int left() const { return x(); }
@@ -90,7 +95,7 @@ public:
 
     bool contains(int x, int y) const
     {
-        return x >= m_position.x() && x < (m_position.x() + width()) && y >= m_position.y() && y < (m_position.y() + height());
+        return x >= left() && x <= right() && y >= top() && y <= bottom();
     }
 
     bool contains(const IntPoint& point) const
@@ -116,8 +121,8 @@ public:
         if (_left < _right && _top < _bottom) {
             m_position.setX(_left);
             m_position.setY(_top);
-            m_size.setWidth(_right - _left);
-            m_size.setHeight(_bottom - _top);
+            m_size.setWidth((_right - _left));
+            m_size.setHeight((_bottom - _top));
         } else {
             m_position = {};
             m_size = {};

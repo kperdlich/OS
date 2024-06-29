@@ -70,6 +70,7 @@ int main()
         win1->setCentralWidget(*rootWidget);
         win1->setTitle("Window 1");
         win1->show();
+        return app.exec();
     }
 
     {

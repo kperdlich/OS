@@ -120,7 +120,6 @@ void Window::setCentralWidget(Widget& widget)
 void Window::show()
 {
     GUI::WindowManager::instance().show(*this);
-    WindowManager::instance().invalidate(*this);
     if (m_centralWidget) {
         Event showEvent(Event::Type::Show);
         m_centralWidget->event(showEvent);
@@ -129,7 +128,7 @@ void Window::show()
 
 void Window::hide()
 {
-    WindowManager::instance().invalidate(*this);
+    WindowManager::instance().hide(*this);
     if (m_centralWidget) {
         Event hideEvent(Event::Type::Hide);
         m_centralWidget->event(hideEvent);
@@ -154,6 +153,15 @@ void Window::setFocusedWidget(Widget* widget, FocusReason reason)
 bool Window::isActive() const
 {
     return WindowManager::instance().activeWindow() == this;
+}
+
+void Window::setPosition(const IntPoint& point)
+{
+    m_rect.setPosition(point);
+
+    //Rect windowRect = rect();
+    //windowRect.moveBy(-rect().position());
+    //WindowManager::instance().invalidateWindowRect(*this, windowRect);
 }
 
 } // GUI

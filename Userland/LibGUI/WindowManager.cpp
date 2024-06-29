@@ -8,6 +8,7 @@
 #include "Painter.h"
 #include "Screen.h"
 #include "Widget.h"
+#include <chrono>
 
 namespace GUI {
 
@@ -46,7 +47,7 @@ static const Rect TaskbarRect { 0, height - TaskbarHeight, width, TaskbarHeight 
 static Rect windowFrameRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x() - FrameWidthMargin, rect.y() - TitleBarHeight - FrameWidthMargin, rect.width() + (2 * FrameWidthMargin), rect.height() + TitleBarHeight };
+    return { rect.x() - FrameWidthMargin, rect.y() - TitleBarHeight, rect.width() + (2 * FrameWidthMargin), rect.height() + TitleBarHeight};
 }
 
 static Rect windowTitleBarCloseButtonRect(const Window& window)
@@ -87,6 +88,8 @@ bool WindowManager::event(Event& event)
 void WindowManager::show(Window& window)
 {
     m_windows.emplace_back(&window);
+    if (window.isVisible())
+        repaint(window);
 }
 
 void WindowManager::remove(Window& window)
@@ -119,11 +122,17 @@ void WindowManager::makeActive(Window* window)
     Window* const previousActiveWindow = m_activeWindow;
     m_activeWindow = window;
 
-    if (previousActiveWindow)
-        invalidate(*previousActiveWindow);
+    if (previousActiveWindow) {
+        if (previousActiveWindow->isVisible()) {
+            repaint(*previousActiveWindow);
+        } else {
+            hide(*previousActiveWindow);
+        }
+    }
 
-    if (m_activeWindow)
-        invalidate(*m_activeWindow);
+    if (m_activeWindow) {
+        repaint(*m_activeWindow);
+    }
 
     if (m_activeWindow && m_activeWindow->focusedWidget())
         Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusIn, FocusReason::ActiveWindow)));
@@ -142,11 +151,13 @@ void WindowManager::processMouseEvent(MouseEvent& event)
 
     if (event.type() == Event::Type::MouseMove && m_isDraggingWindow) {
         const Rect oldRectWindowRect = windowFrameRect(*m_activeWindow);
-        const int deltaX = event.x() - m_lastMouseDragPos.width();
-        const int deltaY = event.y() - m_lastMouseDragPos.height();
-        m_activeWindow->moveBy(deltaX, deltaY);
-        m_lastMouseDragPos = { event.x(), event.y() };
-        invalidateRect(oldRectWindowRect.united(windowFrameRect(*m_activeWindow)));
+        Point pos = m_dragWindowOrigin;
+        pos.moveBy(event.x() - m_dragOrigin.x(), event.y() - m_dragOrigin.y());
+        m_activeWindow->setPosition(pos);
+        Painter painter;
+        std::cout << "Hide oldRectWindowRect rect: " << oldRectWindowRect.toString() << std::endl;
+        painter.drawFilledRect(oldRectWindowRect, Colors::White);
+        repaintOverlappingWindow(windowFrameRect(*m_activeWindow));
         return;
     }
 
@@ -208,7 +219,8 @@ void WindowManager::onWindowTaskBarMouseDown(Window& window, int x, int y)
 {
     const auto& rect = window.rect();
     if (!windowTitleBarCloseButtonRect(window).contains(x, y)) {
-        m_lastMouseDragPos = { x, y };
+        m_dragOrigin = { x, y };
+        m_dragWindowOrigin = window.rect().position();
         m_isDraggingWindow = true;
     }
 }
@@ -234,42 +246,30 @@ void WindowManager::invalidateWindowRect(Window& window, const Rect& rect)
     Application::instance().postEvent(&window, ADS::UniquePtr<PaintEvent>(new PaintEvent(rect)));
 }
 
-void WindowManager::invalidate(Window& window)
+void WindowManager::hide(Window& window)
 {
-    invalidateRect(windowFrameRect(window));
+    Painter painter;
+    painter.drawFilledRect(windowFrameRect(window), Colors::White);
 }
 
-void WindowManager::invalidateRect(const Rect& rect)
+void WindowManager::repaint(Window& window)
 {
-    m_dirtyRects.push_back(rect);
-    compose();
+    std::cout << "[WindowManager::repaint] " << window.title() <<  " rect: " << windowFrameRect(window).toString() << std::endl;
+    paintWindowFrame(window);
+    Rect localWindowRect = window.rect();
+    localWindowRect.moveBy(-window.rect().position());
+    paintWindowFrame(window);
+    PaintEvent event(localWindowRect);
+    window.event(event);
 }
 
-void WindowManager::compose()
+void WindowManager::repaintOverlappingWindow(const Rect& rect)
 {
-    static const Color BackgroundColor = Colors::White;
-    const ADS::Vector<Rect> dirtyRects = std::move(m_dirtyRects);
-
-    for (auto& dirtyRect : dirtyRects) {
-        Painter painter;
-        painter.setClipRect(dirtyRect);
-        painter.drawFilledRect(dirtyRect, BackgroundColor);
-    }
-
-    forEachVisibleWindowBackToFront([&](GUI::Window& window) -> GUI::IteratorResult {
-        for (auto& dirtyRect : dirtyRects) {
-            if (dirtyRect.intersects(windowFrameRect(window)))
-                paintWindowFrame(window);
-            if (dirtyRect.intersects(window.rect())) {
-                Rect localWindowRect = dirtyRect.intersectRect(window.rect());
-                localWindowRect.moveBy(-window.rect().position());
-                invalidateWindowRect(window, localWindowRect);
-            }
+    forEachVisibleWindowBackToFront([&](Window& window) -> IteratorResult {
+        if (rect.intersects(windowFrameRect(window))) {
+            repaint(window);
         }
-        return GUI::IteratorResult::Continue;
     });
-
-    paintTaskbar();
 }
 
 } // GUI

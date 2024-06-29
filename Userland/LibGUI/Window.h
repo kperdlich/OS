@@ -33,6 +33,7 @@ public:
     void moveBy(int x, int y);
 
     void setRect(const Rect& rect);
+    void setPosition(const IntPoint& point);
     [[nodiscard]] inline Rect rect() const { return m_rect; }
 
     inline void setTitle(const ADS::String& title) { m_title = title; }

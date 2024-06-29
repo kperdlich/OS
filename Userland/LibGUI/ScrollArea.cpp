@@ -125,4 +125,11 @@ Size ScrollArea::minSizeHint() const
     return Widget::minSizeHint();
 }
 
+void ScrollArea::onPaintEvent(PaintEvent& event)
+{
+    Painter painter(this);
+    painter.setClipRect(event.rect());
+    painter.drawFilledRect(rect(), Colors::Blue);
+}
+
 } // GUI

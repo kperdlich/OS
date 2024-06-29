@@ -36,6 +36,10 @@ void Painter::setClipRect(const Rect& clipRect)
 
 void Painter::drawFilledRect(const Rect& rect, GUI::Color color)
 {
+#if 0
+    const auto start = std::chrono::system_clock::now();
+#endif
+
     Rect translated = rect;
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
 
@@ -46,6 +50,12 @@ void Painter::drawFilledRect(const Rect& rect, GUI::Color color)
                 Screen::instance().setPixel(clippedRect.x() + x, clippedRect.y() + y, color);
         }
     }
+
+#if 0
+    const auto passed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start);
+    std::cout << "[Painter::drawFilledRect] took " << passed.count() << " ms" << std::endl;
+#endif
+
 }
 
 void Painter::drawRect(const Rect& rect, GUI::Color color)

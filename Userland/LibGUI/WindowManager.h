@@ -41,24 +41,25 @@ public:
     void releaseMouseGrabbedWidget();
 
     void invalidateWindowRect(Window& window, const Rect& rect);
-    void invalidateRect(const Rect& rect);
-    void invalidate(Window& window);
+    void hide(Window& window);
+
 private:
     void processMouseEvent(MouseEvent& event);
 
     WindowManager() = default;
 
-    void compose();
     void onWindowTaskBarMouseDown(Window& window, int x, int y);
     void paintWindowFrame(Window& window);
     void closeWindow(Window& window);
+    void repaint(Window& window);
+    void repaintOverlappingWindow(const Rect& rect);
 
 private:
-    ADS::Vector<Rect> m_dirtyRects;
     ADS::Vector<Window*> m_windows;
     Window* m_activeWindow { nullptr };
     Widget* m_mouseGrabbedWidget { nullptr };
-    Size m_lastMouseDragPos { 0, 0 };
+    IntPoint m_dragOrigin;
+    IntPoint m_dragWindowOrigin;
     bool m_isDraggingWindow { false };
 };
 

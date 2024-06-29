@@ -48,7 +48,8 @@ bool Widget::event(Event& event)
         PaintEvent& paintEvent = static_cast<PaintEvent&>(event);
         Painter painter(this);
         painter.setClipRect(paintEvent.rect());
-        painter.drawFilledRect(rect(), Colors::Grey);
+        painter.drawFilledRect(rect(), Colors::Red);
+        std::cout << "[Widget::paint] " << className() << " rect: " << relativeRect().toString() << std::endl;
         if (isVisible())
             onPaintEvent(paintEvent);
         for (auto& child : m_children) {
