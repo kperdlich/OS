@@ -60,7 +60,7 @@ public:
     void releaseMouse();
 
     [[nodiscard]] bool isVisible() const { return m_isVisible; }
-    void setIsVisible(bool value) { m_isVisible = value; }
+    void setIsVisible(bool value);
 
     Layout* layout() const { return m_layout; }
     void setLayout(Layout* layout);

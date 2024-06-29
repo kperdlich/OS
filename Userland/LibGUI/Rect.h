@@ -46,6 +46,26 @@ public:
     void setSize(Size value) { m_size = value; }
     inline Size size() const { return m_size; }
 
+    void setLeft(int value)
+    {
+        setX(value);
+    }
+
+    void setRight(int value)
+    {
+        setWidth(value - x() + 1);
+    }
+
+    void setTop(int value)
+    {
+        setY(value);
+    }
+
+    void setBottom(int value)
+    {
+        setHeight(value - y() + 1);
+    }
+
     int left() const { return x(); }
     int right() const { return x() + width(); }
     int top() const { return y(); }

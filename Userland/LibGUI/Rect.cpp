@@ -14,15 +14,12 @@ Rect GUI::Rect::united(const GUI::Rect& other) const
     if (isEmpty())
         return other;
 
-    const int minX = ADS::min(x(), other.x());
-    const int minY = ADS::min(y(), other.y());
-    const int maxX = ADS::max(x(), other.x());
-    const int maxY = ADS::max(y(), other.y());
-
-    const int width = maxX - minX;
-    const int height = maxY - minY;
-
-    return { minX, maxY, width, height };
+    Rect rect;
+    rect.setLeft(ADS::min(left(), other.left()));
+    rect.setTop(ADS::min(top(), other.top()));
+    rect.setRight(ADS::max(right(), other.right()));
+    rect.setBottom(ADS::max(bottom(), other.bottom()));
+    return rect;
 }
 
 }

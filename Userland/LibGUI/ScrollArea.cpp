@@ -41,13 +41,6 @@ void ScrollArea::onResizeEvent(ResizeEvent& event)
     updateScrollBars();
 }
 
-void ScrollArea::onPaintEvent(PaintEvent& event)
-{
-    Painter painter(this);
-    painter.setClipRect(event.rect());
-
-    painter.drawFilledRect(rect(), Colors::Grey);
-}
 
 void ScrollArea::updateScrollBars()
 {

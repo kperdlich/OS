@@ -61,7 +61,7 @@ bool Window::event(Event& event)
         const UpdateEvent& updateEvent = static_cast<UpdateEvent&>(event);
         const Rect widgetRect = updateEvent.widget()->windowRelativeRect();
         std::cout << "Window[" << title() << "] UpdateRequest from " << updateEvent.widget()->className() << " Rect: " << widgetRect.toString() << std::endl;
-        WindowManager::instance().invalidateRect(*this, widgetRect);
+        WindowManager::instance().invalidateWindowRect(*this, widgetRect);
         return true;
     }
 
@@ -120,6 +120,7 @@ void Window::setCentralWidget(Widget& widget)
 void Window::show()
 {
     GUI::WindowManager::instance().show(*this);
+    WindowManager::instance().invalidate(*this);
     if (m_centralWidget) {
         Event showEvent(Event::Type::Show);
         m_centralWidget->event(showEvent);
@@ -128,6 +129,7 @@ void Window::show()
 
 void Window::hide()
 {
+    WindowManager::instance().invalidate(*this);
     if (m_centralWidget) {
         Event hideEvent(Event::Type::Hide);
         m_centralWidget->event(hideEvent);

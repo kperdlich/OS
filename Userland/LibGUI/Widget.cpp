@@ -46,6 +46,9 @@ bool Widget::event(Event& event)
     case Event::Type::Paint: {
         m_isDirty = false;
         PaintEvent& paintEvent = static_cast<PaintEvent&>(event);
+        Painter painter(this);
+        painter.setClipRect(paintEvent.rect());
+        painter.drawFilledRect(rect(), Colors::Grey);
         if (isVisible())
             onPaintEvent(paintEvent);
         for (auto& child : m_children) {
@@ -160,6 +163,8 @@ void Widget::setRelativeRect(const Rect& rect)
         ResizeEvent resizeEvent(newSize, oldSize);
         event(resizeEvent);
     }
+
+    update();
 }
 
 void Widget::setWindow(Window* window)
@@ -273,6 +278,7 @@ void Widget::setFixedSize(const Size& value)
 {
     m_minimumSize = value;
     updateLayout();
+    update();
 }
 
 Rect Widget::windowRelativeRect() const
@@ -287,6 +293,13 @@ void Widget::moveTo(int x, int y)
 {
     m_relativeRect.setY(y);
     m_relativeRect.setX(x);
+    update();
+}
+
+void Widget::setIsVisible(bool value)
+{
+    m_isVisible = value;
+    update();
 }
 
 void Widget::update()

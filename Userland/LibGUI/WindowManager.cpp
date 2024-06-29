@@ -81,11 +81,6 @@ bool WindowManager::event(Event& event)
         return CObject::event(event);
     }
 
-    if (event.isPaintEvent()) {
-        processPaintEvent(event);
-        return true;
-    }
-
     return CObject::event(event);
 }
 
@@ -121,7 +116,14 @@ void WindowManager::makeActive(Window* window)
     if (m_activeWindow && m_activeWindow->focusedWidget())
         Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusOut, FocusReason::ActiveWindow)));
 
+    Window* const previousActiveWindow = m_activeWindow;
     m_activeWindow = window;
+
+    if (previousActiveWindow)
+        invalidate(*previousActiveWindow);
+
+    if (m_activeWindow)
+        invalidate(*m_activeWindow);
 
     if (m_activeWindow && m_activeWindow->focusedWidget())
         Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusIn, FocusReason::ActiveWindow)));
@@ -139,10 +141,12 @@ void WindowManager::processMouseEvent(MouseEvent& event)
     }
 
     if (event.type() == Event::Type::MouseMove && m_isDraggingWindow) {
+        const Rect oldRectWindowRect = windowFrameRect(*m_activeWindow);
         const int deltaX = event.x() - m_lastMouseDragPos.width();
         const int deltaY = event.y() - m_lastMouseDragPos.height();
         m_activeWindow->moveBy(deltaX, deltaY);
         m_lastMouseDragPos = { event.x(), event.y() };
+        invalidateRect(oldRectWindowRect.united(windowFrameRect(*m_activeWindow)));
         return;
     }
 
@@ -182,22 +186,11 @@ void WindowManager::processMouseEvent(MouseEvent& event)
         makeActive(nullptr);
 }
 
-void WindowManager::processPaintEvent(Event& event)
-{
-    forEachVisibleWindowBackToFront([&](GUI::Window& window) -> GUI::IteratorResult {
-        paintWindow(window, event);
-        return GUI::IteratorResult::Continue;
-    });
-
-    paintTaskbar();
-}
-
-void WindowManager::paintWindow(Window& window, Event& event)
+void WindowManager::paintWindowFrame(Window& window)
 {
     const bool isActiveWindow = m_activeWindow == &window;
 
     Painter painter;
-    painter.drawFilledRect(windowFrameRect(window), Colors::Grey);
     painter.drawFilledRect(windowTitleBarRect(window), isActiveWindow ? ActiveWindowTitleBarColor : InactiveTitleBarColor);
 
     Rect closeButtonRect = windowTitleBarCloseButtonRect(window);
@@ -209,8 +202,6 @@ void WindowManager::paintWindow(Window& window, Event& event)
     painter.drawRect(windowTitleBarCloseButtonRect(window), Colors::Black);
     painter.drawText(windowTitleBarRect(window), window.title(), Alignment::Center, isActiveWindow ? ActiveWindowTitleBarTextColor : InactiveTitleBarTextColor);
     painter.drawRect(windowFrameRect(window), isActiveWindow ? Colors::Black : InactiveTitleBarColor);
-
-    window.event(event);
 }
 
 void WindowManager::onWindowTaskBarMouseDown(Window& window, int x, int y)
@@ -224,8 +215,8 @@ void WindowManager::onWindowTaskBarMouseDown(Window& window, int x, int y)
 
 void WindowManager::closeWindow(Window& window)
 {
-    makeActive(nullptr);
     window.close();
+    makeActive(nullptr);
 }
 
 void WindowManager::releaseMouseGrabbedWidget()
@@ -238,10 +229,47 @@ void WindowManager::setMouseGrabbedWidget(Widget& widget)
     m_mouseGrabbedWidget = &widget;
 }
 
-void WindowManager::invalidateRect(Window& window, const Rect& rect)
+void WindowManager::invalidateWindowRect(Window& window, const Rect& rect)
 {
-    // TODO: Handle window specific actions (dragging, close etc.)
     Application::instance().postEvent(&window, ADS::UniquePtr<PaintEvent>(new PaintEvent(rect)));
+}
+
+void WindowManager::invalidate(Window& window)
+{
+    invalidateRect(windowFrameRect(window));
+}
+
+void WindowManager::invalidateRect(const Rect& rect)
+{
+    m_dirtyRects.push_back(rect);
+    compose();
+}
+
+void WindowManager::compose()
+{
+    static const Color BackgroundColor = Colors::White;
+    const ADS::Vector<Rect> dirtyRects = std::move(m_dirtyRects);
+
+    for (auto& dirtyRect : dirtyRects) {
+        Painter painter;
+        painter.setClipRect(dirtyRect);
+        painter.drawFilledRect(dirtyRect, BackgroundColor);
+    }
+
+    forEachVisibleWindowBackToFront([&](GUI::Window& window) -> GUI::IteratorResult {
+        for (auto& dirtyRect : dirtyRects) {
+            if (dirtyRect.intersects(windowFrameRect(window)))
+                paintWindowFrame(window);
+            if (dirtyRect.intersects(window.rect())) {
+                Rect localWindowRect = dirtyRect.intersectRect(window.rect());
+                localWindowRect.moveBy(-window.rect().position());
+                invalidateWindowRect(window, localWindowRect);
+            }
+        }
+        return GUI::IteratorResult::Continue;
+    });
+
+    paintTaskbar();
 }
 
 } // GUI
