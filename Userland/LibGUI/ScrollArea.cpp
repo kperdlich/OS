@@ -127,9 +127,11 @@ Size ScrollArea::minSizeHint() const
 
 void ScrollArea::onPaintEvent(PaintEvent& event)
 {
+#if 0
     Painter painter(this);
     painter.setClipRect(event.rect());
     painter.drawFilledRect(rect(), Colors::Blue);
+#endif
 }
 
 } // GUI

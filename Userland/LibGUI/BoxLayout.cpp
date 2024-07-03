@@ -44,6 +44,10 @@ void BoxLayout::activate()
     const int automaticSizeItems = visibleItems - fixedItems;
     const Size automaticItemSize = automaticSizeItems > 0 ? Size { availableSize.width() / automaticSizeItems, availableSize.height() / automaticSizeItems } : Size {};
 
+#if 1
+    std::cout << "[BoxLayout::activate()] automaticSizeItems: " << automaticSizeItems << " automaticItemSize: " << automaticItemSize.toString() <<  " Spacing: " << spacing() << std::endl;
+#endif
+
     int currentX = 0;
     int currentY = 0;
 

@@ -10,7 +10,7 @@ namespace GUI {
 class ScrollArea : public Widget {
 public:
     explicit ScrollArea(Widget* parent = nullptr);
-    virtual const char* className() const override { return "ScrollView"; }
+    virtual const char* className() const override { return "ScrollArea"; }
     virtual Size preferredSizeHint() const override;
     virtual Size minSizeHint() const override;
 

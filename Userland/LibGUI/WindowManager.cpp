@@ -47,7 +47,7 @@ static const Rect TaskbarRect { 0, height - TaskbarHeight, width, TaskbarHeight 
 static Rect windowFrameRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x() - FrameWidthMargin, rect.y() - TitleBarHeight, rect.width() + (2 * FrameWidthMargin), rect.height() + TitleBarHeight};
+    return { rect.x() - FrameWidthMargin, rect.y() - TitleBarHeight, rect.width() + (2 * FrameWidthMargin), rect.height() + TitleBarHeight + 1 };
 }
 
 static Rect windowTitleBarCloseButtonRect(const Window& window)
@@ -254,7 +254,7 @@ void WindowManager::hide(Window& window)
 
 void WindowManager::repaint(Window& window)
 {
-    std::cout << "[WindowManager::repaint] " << window.title() <<  " rect: " << windowFrameRect(window).toString() << std::endl;
+    std::cout << "[WindowManager::repaint] " << window.title() << " rect: " << windowFrameRect(window).toString() << std::endl;
     paintWindowFrame(window);
     Rect localWindowRect = window.rect();
     localWindowRect.moveBy(-window.rect().position());

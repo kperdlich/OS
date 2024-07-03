@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Types.h"
+
 namespace GUI {
 
 class Size {
@@ -48,6 +50,11 @@ public:
         m_height += other.m_height;
         m_width += other.m_width;
         return *this;
+    }
+
+    ADS::String toString() const
+    {
+        return "[" + std::to_string(m_width) + "," + std::to_string(m_height) + "]";
     }
 
 private:
