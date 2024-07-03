@@ -7,6 +7,62 @@
 
 namespace GUI {
 
+static const Size upButtonCharSize { 9, 9 };
+static constexpr const char* upButtonCharacters {
+    "         "
+    "         "
+    "    #    "
+    "   ###   "
+    "  #####  "
+    " ####### "
+    "#########"
+    "         "
+    "         "
+};
+static const CharacterBitmap upButtonBitmap(upButtonCharSize, upButtonCharacters);
+
+static const Size downButtonCharSize { 9, 9 };
+static constexpr const char* downButtonCharacters {
+    "         "
+    "         "
+    "#########"
+    " ####### "
+    "  #####  "
+    "   ###   "
+    "    #    "
+    "         "
+    "         "
+};
+static const CharacterBitmap downButtonBitmap(downButtonCharSize, downButtonCharacters);
+
+static const Size leftButtonCharSize { 9, 9 };
+static constexpr const char* leftButtonCharacters {
+    "     #   "
+    "    ##   "
+    "   ###   "
+    "  ####   "
+    " #####   "
+    "  ####   "
+    "   ###   "
+    "    ##   "
+    "     #   "
+};
+static const CharacterBitmap leftButtonBitmap(leftButtonCharSize, leftButtonCharacters);
+
+static const Size rightButtonCharSize { 9, 9 };
+static constexpr const char* rightButtonCharacters {
+    "  #      "
+    "  ##     "
+    "  ###    "
+    "  ####   "
+    "  #####  "
+    "  ####   "
+    "  ###    "
+    "  ##     "
+    "  #      "
+};
+static const CharacterBitmap rightButtonBitmap(rightButtonCharSize, rightButtonCharacters);
+
 ScrollBar::ScrollBar(Orientation orientation, Widget* parent)
     : m_orientation(orientation)
     , Widget(parent)
@@ -18,14 +74,20 @@ void ScrollBar::onPaintEvent(PaintEvent& event)
     Painter painter(this);
     painter.setClipRect(event.rect());
 
-    painter.drawFilledRect(rect(), Colors::White);
+    painter.drawFilledRect(rect(), Colors::Grey);
     painter.drawRect(rect(), Colors::Black);
 
     painter.drawFilledRect(scrollUpButtonRect(), Colors::DarkGrey);
     painter.drawRect(scrollUpButtonRect(), Colors::Black);
+    IntPoint upButtonPos = scrollUpButtonRect().position();
+    upButtonPos.moveBy(3, 3);
+    painter.drawCharacterBitmap(upButtonPos, scrollButtonUpBitmap(), Colors::Black);
 
     painter.drawFilledRect(scrollDownButtonRect(), Colors::DarkGrey);
     painter.drawRect(scrollDownButtonRect(), Colors::Black);
+    IntPoint downButtonPos = scrollDownButtonRect().position();
+    downButtonPos.moveBy(3, 3);
+    painter.drawCharacterBitmap(downButtonPos, scrollButtonDownBitmap(), Colors::Black);
 
     painter.drawFilledRect(sliderRect(), Colors::DarkGrey);
     painter.drawRect(sliderRect(), Colors::Black);
@@ -82,8 +144,7 @@ void ScrollBar::onMouseDownEvent(MouseEvent& event)
         if (m_sliderValue != oldValue && onValueChanged)
             onValueChanged(m_sliderValue);
         update();
-    }
-    else {
+    } else {
         const int oldValue = m_sliderValue;
         m_sliderValue = ADS::max(m_sliderValue - m_pageStep, m_min);
         if (m_sliderValue != oldValue && onValueChanged)
@@ -162,6 +223,16 @@ Rect ScrollBar::scrollDownButtonRect() const
         return { 0, height() - scrollButtonSize(), scrollButtonSize(), scrollButtonSize() };
 
     return { width() - scrollButtonSize(), 0, scrollButtonSize(), scrollButtonSize() };
+}
+
+const CharacterBitmap& ScrollBar::scrollButtonUpBitmap() const
+{
+    return m_orientation == Orientation::Vertical ? upButtonBitmap : leftButtonBitmap;
+}
+
+const CharacterBitmap& ScrollBar::scrollButtonDownBitmap() const
+{
+    return m_orientation == Orientation::Vertical ? downButtonBitmap : rightButtonBitmap;
 }
 
 Rect ScrollBar::sliderRect() const

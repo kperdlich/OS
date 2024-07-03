@@ -2,6 +2,7 @@
 // Created by n3dry on 20.06.24.
 //
 
+#include "CharacterBitmap.h"
 #include "Orientation.h"
 #include "Types.h"
 #include "Widget.h"
@@ -39,6 +40,8 @@ private:
     [[nodiscard]] Rect scrollUpButtonRect() const;
     [[nodiscard]] Rect scrollDownButtonRect() const;
     [[nodiscard]] Rect sliderRect() const;
+    [[nodiscard]] const CharacterBitmap& scrollButtonUpBitmap() const;
+    [[nodiscard]] const CharacterBitmap& scrollButtonDownBitmap() const;
     [[nodiscard]] int availableRange() const;
     [[nodiscard]] int scrollButtonSize() const { return m_orientation == Orientation::Vertical ? width() : height(); }
 
