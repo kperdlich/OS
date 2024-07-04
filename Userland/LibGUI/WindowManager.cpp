@@ -227,8 +227,8 @@ void WindowManager::onWindowTaskBarMouseDown(Window& window, int x, int y)
 
 void WindowManager::closeWindow(Window& window)
 {
-    window.close();
     makeActive(nullptr);
+    window.close();
 }
 
 void WindowManager::releaseMouseGrabbedWidget()
@@ -269,6 +269,7 @@ void WindowManager::repaintOverlappingWindow(const Rect& rect)
         if (rect.intersects(windowFrameRect(window))) {
             repaint(window);
         }
+        return IteratorResult::Continue;
     });
 }
 
