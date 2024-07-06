@@ -66,11 +66,10 @@ int main()
         rootWidget->setLayout(rootLayout);
 
         GUI::Window* win1 = new GUI::Window();
-        win1->setRect({300, 300, 640, 480});
+        win1->resize({ 640, 480 });
         win1->setCentralWidget(*rootWidget);
         win1->setTitle("Window 1");
         win1->show();
-        return app.exec();
     }
 
     {

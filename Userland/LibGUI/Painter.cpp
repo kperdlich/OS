@@ -5,33 +5,33 @@
 #include "Painter.h"
 #include "ASCIIFont.h"
 #include "DefaultFont8x10.h"
-#include "Screen.h"
 #include "Window.h"
 
 namespace GUI {
 
 static ASCIIFont s_defaultFont(DefaultFont::font, DefaultFont::firstCharacter, DefaultFont::lastCharacter, DefaultFont::fontWidth, DefaultFont::fontHeight);
 
-Painter::Painter(Widget* widget)
+Painter::Painter(Bitmap& widget)
+    : m_targetBuffer(&widget)
+    , m_clipRect(Rect { 0, 0, m_targetBuffer->size() })
+
 {
-    if (widget) {
-        m_relativeTranslationX = widget->windowRelativeRect().x();
-        m_relativeTranslationY = widget->windowRelativeRect().y();
+}
 
-        if (const Window* window = widget->window()) {
-            m_relativeTranslationX += window->rect().x();
-            m_relativeTranslationY += window->rect().y();
-        }
-    }
+Painter::Painter(Widget& widget)
+    : m_targetBuffer(widget.window()->backBuffer())
+    , m_clipRect(Rect { 0, 0, m_targetBuffer->size() })
+    , m_relativeTranslationX(widget.windowRelativeRect().x())
+    , m_relativeTranslationY(widget.windowRelativeRect().y())
 
-    m_clipRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() };
+{
 }
 
 void Painter::setClipRect(const Rect& clipRect)
 {
     Rect translated = clipRect;
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
-    m_clipRect = Rect { 0, 0, Screen::instance().width(), Screen::instance().height() }.intersectRect(translated);
+    m_clipRect = Rect { 0, 0, m_targetBuffer->size() }.intersectRect(translated);
 }
 
 void Painter::drawFilledRect(const Rect& rect, GUI::Color color)
@@ -47,7 +47,7 @@ void Painter::drawFilledRect(const Rect& rect, GUI::Color color)
     for (int y = 0; y < clippedRect.height(); ++y) {
         for (int x = 0; x < clippedRect.width(); ++x) {
             if (clippedRect.contains(clippedRect.x() + x, clippedRect.y() + y))
-                Screen::instance().setPixel(clippedRect.x() + x, clippedRect.y() + y, color);
+                m_targetBuffer->setPixel(clippedRect.x() + x, clippedRect.y() + y, color);
         }
     }
 
@@ -55,7 +55,6 @@ void Painter::drawFilledRect(const Rect& rect, GUI::Color color)
     const auto passed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start);
     std::cout << "[Painter::drawFilledRect] took " << passed.count() << " ms" << std::endl;
 #endif
-
 }
 
 void Painter::drawRect(const Rect& rect, GUI::Color color)
@@ -67,13 +66,13 @@ void Painter::drawRect(const Rect& rect, GUI::Color color)
     for (int y = 0; y < clippedRect.height(); ++y) {
         if (y == 0 || y == clippedRect.height() - 1) {
             for (int x = 0; x < clippedRect.width(); ++x) {
-                Screen::instance().setPixel(clippedRect.x() + x, clippedRect.y() + y, color);
+                m_targetBuffer->setPixel(clippedRect.x() + x, clippedRect.y() + y, color);
             }
         } else {
             if (clippedRect.contains(clippedRect.x(), clippedRect.y() + y))
-                Screen::instance().setPixel(clippedRect.x(), clippedRect.y() + y, color);
+                m_targetBuffer->setPixel(clippedRect.x(), clippedRect.y() + y, color);
             if (clippedRect.contains(clippedRect.x() + clippedRect.width() - 1, clippedRect.y() + y))
-                Screen::instance().setPixel(clippedRect.x() + clippedRect.width() - 1, clippedRect.y() + y, color);
+                m_targetBuffer->setPixel(clippedRect.x() + clippedRect.width() - 1, clippedRect.y() + y, color);
         }
     }
 }
@@ -103,7 +102,7 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
         const int endY = ADS::max(y0, y1);
         for (int i = startY; i <= endY; ++i) {
             if (clippedRect.contains(x0, i))
-                Screen::instance().setPixel(x0, i, color);
+                m_targetBuffer->setPixel(x0, i, color);
         }
         return;
     }
@@ -114,7 +113,7 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
         const int endX = ADS::max(x0, x1);
         for (int i = startX; i <= endX; ++i) {
             if (clippedRect.contains(i, y0))
-                Screen::instance().setPixel(i, y0, color);
+                m_targetBuffer->setPixel(i, y0, color);
         }
         return;
     }
@@ -130,7 +129,7 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
 
     while (true) {
         if (clippedRect.contains(x, y))
-            Screen::instance().setPixel(x, y, color);
+            m_targetBuffer->setPixel(x, y, color);
         if (x == x1 && y == y1)
             break;
         const int error2 = 2 * error;
@@ -190,7 +189,7 @@ void Painter::drawText(const Rect& rect, const ADS::String& text, Alignment alig
                     const int xPos = translated.x() + x + (i * s_defaultFont.width());
                     const int yPos = translated.y() + y;
                     if (clippedRect.contains(xPos, yPos))
-                        Screen::instance().setPixel(xPos, yPos, color);
+                        m_targetBuffer->setPixel(xPos, yPos, color);
                 }
             }
         }
@@ -212,9 +211,38 @@ void Painter::drawCharacterBitmap(const IntPoint& point, const CharacterBitmap& 
                 const int xPos = translated.x() + x;
                 const int yPos = translated.y() + y;
                 if (clippedRect.contains(xPos, yPos))
-                    Screen::instance().setPixel(xPos, yPos, color);
+                    m_targetBuffer->setPixel(xPos, yPos, color);
             }
         }
+    }
+}
+
+void Painter::blit(IntPoint point, Bitmap& source)
+{
+    ASSERT(source.format() == m_targetBuffer->format());
+
+    const Rect sourceRect = { point, source.size() };
+    const Rect targetRect = { 0, 0, m_targetBuffer->size() };
+    const Rect clippedRect = targetRect.intersectRect(sourceRect);
+    if (clippedRect.isEmpty())
+        return;
+
+    const int byteDensity = m_targetBuffer->byteDensity();
+
+    const int srcStartX = clippedRect.x() - point.x();
+    const int srcStartY = clippedRect.y() - point.y();
+    char* src = source.data() + (srcStartY * source.width() + srcStartX) * byteDensity;
+
+    const int dstStartX = clippedRect.x();
+    const int dstStartY = clippedRect.y();
+    char* dst = m_targetBuffer->data() + (dstStartY * m_targetBuffer->width() + dstStartX) * byteDensity;
+
+    const int rowBytes = clippedRect.width() * byteDensity;
+
+    for (int row = 0; row < clippedRect.height(); ++row) {
+        ADS::memcpy(dst, src, rowBytes);
+        src += source.width() * byteDensity;
+        dst += m_targetBuffer->width() * byteDensity;
     }
 }
 

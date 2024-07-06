@@ -52,7 +52,7 @@ void Button::onMouseMoveEvent(MouseEvent& event)
 void Button::onPaintEvent(PaintEvent& event)
 {
     static const GUI::Color buttonColor = Colors::Grey;
-    Painter painter(this);
+    Painter painter(*this);
     painter.setClipRect(event.rect());
 
     painter.drawFilledRect(rect(), buttonColor);

@@ -46,7 +46,7 @@ bool Widget::event(Event& event)
     case Event::Type::Paint: {
         m_isDirty = false;
         PaintEvent& paintEvent = static_cast<PaintEvent&>(event);
-        Painter painter(this);
+        Painter painter(*this);
         painter.setClipRect(paintEvent.rect());
         painter.drawFilledRect(rect(), Colors::Grey);
 #if 1
@@ -307,12 +307,18 @@ void Widget::setIsVisible(bool value)
 
 void Widget::update()
 {
+    update(rect());
+}
+
+void Widget::update(const Rect& rect)
+{
     if (m_isDirty)
         return;
-
     m_isDirty = true;
     if (Window* widgetWindow = window()) {
-        UpdateEvent event(*this);
+        Rect widgetRelativeRect = rect;
+        widgetRelativeRect.moveBy(windowRelativeRect().position());
+        UpdateEvent event(*this, widgetRelativeRect);
         widgetWindow->event(event);
     }
 }

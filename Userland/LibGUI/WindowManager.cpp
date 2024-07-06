@@ -64,8 +64,9 @@ static Rect windowTitleBarRect(const Window& window)
 
 static void paintTaskbar()
 {
-    Painter painter;
-    painter.drawFilledRect(TaskbarRect, TaskbarColor);
+    // FIXME:
+    // Painter painter;
+    // painter.drawFilledRect(TaskbarRect, TaskbarColor);
 }
 
 bool WindowManager::event(Event& event)
@@ -82,14 +83,18 @@ bool WindowManager::event(Event& event)
         return CObject::event(event);
     }
 
+    // Compose timer
+    if (event.type() == Event::Type::Timer) {
+        compose();
+        return true;
+    }
+
     return CObject::event(event);
 }
 
 void WindowManager::show(Window& window)
 {
     m_windows.emplace_back(&window);
-    if (window.isVisible())
-        repaint(window);
 }
 
 void WindowManager::remove(Window& window)
@@ -119,20 +124,7 @@ void WindowManager::makeActive(Window* window)
     if (m_activeWindow && m_activeWindow->focusedWidget())
         Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusOut, FocusReason::ActiveWindow)));
 
-    Window* const previousActiveWindow = m_activeWindow;
     m_activeWindow = window;
-
-    if (previousActiveWindow) {
-        if (previousActiveWindow->isVisible()) {
-            repaint(*previousActiveWindow);
-        } else {
-            hide(*previousActiveWindow);
-        }
-    }
-
-    if (m_activeWindow) {
-        repaint(*m_activeWindow);
-    }
 
     if (m_activeWindow && m_activeWindow->focusedWidget())
         Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusIn, FocusReason::ActiveWindow)));
@@ -150,14 +142,11 @@ void WindowManager::processMouseEvent(MouseEvent& event)
     }
 
     if (event.type() == Event::Type::MouseMove && m_isDraggingWindow) {
-        const Rect oldRectWindowRect = windowFrameRect(*m_activeWindow);
+        invalidate(*m_activeWindow);
         Point pos = m_dragWindowOrigin;
         pos.moveBy(event.x() - m_dragOrigin.x(), event.y() - m_dragOrigin.y());
         m_activeWindow->setPosition(pos);
-        Painter painter;
-        std::cout << "Hide oldRectWindowRect rect: " << oldRectWindowRect.toString() << std::endl;
-        painter.drawFilledRect(oldRectWindowRect, Colors::White);
-        repaintOverlappingWindow(windowFrameRect(*m_activeWindow));
+        invalidate(*m_activeWindow);
         return;
     }
 
@@ -199,9 +188,11 @@ void WindowManager::processMouseEvent(MouseEvent& event)
 
 void WindowManager::paintWindowFrame(Window& window)
 {
+    ASSERT(m_backBuffer != nullptr);
+
     const bool isActiveWindow = m_activeWindow == &window;
 
-    Painter painter;
+    Painter painter(*m_backBuffer);
     painter.drawFilledRect(windowTitleBarRect(window), isActiveWindow ? ActiveWindowTitleBarColor : InactiveTitleBarColor);
 
     Rect closeButtonRect = windowTitleBarCloseButtonRect(window);
@@ -243,34 +234,85 @@ void WindowManager::setMouseGrabbedWidget(Widget& widget)
 
 void WindowManager::invalidateWindowRect(Window& window, const Rect& rect)
 {
+    Rect absoluteRect = rect;
+    absoluteRect.moveBy(window.position());
+    invalidate(absoluteRect);
+
     Application::instance().postEvent(&window, ADS::UniquePtr<PaintEvent>(new PaintEvent(rect)));
+}
+
+void WindowManager::invalidate(Window& window)
+{
+    invalidate(windowFrameRect(window));
+}
+
+void WindowManager::invalidate(const Rect& rect)
+{
+    m_dirtyRects.push_back(rect);
+
+    if (m_composeTimer < 0)
+        m_composeTimer = startTimer(1000 / 60); // 60hz
 }
 
 void WindowManager::hide(Window& window)
 {
-    Painter painter;
-    painter.drawFilledRect(windowFrameRect(window), Colors::White);
+    invalidate(window);
 }
 
-void WindowManager::repaint(Window& window)
+void WindowManager::compose()
 {
-    std::cout << "[WindowManager::repaint] " << window.title() << " rect: " << windowFrameRect(window).toString() << std::endl;
-    paintWindowFrame(window);
-    Rect localWindowRect = window.rect();
-    localWindowRect.moveBy(-window.rect().position());
-    paintWindowFrame(window);
-    PaintEvent event(localWindowRect);
-    window.event(event);
+    if (m_dirtyRects.empty())
+        return;
+
+    if (!m_frontBuffer)
+        m_frontBuffer = Bitmap::createWrapper(Screen::instance().framebuffer());
+
+    if (!m_backBuffer)
+        m_backBuffer = Bitmap::createFrom(*m_frontBuffer);
+
+    const auto start = std::chrono::steady_clock::now();
+    flushPainting();
+    const auto end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+    std::cout << "compose: time " << end.count() << " ms" << std::endl;
 }
 
-void WindowManager::repaintOverlappingWindow(const Rect& rect)
+void WindowManager::flushPainting()
 {
+    ASSERT(m_backBuffer != nullptr);
+
+    // Draw Background by default
+    for (auto& dirtyRect : m_dirtyRects) {
+        Painter painter(*m_backBuffer);
+        painter.drawFilledRect(dirtyRect, Colors::White);
+    }
+
     forEachVisibleWindowBackToFront([&](Window& window) -> IteratorResult {
-        if (rect.intersects(windowFrameRect(window))) {
-            repaint(window);
+        for (auto& dirtyRect : m_dirtyRects) {
+            if (!dirtyRect.intersects(windowFrameRect(window))) {
+                continue;
+            }
+            Bitmap* windowBackBuffer = window.backBuffer();
+            if (!windowBackBuffer)
+                return IteratorResult::Continue;
+            // FIXME: On none debug build, the window frame is not displayed.
+            paintWindowFrame(window);
+            Painter painter(*m_backBuffer);
+            // FIXME: Only blit pixels for updated rect
+            painter.blit(window.position(), *windowBackBuffer);
+            return IteratorResult::Continue;
         }
         return IteratorResult::Continue;
     });
+
+    // FIXME: Only copy updated pixels for updated rect
+    ASSERT(m_backBuffer->size() == m_frontBuffer->size());
+    ASSERT(m_backBuffer->format() == m_frontBuffer->format());
+    char* src = m_backBuffer->data();
+    char* dst = m_frontBuffer->data();
+    ADS::memcpy(dst, src, m_frontBuffer->width() * m_frontBuffer->height() * m_frontBuffer->byteDensity());
+
+    m_dirtyRects.clear();
+    Screen::instance().present();
 }
 
 } // GUI

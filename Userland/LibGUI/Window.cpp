@@ -51,6 +51,9 @@ bool Window::event(Event& event)
     }
 
     if (event.isPaintEvent()) {
+        if (!m_backBuffer) {
+            m_backBuffer = Bitmap::create(BitmapFormat::RGBA32, size());
+        }
         PaintEvent& paintEvent = static_cast<PaintEvent&>(event);
         if (m_centralWidget && m_centralWidget->windowRelativeRect().intersects(paintEvent.rect()))
             return m_centralWidget->event(event);
@@ -59,9 +62,8 @@ bool Window::event(Event& event)
 
     if (event.type() == Event::Type::UpdateRequest) {
         const UpdateEvent& updateEvent = static_cast<UpdateEvent&>(event);
-        const Rect widgetRect = updateEvent.widget()->windowRelativeRect();
-        std::cout << "Window[" << title() << "] UpdateRequest from " << updateEvent.widget()->className() << " Rect: " << widgetRect.toString() << std::endl;
-        WindowManager::instance().invalidateWindowRect(*this, widgetRect);
+        std::cout << "Window[" << title() << "] UpdateRequest from " << updateEvent.widget()->className() << " Rect: " << updateEvent.rect().toString() << std::endl;
+        WindowManager::instance().invalidateWindowRect(*this, updateEvent.rect());
         return true;
     }
 
@@ -83,14 +85,20 @@ void Window::moveBy(int x, int y)
     m_rect.moveBy(x, y);
 }
 
-void Window::setRect(const Rect& rect)
+void Window::resize(Size size)
 {
+    // FIXME: clear back buffer when window resize is properly implemented
     Size oldSize = m_rect.size();
-    m_rect = rect;
+    m_rect.setSize(size);
     if (m_centralWidget) {
         ResizeEvent event(m_rect.size(), oldSize);
         m_centralWidget->event(event);
     }
+}
+
+void Window::resize(int width, int height)
+{
+    resize({ width, height });
 }
 
 void Window::setCentralWidget(Widget& widget)
@@ -113,7 +121,7 @@ void Window::setCentralWidget(Widget& widget)
     else
         newRect.setWidth(m_centralWidget->preferredSizeHint().width());
 
-    setRect(newRect);
+    resize(newRect.size());
     m_centralWidget->resize(newRect.width(), newRect.height());
 }
 
@@ -159,9 +167,9 @@ void Window::setPosition(const IntPoint& point)
 {
     m_rect.setPosition(point);
 
-    //Rect windowRect = rect();
-    //windowRect.moveBy(-rect().position());
-    //WindowManager::instance().invalidateWindowRect(*this, windowRect);
+    // Rect windowRect = rect();
+    // windowRect.moveBy(-rect().position());
+    // WindowManager::instance().invalidateWindowRect(*this, windowRect);
 }
 
 } // GUI

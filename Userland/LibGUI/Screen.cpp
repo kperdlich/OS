@@ -22,10 +22,8 @@ Screen::Screen()
     m_texture = SDL_CreateTexture(m_renderer,
         SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, internalWidth, internalHeight);
 
-    auto framebuffer = new uint32_t[internalWidth * internalHeight];
-    m_framebuffer = GUI::Bitmap::createFrom(GUI::BitmapFormat::RGBA32, { internalWidth, internalHeight }, (char*)framebuffer);
-
-    fill(GUI::Colors::White);
+    m_framebuffer = GUI::Bitmap::create(GUI::BitmapFormat::RGBA32, { internalWidth, internalHeight });
+    m_framebuffer->fill(GUI::Colors::White);
 }
 
 Screen::~Screen()
@@ -34,16 +32,6 @@ Screen::~Screen()
     SDL_DestroyRenderer(m_renderer);
     SDL_DestroyWindow(m_window);
     SDL_Quit();
-}
-
-void Screen::fill(GUI::Color color)
-{
-    m_framebuffer->fill(color);
-}
-
-void Screen::setPixel(int x, int y, GUI::Color color)
-{
-    m_framebuffer->setPixel(x, y, color);
 }
 
 void Screen::present()

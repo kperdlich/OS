@@ -18,13 +18,12 @@ public:
         return instance;
     }
 
-    void fill(GUI::Color color);
-    void setPixel(int x, int y, GUI::Color color);
-
     void present();
 
-    inline int width() const { return m_framebuffer->size().width(); }
-    inline int height() const { return m_framebuffer->size().height(); };
+    [[nodiscard]] int width() const { return m_framebuffer->size().width(); }
+    [[nodiscard]] int height() const { return m_framebuffer->size().height(); };
+    [[nodiscard]] Size size() const { return m_framebuffer->size(); }
+    Bitmap& framebuffer() { return *m_framebuffer.get(); }
 
 private:
     Screen();

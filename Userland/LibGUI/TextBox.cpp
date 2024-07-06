@@ -96,7 +96,7 @@ void TextBox::scrollCursorIntoView()
 
 void TextBox::onPaintEvent(PaintEvent& event)
 {
-    Painter painter(this);
+    Painter painter(*this);
     painter.setClipRect(event.rect());
 
     painter.drawFilledRect(rect(), Colors::White);

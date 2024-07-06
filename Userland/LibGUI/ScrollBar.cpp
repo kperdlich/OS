@@ -71,7 +71,7 @@ ScrollBar::ScrollBar(Orientation orientation, Widget* parent)
 
 void ScrollBar::onPaintEvent(PaintEvent& event)
 {
-    Painter painter(this);
+    Painter painter(*this);
     painter.setClipRect(event.rect());
 
     painter.drawFilledRect(rect(), Colors::Grey);
@@ -99,14 +99,7 @@ void ScrollBar::onMouseMoveEvent(MouseEvent& event)
         return;
 
     const int delta = calculateDraggingDelta(event.position());
-    const int newSliderValue = ADS::clamp(m_draggingStartValue + delta, m_min, m_max);
-    if (newSliderValue == m_sliderValue)
-        return;
-
-    m_sliderValue = newSliderValue;
-    if (onValueChanged)
-        onValueChanged(m_sliderValue);
-    update();
+    setValue(m_draggingStartValue + delta);
 }
 
 void ScrollBar::onMouseDownEvent(MouseEvent& event)

@@ -105,16 +105,19 @@ class Widget;
 
 class UpdateEvent : public Event {
 public:
-    explicit UpdateEvent(Widget& widget)
+    explicit UpdateEvent(Widget& widget, const Rect& rect)
         : m_widget(&widget)
+        , m_rect(rect)
         , Event(Event::Type::UpdateRequest)
     {
     }
 
     [[nodiscard]] Widget* widget() const { return m_widget; }
+    [[nodiscard]] Rect rect() const { return m_rect; }
 
 private:
     Widget* m_widget { nullptr };
+    Rect m_rect;
 };
 
 class PaintEvent : public Event {

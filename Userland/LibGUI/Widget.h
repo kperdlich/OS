@@ -23,11 +23,13 @@ public:
     virtual bool isWidgetType() const override;
 
     void setWindow(Window* window);
-    [[nodiscard]] Window* window() const { return m_window; }
+    [[nodiscard]] Window* window() { return m_window; }
+    [[nodiscard]] const Window* window() const { return m_window; }
 
     [[nodiscard]] Rect windowRelativeRect() const;
 
     void update();
+    void update(const Rect& rect);
 
     void resize(int width, int height);
     void resize(const Size& newSize);
