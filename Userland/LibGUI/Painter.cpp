@@ -229,9 +229,9 @@ void Painter::blit(IntPoint point, Bitmap& source)
 
     const int byteDensity = m_targetBuffer->byteDensity();
 
-    const int srcStartX = clippedRect.x() - point.x();
-    const int srcStartY = clippedRect.y() - point.y();
-    char* src = source.data() + (srcStartY * source.width() + srcStartX) * byteDensity;
+    const int sourceStartX = clippedRect.x() - point.x();
+    const int sourceStartY = clippedRect.y() - point.y();
+    char* src = source.data() + (sourceStartY * source.width() + sourceStartX) * byteDensity;
 
     const int dstStartX = clippedRect.x();
     const int dstStartY = clippedRect.y();

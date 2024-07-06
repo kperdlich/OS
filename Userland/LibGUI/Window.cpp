@@ -24,7 +24,8 @@ void Window::close()
 {
     hide();
     GUI::WindowManager::instance().remove(*this);
-    deleteLater();
+    // FIXME: handle deletion
+    //deleteLater();
 }
 
 bool Window::event(Event& event)
