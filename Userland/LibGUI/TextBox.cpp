@@ -123,6 +123,7 @@ void TextBox::onPaintEvent(PaintEvent& event)
 void TextBox::onKeyDownEvent(KeyEvent& event)
 {
     m_isCursorVisible = true;
+    update();
 
     if (event.key() == Key::Key_Left) {
         handleKeyLeft(event);
