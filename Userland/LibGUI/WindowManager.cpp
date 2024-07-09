@@ -248,6 +248,11 @@ void WindowManager::invalidate(Window& window)
 
 void WindowManager::invalidate(const Rect& rect)
 {
+    for (auto& dirtyRect : m_dirtyRects) {
+        if (dirtyRect == rect)
+            return;
+    }
+
     m_dirtyRects.push_back(rect);
 
     if (m_composeTimer < 0)
@@ -279,15 +284,16 @@ void WindowManager::compose()
 void WindowManager::flushPainting()
 {
     ASSERT(m_backBuffer != nullptr);
+    const ADS::Vector<Rect> dirtyRects = std::move(m_dirtyRects);
 
     // Draw Background by default
-    for (auto& dirtyRect : m_dirtyRects) {
+    for (auto& dirtyRect : dirtyRects) {
         Painter painter(*m_backBuffer);
         painter.drawFilledRect(dirtyRect, Colors::White);
     }
 
     forEachVisibleWindowBackToFront([&](Window& window) -> IteratorResult {
-        for (auto& dirtyRect : m_dirtyRects) {
+        for (auto& dirtyRect : dirtyRects) {
             if (!dirtyRect.intersects(windowFrameRect(window))) {
                 continue;
             }
@@ -311,7 +317,6 @@ void WindowManager::flushPainting()
     char* dst = m_frontBuffer->data();
     ADS::memcpy(dst, src, m_frontBuffer->width() * m_frontBuffer->height() * m_frontBuffer->byteDensity());
 
-    m_dirtyRects.clear();
     Screen::instance().present();
 }
 
