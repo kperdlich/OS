@@ -294,11 +294,11 @@ void WindowManager::flushPainting()
             Bitmap* windowBackBuffer = window.backBuffer();
             if (!windowBackBuffer)
                 return IteratorResult::Continue;
-            // FIXME: On none debug build, the window frame is not displayed.
-            paintWindowFrame(window);
+
             Painter painter(*m_backBuffer);
             // FIXME: Only blit pixels for updated rect
             painter.blit(window.position(), *windowBackBuffer);
+            paintWindowFrame(window);
             return IteratorResult::Continue;
         }
         return IteratorResult::Continue;

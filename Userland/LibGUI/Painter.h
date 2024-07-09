@@ -30,10 +30,10 @@ public:
     void blit(IntPoint point, Bitmap& source);
 
 private:
+    Bitmap* m_targetBuffer { nullptr };
     int m_relativeTranslationX {};
     int m_relativeTranslationY {};
     Rect m_clipRect;
-    Bitmap* m_targetBuffer;
 };
 
 } // GUI

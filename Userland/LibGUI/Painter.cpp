@@ -11,9 +11,9 @@ namespace GUI {
 
 static ASCIIFont s_defaultFont(DefaultFont::font, DefaultFont::firstCharacter, DefaultFont::lastCharacter, DefaultFont::fontWidth, DefaultFont::fontHeight);
 
-Painter::Painter(Bitmap& widget)
-    : m_targetBuffer(&widget)
-    , m_clipRect(Rect { 0, 0, m_targetBuffer->size() })
+Painter::Painter(Bitmap& bitmap)
+    : m_targetBuffer(&bitmap)
+    , m_clipRect(Rect { 0, 0, bitmap.size() })
 
 {
 }
