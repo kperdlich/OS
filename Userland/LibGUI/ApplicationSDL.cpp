@@ -14,7 +14,6 @@ public:
     int exec()
     {
         while (true) {
-            GUI::Screen::instance().present();
             processSDLEvents();
             updateTimer();
 
