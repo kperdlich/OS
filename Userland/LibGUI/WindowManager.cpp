@@ -124,10 +124,17 @@ void WindowManager::makeActive(Window* window)
     if (m_activeWindow && m_activeWindow->focusedWidget())
         Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusOut, FocusReason::ActiveWindow)));
 
+    Window* const previousWindow = m_activeWindow;
     m_activeWindow = window;
 
-    if (m_activeWindow && m_activeWindow->focusedWidget())
-        Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusIn, FocusReason::ActiveWindow)));
+    if (previousWindow)
+        invalidate(*previousWindow);
+
+    if (m_activeWindow) {
+        if (m_activeWindow->focusedWidget())
+            Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusIn, FocusReason::ActiveWindow)));
+        invalidate(*m_activeWindow);
+    }
 }
 
 void WindowManager::processMouseEvent(MouseEvent& event)
