@@ -82,7 +82,7 @@ void Painter::drawFilledQuad(int x, int y, int size, GUI::Color color)
     drawFilledRect({ x, y, size, size }, color);
 }
 
-void Painter::drawLine(const IntPoint& x, const IntPoint& y, GUI::Color color)
+void Painter::drawLine(const Point& x, const Point& y, GUI::Color color)
 {
     drawLine(x.x(), x.y(), y.x(), y.y(), color);
 }
@@ -196,7 +196,7 @@ void Painter::drawText(const Rect& rect, const ADS::String& text, Alignment alig
     }
 }
 
-void Painter::drawCharacterBitmap(const IntPoint& point, const CharacterBitmap& bitmap, Color color)
+void Painter::drawCharacterBitmap(const Point& point, const CharacterBitmap& bitmap, Color color)
 {
     Rect translated = { point.x(), point.y(), bitmap.width(), bitmap.height() };
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
@@ -217,7 +217,7 @@ void Painter::drawCharacterBitmap(const IntPoint& point, const CharacterBitmap& 
     }
 }
 
-void Painter::blit(IntPoint point, Bitmap& source)
+void Painter::blit(Point point, Bitmap& source)
 {
     ASSERT(source.format() == m_targetBuffer->format());
 

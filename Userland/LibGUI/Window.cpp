@@ -76,7 +76,7 @@ bool Window::isWindowType() const
     return true;
 }
 
-bool Window::contains(IntPoint point)
+bool Window::contains(Point point)
 {
     return m_rect.contains(point);
 }
@@ -164,7 +164,7 @@ bool Window::isActive() const
     return WindowManager::instance().activeWindow() == this;
 }
 
-void Window::setPosition(const IntPoint& point)
+void Window::setPosition(const Point& point)
 {
     m_rect.setPosition(point);
 

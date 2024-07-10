@@ -95,7 +95,7 @@ bool Widget::event(Event& event)
     }
 }
 
-bool Widget::hits(const IntPoint& point, HitResult& result)
+bool Widget::hits(const Point& point, HitResult& result)
 {
     for (auto& child : m_children) {
         if (!child->isWidgetType())

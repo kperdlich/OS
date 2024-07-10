@@ -4,37 +4,38 @@
 
 #pragma once
 
+#include "Types.h"
+
 namespace GUI {
 
-template<typename T>
 class Point final {
 public:
     Point() = default;
-    Point(T x, T y)
+    Point(int x, int y)
         : m_x(x)
         , m_y(y)
     {
     }
 
-    void setX(T x) { m_x = x; }
-    void setY(T y) { m_y = y; }
+    void setX(int x) { m_x = x; }
+    void setY(int y) { m_y = y; }
 
-    T x() const { return m_x; }
-    T y() const { return m_y; }
+    int x() const { return m_x; }
+    int y() const { return m_y; }
 
-    void moveBy(const Point<T>& point)
+    void moveBy(const Point& point)
     {
         m_x += point.x();
         m_y += point.y();
     }
 
-    void moveBy(T x, T y)
+    void moveBy(int x, int y)
     {
         m_x += x;
         m_y += y;
     }
 
-    bool operator==(const Point<T>& other) const
+    bool operator==(const Point& other) const
     {
         return m_x == other.m_x
             && m_y == other.m_y;
@@ -43,11 +44,14 @@ public:
     Point operator-(const Point& other) const { return { m_x - other.m_x, m_y - other.m_y }; }
     Point operator-() const { return { -m_x, -m_y }; }
 
-private:
-    T m_x {};
-    T m_y {};
-};
+    [[nodiscard]] ADS::String toString() const
+    {
+        return "[" + std::to_string(m_x) + "," + std::to_string(m_y) + "]";
+    }
 
-using IntPoint = Point<int>;
+private:
+    int m_x {};
+    int m_y {};
+};
 
 } // GUI

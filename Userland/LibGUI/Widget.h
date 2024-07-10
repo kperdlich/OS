@@ -34,7 +34,7 @@ public:
     void resize(int width, int height);
     void resize(const Size& newSize);
 
-    [[nodiscard]] IntPoint relativePosition() const { return m_relativeRect.position(); }
+    [[nodiscard]] Point relativePosition() const { return m_relativeRect.position(); }
     [[nodiscard]] Rect relativeRect() const { return m_relativeRect; }
     void setRelativeRect(const Rect& rect);
 
@@ -45,7 +45,7 @@ public:
 
     struct HitResult {
         Widget* widget;
-        IntPoint localPosition;
+        Point localPosition;
     };
 
     enum class SizePolicy {
@@ -53,7 +53,7 @@ public:
         Automatic,
     };
 
-    [[nodiscard]] bool hits(const IntPoint& point, HitResult& result);
+    [[nodiscard]] bool hits(const Point& point, HitResult& result);
 
     [[nodiscard]] bool hasFocus() const;
     void setFocus(FocusReason reason);

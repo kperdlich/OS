@@ -62,10 +62,10 @@ void Button::onPaintEvent(PaintEvent& event)
     } else {
         static const Color shadowGreyColor { 129, 129, 129, 255 };
 
-        const IntPoint topLeft { 0, 0 };
-        const IntPoint topRight { width(), 0 };
-        const IntPoint bottomLeft { 0, height() };
-        const IntPoint bottomRight { width(), height() };
+        const Point topLeft { 0, 0 };
+        const Point topRight { width(), 0 };
+        const Point bottomLeft { 0, height() };
+        const Point bottomRight { width(), height() };
 
         painter.drawLine(topLeft, topRight, Colors::White);
         painter.drawLine(topLeft, bottomLeft, Colors::White);

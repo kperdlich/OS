@@ -39,27 +39,51 @@ static constexpr const char* closeButtonCharacters {
 
 static const CharacterBitmap closeButtonBitmap(closeButtonCharSize, closeButtonCharacters);
 
-static constexpr const int FrameWidthMargin = 1;
+static constexpr const int FrameBorder = 2;
 static constexpr const int TaskbarHeight = 20;
 static const GUI::Color TaskbarColor { 190, 190, 190, 0xff };
 static const Rect TaskbarRect { 0, height - TaskbarHeight, width, TaskbarHeight };
 
-static Rect windowFrameRect(const Window& window)
+static Rect windowOuterFrameRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x() - FrameWidthMargin, rect.y() - TitleBarHeight, rect.width() + (2 * FrameWidthMargin), rect.height() + TitleBarHeight + 1 };
+    return { rect.x() - FrameBorder, rect.y() - TitleBarHeight - FrameBorder, rect.width() + (2 * FrameBorder), rect.height() + TitleBarHeight + (2 * FrameBorder) };
 }
 
 static Rect windowTitleBarCloseButtonRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x() + rect.width() + FrameWidthMargin - TitleBarButtonSize - TitleBarButtonsMargin, rect.y() - TitleBarHeight + TitleBarButtonsMargin, TitleBarButtonSize, TitleBarButtonSize };
+    return { rect.x() + rect.width() - TitleBarButtonSize - TitleBarButtonsMargin, rect.y() - TitleBarHeight + TitleBarButtonsMargin, TitleBarButtonSize, TitleBarButtonSize };
 }
 
 static Rect windowTitleBarRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x() - FrameWidthMargin, rect.y() - TitleBarHeight, rect.width() + (2 * FrameWidthMargin), TitleBarHeight };
+    return { rect.x(), rect.y() - TitleBarHeight, rect.width(), TitleBarHeight };
+}
+
+static Rect windowTopOuterFrameRect(const Window& window)
+{
+    const auto& rect = window.rect();
+    return { rect.x() - FrameBorder, rect.y() - TitleBarHeight - FrameBorder, rect.width() + (2 * FrameBorder), FrameBorder };
+}
+
+static Rect windowLeftOuterFrameRect(const Window& window)
+{
+    const auto& rect = window.rect();
+    return { rect.x() - FrameBorder, rect.y() - TitleBarHeight, FrameBorder, rect.height() + TitleBarHeight };
+}
+
+static Rect windowRightOuterFrameRect(const Window& window)
+{
+    const auto& rect = window.rect();
+    return { rect.x() + rect.width(), rect.y() - TitleBarHeight, FrameBorder, rect.height() + TitleBarHeight };
+}
+
+static Rect windowBottomOuterFrameRect(const Window& window)
+{
+    const auto& rect = window.rect();
+    return { rect.x() - FrameBorder, rect.y() + rect.height(), rect.width() + (2 * FrameBorder), FrameBorder };
 }
 
 static void paintTaskbar()
@@ -174,6 +198,12 @@ void WindowManager::processMouseEvent(MouseEvent& event)
                 onWindowTaskBarMouseDown(window, event.x(), event.y());
                 return IteratorResult::Break;
             }
+
+            if (insideWindowResizeArea(window, event.position())) {
+                std::cout << "[WindowManager::processMouseEvent] on resize area " << event.position().toString() << std::endl;
+                // FIXME: implement window resize
+                return IteratorResult::Break;
+            }
         }
 
         if (window.contains(event.position())) {
@@ -203,14 +233,18 @@ void WindowManager::paintWindowFrame(Window& window)
     painter.drawFilledRect(windowTitleBarRect(window), isActiveWindow ? ActiveWindowTitleBarColor : InactiveTitleBarColor);
 
     Rect closeButtonRect = windowTitleBarCloseButtonRect(window);
-    IntPoint closeButtonBitmapPos = closeButtonRect.position();
+    Point closeButtonBitmapPos = closeButtonRect.position();
     closeButtonBitmapPos.moveBy(3, 3);
     painter.drawFilledRect(closeButtonRect, Colors::Grey);
     painter.drawCharacterBitmap(closeButtonBitmapPos, closeButtonBitmap, Colors::Black);
 
     painter.drawRect(windowTitleBarCloseButtonRect(window), Colors::Black);
     painter.drawText(windowTitleBarRect(window), window.title(), Alignment::Center, isActiveWindow ? ActiveWindowTitleBarTextColor : InactiveTitleBarTextColor);
-    painter.drawRect(windowFrameRect(window), isActiveWindow ? Colors::Black : InactiveTitleBarColor);
+
+    painter.drawFilledRect(windowTopOuterFrameRect(window), Colors::DarkGrey);
+    painter.drawFilledRect(windowBottomOuterFrameRect(window), Colors::DarkGrey);
+    painter.drawFilledRect(windowLeftOuterFrameRect(window), Colors::DarkGrey);
+    painter.drawFilledRect(windowRightOuterFrameRect(window), Colors::DarkGrey);
 }
 
 void WindowManager::onWindowTaskBarMouseDown(Window& window, int x, int y)
@@ -250,7 +284,7 @@ void WindowManager::invalidateWindowRect(Window& window, const Rect& rect)
 
 void WindowManager::invalidate(Window& window)
 {
-    invalidate(windowFrameRect(window));
+    invalidate(windowOuterFrameRect(window));
 }
 
 void WindowManager::invalidate(const Rect& rect)
@@ -301,7 +335,7 @@ void WindowManager::flushPainting()
 
     forEachVisibleWindowBackToFront([&](Window& window) -> IteratorResult {
         for (auto& dirtyRect : dirtyRects) {
-            if (!dirtyRect.intersects(windowFrameRect(window))) {
+            if (!dirtyRect.intersects(windowOuterFrameRect(window))) {
                 continue;
             }
             Bitmap* windowBackBuffer = window.backBuffer();
@@ -325,6 +359,14 @@ void WindowManager::flushPainting()
     ADS::memcpy(dst, src, m_frontBuffer->width() * m_frontBuffer->height() * m_frontBuffer->byteDensity());
 
     Screen::instance().present();
+}
+
+bool WindowManager::insideWindowResizeArea(const Window& window, const Point& position) const
+{
+    return windowTopOuterFrameRect(window).contains(position)
+        || windowBottomOuterFrameRect(window).contains(position)
+        || windowLeftOuterFrameRect(window).contains(position)
+        || windowRightOuterFrameRect(window).contains(position);
 }
 
 } // GUI

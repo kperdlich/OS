@@ -19,7 +19,7 @@ public:
     {
     }
 
-    Rect(const IntPoint& point, Size size)
+    Rect(const Point& point, Size size)
         : m_position(point)
         , m_size(size)
     {
@@ -46,7 +46,7 @@ public:
     void setSize(Size value) { m_size = value; }
     inline Size size() const { return m_size; }
 
-    void setPosition(const IntPoint& position)
+    void setPosition(const Point& position)
     {
         m_position = position;
     }
@@ -81,14 +81,14 @@ public:
         return width() == 0 || height() == 0;
     }
 
-    inline Point<int> position() const { return m_position; }
+    inline Point position() const { return m_position; }
 
     inline void moveBy(int x, int y)
     {
         m_position.moveBy(x, y);
     }
 
-    void moveBy(const Point<int>& point)
+    void moveBy(const Point& point)
     {
         m_position.moveBy(point);
     }
@@ -98,7 +98,7 @@ public:
         return x >= left() && x <= right() && y >= top() && y <= bottom();
     }
 
-    bool contains(const IntPoint& point) const
+    bool contains(const Point& point) const
     {
         return contains(point.x(), point.y());
     }
@@ -144,15 +144,6 @@ public:
 
     Rect united(const Rect& other) const;
 
-    Rect clip(const Rect& clipInside) const
-    {
-        const int clippedX = ADS::clamp(clipInside.x(), m_position.x(), m_position.x() + m_size.width());
-        const int clippedY = ADS::clamp(clipInside.y(), m_position.y(), m_position.y() + m_size.height());
-        const int clippedWidth = ADS::min(clipInside.width() - ADS::abs(clippedX - clipInside.x()), m_size.width() - clippedX);
-        const int clippedHeight = ADS::min(clipInside.height() - ADS::abs(clippedY - clipInside.y()), m_size.height() - clippedY);
-        return Rect { clippedX, clippedY, clippedWidth, clippedHeight };
-    }
-
     bool operator==(const Rect& other) const
     {
         return m_position == other.m_position
@@ -166,7 +157,7 @@ public:
     }
 
 private:
-    Point<int> m_position {};
+    Point m_position {};
     Size m_size {};
 };
 

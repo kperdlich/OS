@@ -69,11 +69,11 @@ public:
 
     [[nodiscard]] int x() const { return m_position.x(); }
     [[nodiscard]] int y() const { return m_position.y(); }
-    IntPoint position() const { return m_position; }
+    Point position() const { return m_position; }
     MouseButton button() const { return m_button; }
 
 private:
-    IntPoint m_position;
+    Point m_position;
     MouseButton m_button;
 };
 

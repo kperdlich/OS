@@ -36,7 +36,7 @@ protected:
 
 private:
     [[nodiscard]] int sliderLength() const;
-    [[nodiscard]] int calculateDraggingDelta(const IntPoint& newPosition) const;
+    [[nodiscard]] int calculateDraggingDelta(const Point& newPosition) const;
     [[nodiscard]] Rect scrollUpButtonRect() const;
     [[nodiscard]] Rect scrollDownButtonRect() const;
     [[nodiscard]] Rect sliderRect() const;
@@ -52,7 +52,7 @@ private:
     int m_singleStep { 1 };
     int m_pageStep { 10 };
     int m_sliderValue { 0 };
-    IntPoint m_draggingStartPosition;
+    Point m_draggingStartPosition;
     int m_draggingStartValue { 0 };
     bool m_isDragging { false };
 };

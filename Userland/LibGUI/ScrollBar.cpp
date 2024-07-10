@@ -79,13 +79,13 @@ void ScrollBar::onPaintEvent(PaintEvent& event)
 
     painter.drawFilledRect(scrollUpButtonRect(), Colors::DarkGrey);
     painter.drawRect(scrollUpButtonRect(), Colors::Black);
-    IntPoint upButtonPos = scrollUpButtonRect().position();
+    Point upButtonPos = scrollUpButtonRect().position();
     upButtonPos.moveBy(3, 3);
     painter.drawCharacterBitmap(upButtonPos, scrollButtonUpBitmap(), Colors::Black);
 
     painter.drawFilledRect(scrollDownButtonRect(), Colors::DarkGrey);
     painter.drawRect(scrollDownButtonRect(), Colors::Black);
-    IntPoint downButtonPos = scrollDownButtonRect().position();
+    Point downButtonPos = scrollDownButtonRect().position();
     downButtonPos.moveBy(3, 3);
     painter.drawCharacterBitmap(downButtonPos, scrollButtonDownBitmap(), Colors::Black);
 
@@ -178,7 +178,7 @@ void ScrollBar::setValue(int value)
     update();
 }
 
-int ScrollBar::calculateDraggingDelta(const IntPoint& newPosition) const
+int ScrollBar::calculateDraggingDelta(const Point& newPosition) const
 {
     const int positionDelta = m_orientation == Orientation::Vertical
         ? newPosition.y() - m_draggingStartPosition.y()

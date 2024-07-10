@@ -31,14 +31,14 @@ public:
     bool isVisible() { return m_isVisible; }
     Size size() const { return m_rect.size(); }
 
-    bool contains(IntPoint position);
+    bool contains(Point position);
     void moveBy(int x, int y);
 
     void resize(Size size);
     void resize(int width, int height);
-    void setPosition(const IntPoint& point);
+    void setPosition(const Point& point);
     [[nodiscard]] Rect rect() const { return m_rect; }
-    [[nodiscard]] IntPoint position() const { return m_rect.position(); }
+    [[nodiscard]] Point position() const { return m_rect.position(); }
 
     inline void setTitle(const ADS::String& title) { m_title = title; }
     inline ADS::String title() const { return m_title; }
