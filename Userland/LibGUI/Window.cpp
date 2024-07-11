@@ -170,11 +170,9 @@ bool Window::isActive() const
 
 void Window::setPosition(const Point& point)
 {
+    WindowManager::instance().invalidate(*this);
     m_rect.setPosition(point);
-
-    // Rect windowRect = rect();
-    // windowRect.moveBy(-rect().position());
-    // WindowManager::instance().invalidateWindowRect(*this, windowRect);
+    WindowManager::instance().invalidate(*this);
 }
 
 } // GUI
