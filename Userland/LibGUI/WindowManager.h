@@ -40,7 +40,6 @@ public:
     void setMouseGrabbedWidget(Widget& widget);
     void releaseMouseGrabbedWidget();
 
-
     void invalidateWindowRect(Window& window, const Rect& rect);
     void invalidate(Window& window);
     void invalidate(const Rect& rect);

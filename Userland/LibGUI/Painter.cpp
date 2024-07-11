@@ -40,14 +40,21 @@ void Painter::drawFilledRect(const Rect& rect, GUI::Color color)
     const auto start = std::chrono::system_clock::now();
 #endif
 
-    Rect translated = rect;
-    translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
+    Rect clippedAndTranslatedRect = rect;
+    clippedAndTranslatedRect.moveBy(m_relativeTranslationX, m_relativeTranslationY);
+    clippedAndTranslatedRect.intersect(m_clipRect);
 
-    const auto clippedRect = m_clipRect.intersectRect(translated);
-    for (int y = 0; y < clippedRect.height(); ++y) {
-        for (int x = 0; x < clippedRect.width(); ++x) {
-            if (clippedRect.contains(clippedRect.x() + x, clippedRect.y() + y))
-                m_targetBuffer->setPixel(clippedRect.x() + x, clippedRect.y() + y, color);
+    if (clippedAndTranslatedRect.isEmpty())
+        return;
+
+    const int startX = clippedAndTranslatedRect.x();
+    const int startY = clippedAndTranslatedRect.y();
+    const int width = clippedAndTranslatedRect.width();
+    const int height = clippedAndTranslatedRect.height();
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            m_targetBuffer->setPixel(startX + x, startY + y, color);
         }
     }
 

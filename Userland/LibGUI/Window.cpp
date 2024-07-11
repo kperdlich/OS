@@ -25,7 +25,7 @@ void Window::close()
     hide();
     GUI::WindowManager::instance().remove(*this);
     // FIXME: handle deletion
-    //deleteLater();
+    // deleteLater();
 }
 
 bool Window::event(Event& event)
@@ -83,18 +83,22 @@ bool Window::contains(Point point)
 
 void Window::moveBy(int x, int y)
 {
+    GUI::WindowManager::instance().invalidate(*this);
     m_rect.moveBy(x, y);
+    GUI::WindowManager::instance().invalidate(*this);
 }
 
 void Window::resize(Size size)
 {
-    // FIXME: clear back buffer when window resize is properly implemented
-    Size oldSize = m_rect.size();
+    if (m_rect.size() == size)
+        return;
+
+    GUI::WindowManager::instance().invalidate(*this);
+    m_backBuffer = nullptr;
     m_rect.setSize(size);
-    if (m_centralWidget) {
-        ResizeEvent event(m_rect.size(), oldSize);
-        m_centralWidget->event(event);
-    }
+    GUI::WindowManager::instance().invalidate(*this);
+    if (m_centralWidget)
+        m_centralWidget->resize(m_rect.size());
 }
 
 void Window::resize(int width, int height)

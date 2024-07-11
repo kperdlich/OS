@@ -319,7 +319,7 @@ void WindowManager::compose()
     const auto start = std::chrono::steady_clock::now();
     flushPainting();
     const auto end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
-    std::cout << "compose: time " << end.count() << " ms" << std::endl;
+    //std::cout << "compose: time " << end.count() << " ms" << std::endl;
 }
 
 void WindowManager::flushPainting()

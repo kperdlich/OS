@@ -21,8 +21,8 @@ public:
 
     bool isInvalid() const { return m_width <= 0 || m_height <= 0; }
 
-    inline int width() const { return m_width; }
-    inline int height() const { return m_height; }
+    int width() const { return m_width; }
+    int height() const { return m_height; }
 
     inline void setWidth(int value) { m_width = value; }
     inline void setHeight(int value) { m_height = value; }

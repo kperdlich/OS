@@ -31,8 +31,8 @@ public:
     {
     }
 
-    inline int width() const { return m_size.width(); }
-    inline int height() const { return m_size.height(); }
+    int width() const { return m_size.width(); }
+    int height() const { return m_size.height(); }
 
     void setWidth(int width) { m_size.setWidth(width); }
     void setHeight(int height) { m_size.setHeight(height); }

@@ -57,10 +57,7 @@ int main()
         GUI::Widget* rootWidget = new GUI::Widget();
         GUI::VBoxLayout* rootLayout = new GUI::VBoxLayout(rootWidget);
         GUI::Button* button = new GUI::Button(rootWidget);
-        button->setText("Press me :)");
-        button->onClick = []() {
-            std::cout << "Button clicked" << std::endl;
-        };
+        button->setText("Resize");
         rootLayout->addWidget(*button);
         rootLayout->addWidget(*scrollArea);
         rootWidget->setLayout(rootLayout);
@@ -69,6 +66,10 @@ int main()
         win1->resize({ 640, 480 });
         win1->setCentralWidget(*rootWidget);
         win1->setTitle("Window 1");
+        button->onClick = [win1]() {
+            std::cout << "Button clicked" << std::endl;
+            win1->resize({ 720, 480 });
+        };
         win1->show();
     }
 
