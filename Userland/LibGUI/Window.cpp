@@ -168,6 +168,11 @@ bool Window::isActive() const
     return WindowManager::instance().activeWindow() == this;
 }
 
+void Window::setPosition(int x, int y)
+{
+    setPosition({ x, y });
+}
+
 void Window::setPosition(const Point& point)
 {
     WindowManager::instance().invalidate(*this);

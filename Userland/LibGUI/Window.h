@@ -36,6 +36,7 @@ public:
 
     void resize(Size size);
     void resize(int width, int height);
+    void setPosition(int x, int y);
     void setPosition(const Point& point);
     [[nodiscard]] Rect rect() const { return m_rect; }
     [[nodiscard]] Point position() const { return m_rect.position(); }
