@@ -40,7 +40,7 @@ public:
     void setMouseGrabbedWidget(Widget& widget);
     void releaseMouseGrabbedWidget();
 
-    void invalidateWindowRect(Window& window, const Rect& rect);
+    void invalidateWindowLocalRect(Window& window, const Rect& rect);
     void invalidate(Window& window);
     void invalidate(const Rect& rect);
     void hide(Window& window);
@@ -56,7 +56,17 @@ private:
     void onWindowTaskBarMouseDown(Window& window, int x, int y);
     void paintWindowFrame(Window& window);
     void closeWindow(Window& window);
-    bool insideWindowResizeArea(const Window& window, const Point& position) const;
+    bool insideResizeArea(const Window& window, const Point& position) const;
+    void startResizing(const Point& position);
+    void updateResizing(const Point& position);
+
+    enum class ResizeDirection {
+        None,
+        Left,
+        Right,
+        Top,
+        Bottom
+    };
 
 private:
     ADS::UniquePtr<Bitmap> m_frontBuffer;
@@ -67,8 +77,12 @@ private:
     Widget* m_mouseGrabbedWidget { nullptr };
     Point m_dragOrigin;
     Point m_dragWindowOrigin;
+    Point m_resizeOrigin;
+    Rect m_resizeWindowStartRect;
     int m_composeTimer { -1 };
+    ResizeDirection m_resizeOption { ResizeDirection::None };
     bool m_isDraggingWindow { false };
+    bool m_isResizingWindow { false };
 };
 
 template<typename Callback>

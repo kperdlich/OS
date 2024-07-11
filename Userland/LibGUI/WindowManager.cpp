@@ -39,7 +39,7 @@ static constexpr const char* closeButtonCharacters {
 
 static const CharacterBitmap closeButtonBitmap(closeButtonCharSize, closeButtonCharacters);
 
-static constexpr const int FrameBorder = 2;
+static constexpr const int FrameBorder = 3;
 static constexpr const int TaskbarHeight = 20;
 static const GUI::Color TaskbarColor { 190, 190, 190, 0xff };
 static const Rect TaskbarRect { 0, height - TaskbarHeight, width, TaskbarHeight };
@@ -183,6 +183,21 @@ void WindowManager::processMouseEvent(MouseEvent& event)
 
     if (event.type() == Event::Type::MouseUp && m_isDraggingWindow) {
         m_isDraggingWindow = false;
+        invalidate(*m_activeWindow);
+        return;
+    }
+
+    if (event.type() == Event::Type::MouseMove && m_isResizingWindow) {
+        updateResizing(event.position());
+        return;
+    }
+
+    if (event.type() == Event::Type::MouseUp && m_isResizingWindow) {
+        m_isResizingWindow = false;
+        m_resizeOrigin = {};
+        m_resizeOption = ResizeDirection::None;
+        m_resizeWindowStartRect = {};
+        invalidate(*m_activeWindow);
         return;
     }
 
@@ -199,9 +214,9 @@ void WindowManager::processMouseEvent(MouseEvent& event)
                 return IteratorResult::Break;
             }
 
-            if (insideWindowResizeArea(window, event.position())) {
-                std::cout << "[WindowManager::processMouseEvent] on resize area " << event.position().toString() << std::endl;
-                // FIXME: implement window resize
+            if (insideResizeArea(window, event.position())) {
+                makeActive(&window);
+                startResizing(event.position());
                 return IteratorResult::Break;
             }
         }
@@ -249,10 +264,9 @@ void WindowManager::paintWindowFrame(Window& window)
 
 void WindowManager::onWindowTaskBarMouseDown(Window& window, int x, int y)
 {
-    const auto& rect = window.rect();
     if (!windowTitleBarCloseButtonRect(window).contains(x, y)) {
         m_dragOrigin = { x, y };
-        m_dragWindowOrigin = window.rect().position();
+        m_dragWindowOrigin = window.position();
         m_isDraggingWindow = true;
     }
 }
@@ -273,7 +287,7 @@ void WindowManager::setMouseGrabbedWidget(Widget& widget)
     m_mouseGrabbedWidget = &widget;
 }
 
-void WindowManager::invalidateWindowRect(Window& window, const Rect& rect)
+void WindowManager::invalidateWindowLocalRect(Window& window, const Rect& rect)
 {
     Rect absoluteRect = rect;
     absoluteRect.moveBy(window.position());
@@ -319,7 +333,7 @@ void WindowManager::compose()
     const auto start = std::chrono::steady_clock::now();
     flushPainting();
     const auto end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
-    //std::cout << "compose: time " << end.count() << " ms" << std::endl;
+    std::cout << "compose: time " << end.count() << " ms" << std::endl;
 }
 
 void WindowManager::flushPainting()
@@ -338,7 +352,7 @@ void WindowManager::flushPainting()
             if (!dirtyRect.intersects(windowOuterFrameRect(window))) {
                 continue;
             }
-            Bitmap* windowBackBuffer = window.backBuffer();
+            Bitmap* const windowBackBuffer = window.backBuffer();
             if (!windowBackBuffer)
                 return IteratorResult::Continue;
 
@@ -361,12 +375,77 @@ void WindowManager::flushPainting()
     Screen::instance().present();
 }
 
-bool WindowManager::insideWindowResizeArea(const Window& window, const Point& position) const
+bool WindowManager::insideResizeArea(const Window& window, const Point& position) const
 {
     return windowTopOuterFrameRect(window).contains(position)
         || windowBottomOuterFrameRect(window).contains(position)
         || windowLeftOuterFrameRect(window).contains(position)
         || windowRightOuterFrameRect(window).contains(position);
+}
+
+void WindowManager::startResizing(const Point& position)
+{
+    ASSERT(m_activeWindow);
+    m_resizeOrigin = position;
+    m_resizeWindowStartRect = m_activeWindow->rect();
+    m_isResizingWindow = true;
+    if (windowTopOuterFrameRect(*m_activeWindow).contains(position)) {
+        m_resizeOption = ResizeDirection::Top;
+    } else if (windowBottomOuterFrameRect(*m_activeWindow).contains(position)) {
+        m_resizeOption = ResizeDirection::Bottom;
+    } else if (windowLeftOuterFrameRect(*m_activeWindow).contains(position)) {
+        m_resizeOption = ResizeDirection::Left;
+    } else if (windowRightOuterFrameRect(*m_activeWindow).contains(position)) {
+        m_resizeOption = ResizeDirection::Right;
+    } else {
+        m_resizeOption = ResizeDirection::None;
+        m_resizeOrigin = {};
+        m_resizeWindowStartRect = {};
+        m_isResizingWindow = false;
+    }
+}
+
+void WindowManager::updateResizing(const Point& position)
+{
+    ASSERT(m_activeWindow);
+
+    const Point diff = position - m_resizeOrigin;
+    const Point newPos = m_resizeWindowStartRect.position();
+    const Size newSize = m_resizeWindowStartRect.size();
+
+    int changeX = 0;
+    int changeY = 0;
+    int changeWidth = 0;
+    int changeHeight = 0;
+
+    switch (m_resizeOption) {
+    case ResizeDirection::Top:
+        changeY = diff.y();
+        changeHeight = -diff.y();
+        break;
+    case ResizeDirection::Bottom:
+        changeHeight = diff.y();
+        break;
+    case ResizeDirection::Left:
+        changeX = diff.x();
+        changeWidth = -diff.x();
+        break;
+    case ResizeDirection::Right:
+        changeWidth = diff.x();
+        break;
+    default:
+        ASSERT(false);
+        break;
+    }
+
+    const Size minSize = m_activeWindow->centralWidget()->minSizeHint();
+    const Size clampedSize { ADS::max(minSize.width(), newSize.width() + changeWidth),
+        ADS::max(minSize.height(), newSize.height() + changeHeight) };
+
+    invalidate(*m_activeWindow);
+    m_activeWindow->resize(clampedSize);
+    m_activeWindow->setPosition(newPos.x() + changeX, newPos.y() + changeY);
+    invalidate(*m_activeWindow);
 }
 
 } // GUI

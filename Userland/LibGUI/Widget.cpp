@@ -49,7 +49,7 @@ bool Widget::event(Event& event)
         Painter painter(*this);
         painter.setClipRect(paintEvent.rect());
         painter.drawFilledRect(rect(), Colors::Grey);
-#if 1
+#if 0
         std::cout << "[Widget::paint] " << className() << " rect: " << relativeRect().toString() << std::endl;
 #endif
         if (isVisible())

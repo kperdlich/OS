@@ -63,8 +63,10 @@ bool Window::event(Event& event)
 
     if (event.type() == Event::Type::UpdateRequest) {
         const UpdateEvent& updateEvent = static_cast<UpdateEvent&>(event);
+#if 0
         std::cout << "Window[" << title() << "] UpdateRequest from " << updateEvent.widget()->className() << " Rect: " << updateEvent.rect().toString() << std::endl;
-        WindowManager::instance().invalidateWindowRect(*this, updateEvent.rect());
+#endif
+        WindowManager::instance().invalidateWindowLocalRect(*this, updateEvent.rect());
         return true;
     }
 
