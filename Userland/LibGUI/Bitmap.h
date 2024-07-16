@@ -41,12 +41,13 @@ private:
         No
     };
 
-    Bitmap(BitmapFormat format, Size size, char* data, OwnBitmapData ownership);
+    Bitmap(BitmapFormat format, Size size, char* data, size_t dataSize, OwnBitmapData ownership);
 
 private:
     Size m_size;
-    BitmapFormat m_format;
+    size_t m_dataSize {};
     char* m_data { nullptr };
+    BitmapFormat m_format;
     bool m_isOwning { false };
 };
 
