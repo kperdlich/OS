@@ -187,17 +187,18 @@ void WindowManager::processMouseEvent(MouseEvent& event)
         return;
     }
 
-    if (event.type() == Event::Type::MouseMove && m_isResizingWindow) {
-        updateResizing(event.position());
-        return;
-    }
+    if (m_isResizingWindow) {
+        if (event.type() == Event::Type::MouseMove) {
+            updateResizing(event.position());
+        }
 
-    if (event.type() == Event::Type::MouseUp && m_isResizingWindow) {
-        m_isResizingWindow = false;
-        m_resizeOrigin = {};
-        m_resizeOption = ResizeDirection::None;
-        m_resizeWindowStartRect = {};
-        invalidate(*m_activeWindow);
+        if (event.type() == Event::Type::MouseUp) {
+            m_isResizingWindow = false;
+            m_resizeOrigin = {};
+            m_resizeOption = ResizeDirection::None;
+            m_resizeWindowStartRect = {};
+            invalidate(*m_activeWindow);
+        }
         return;
     }
 
@@ -342,26 +343,28 @@ void WindowManager::flushPainting()
     const ADS::Vector<Rect> dirtyRects = std::move(m_dirtyRects);
 
     // Draw Background by default
+    Rect bigDirtyRect;
     for (auto& dirtyRect : dirtyRects) {
-        Painter painter(*m_backBuffer);
-        painter.drawFilledRect(dirtyRect, Colors::White);
+        bigDirtyRect = bigDirtyRect.united(dirtyRect);
     }
+    const auto start = std::chrono::steady_clock::now();
+    Painter painter(*m_backBuffer);
+    painter.drawFilledRect(bigDirtyRect, Colors::White);
 
     forEachVisibleWindowBackToFront([&](Window& window) -> IteratorResult {
-        for (auto& dirtyRect : dirtyRects) {
-            if (!dirtyRect.intersects(windowOuterFrameRect(window))) {
-                continue;
-            }
-            Bitmap* const windowBackBuffer = window.backBuffer();
-            if (!windowBackBuffer)
-                return IteratorResult::Continue;
-
-            Painter painter(*m_backBuffer);
-            // FIXME: Only blit pixels for updated rect
-            painter.blit(window.position(), *windowBackBuffer);
-            paintWindowFrame(window);
+        if (!bigDirtyRect.intersects(windowOuterFrameRect(window))) {
             return IteratorResult::Continue;
         }
+        Bitmap* const windowFrontBuffer = window.backBuffer();
+        if (!windowFrontBuffer) {
+            std::cout << "[compose] no front buffer for window: " << window.title() << std::endl;
+            return IteratorResult::Continue;
+        }
+
+        Painter painter(*m_backBuffer);
+        // FIXME: Only blit pixels for updated rect
+        painter.blit(window.position(), *windowFrontBuffer);
+        paintWindowFrame(window);
         return IteratorResult::Continue;
     });
 
@@ -371,6 +374,9 @@ void WindowManager::flushPainting()
     char* src = m_backBuffer->data();
     char* dst = m_frontBuffer->data();
     ADS::memcpy(dst, src, m_frontBuffer->width() * m_frontBuffer->height() * m_frontBuffer->byteDensity());
+
+    killTimer(m_composeTimer);
+    m_composeTimer = -1;
 
     Screen::instance().present();
 }
@@ -386,9 +392,8 @@ bool WindowManager::insideResizeArea(const Window& window, const Point& position
 void WindowManager::startResizing(const Point& position)
 {
     ASSERT(m_activeWindow);
-    m_resizeOrigin = position;
-    m_resizeWindowStartRect = m_activeWindow->rect();
-    m_isResizingWindow = true;
+    m_resizeOption = ResizeDirection::None;
+
     if (windowTopOuterFrameRect(*m_activeWindow).contains(position)) {
         m_resizeOption = ResizeDirection::Top;
     } else if (windowBottomOuterFrameRect(*m_activeWindow).contains(position)) {
@@ -397,12 +402,15 @@ void WindowManager::startResizing(const Point& position)
         m_resizeOption = ResizeDirection::Left;
     } else if (windowRightOuterFrameRect(*m_activeWindow).contains(position)) {
         m_resizeOption = ResizeDirection::Right;
-    } else {
-        m_resizeOption = ResizeDirection::None;
-        m_resizeOrigin = {};
-        m_resizeWindowStartRect = {};
-        m_isResizingWindow = false;
     }
+
+    if (m_resizeOption != ResizeDirection::None) {
+        m_resizeOrigin = position;
+        m_resizeWindowStartRect = m_activeWindow->rect();
+        m_isResizingWindow = true;
+    }
+
+    invalidate(*m_activeWindow);
 }
 
 void WindowManager::updateResizing(const Point& position)
@@ -442,10 +450,8 @@ void WindowManager::updateResizing(const Point& position)
     const Size clampedSize { ADS::max(minSize.width(), newSize.width() + changeWidth),
         ADS::max(minSize.height(), newSize.height() + changeHeight) };
 
-    invalidate(*m_activeWindow);
     m_activeWindow->resize(clampedSize);
     m_activeWindow->setPosition(newPos.x() + changeX, newPos.y() + changeY);
-    invalidate(*m_activeWindow);
 }
 
 } // GUI
