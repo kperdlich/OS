@@ -71,19 +71,47 @@ static Rect windowTopOuterFrameRect(const Window& window)
 static Rect windowLeftOuterFrameRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x() - FrameBorder, rect.y() - TitleBarHeight, FrameBorder, rect.height() + TitleBarHeight };
+    return { rect.x() - FrameBorder, rect.y() - TitleBarHeight - FrameBorder, FrameBorder, rect.height() + TitleBarHeight + (2 * FrameBorder) };
 }
 
 static Rect windowRightOuterFrameRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x() + rect.width(), rect.y() - TitleBarHeight, FrameBorder, rect.height() + TitleBarHeight };
+    return { rect.right(), rect.y() - TitleBarHeight - FrameBorder, FrameBorder, rect.height() + TitleBarHeight + (2 * FrameBorder) };
 }
 
 static Rect windowBottomOuterFrameRect(const Window& window)
 {
     const auto& rect = window.rect();
-    return { rect.x() - FrameBorder, rect.y() + rect.height(), rect.width() + (2 * FrameBorder), FrameBorder };
+    return { rect.x() - FrameBorder, rect.bottom(), rect.width() + (2 * FrameBorder), FrameBorder };
+}
+
+static Rect windowResizeUpLeftRect(const Window& window)
+{
+    const Rect top = windowTopOuterFrameRect(window);
+    const Rect left = windowLeftOuterFrameRect(window);
+    return top.intersectRect(left);
+}
+
+static Rect windowResizeUpRightRect(const Window& window)
+{
+    const Rect top = windowTopOuterFrameRect(window);
+    const Rect right = windowRightOuterFrameRect(window);
+    return top.intersectRect(right);
+}
+
+static Rect windowResizeDownLeftRect(const Window& window)
+{
+    const Rect bottom = windowBottomOuterFrameRect(window);
+    const Rect left = windowLeftOuterFrameRect(window);
+    return bottom.intersectRect(left);
+}
+
+static Rect windowResizeDownRightRect(const Window& window)
+{
+    const Rect bottom = windowBottomOuterFrameRect(window);
+    const Rect right = windowRightOuterFrameRect(window);
+    return bottom.intersectRect(right);
 }
 
 static void paintTaskbar()
@@ -347,7 +375,6 @@ void WindowManager::flushPainting()
     for (auto& dirtyRect : dirtyRects) {
         bigDirtyRect = bigDirtyRect.united(dirtyRect);
     }
-    const auto start = std::chrono::steady_clock::now();
     Painter painter(*m_backBuffer);
     painter.drawFilledRect(bigDirtyRect, Colors::White);
 
@@ -355,15 +382,15 @@ void WindowManager::flushPainting()
         if (!bigDirtyRect.intersects(windowOuterFrameRect(window))) {
             return IteratorResult::Continue;
         }
-        Bitmap* const windowFrontBuffer = window.backBuffer();
-        if (!windowFrontBuffer) {
-            std::cout << "[compose] no front buffer for window: " << window.title() << std::endl;
+        Bitmap* const windowBitmap = window.backBuffer();
+        if (!windowBitmap) {
+            std::cout << "[compose] no bitmap for window: " << window.title() << std::endl;
             return IteratorResult::Continue;
         }
 
         Painter painter(*m_backBuffer);
         // FIXME: Only blit pixels for updated rect
-        painter.blit(window.position(), *windowFrontBuffer);
+        painter.blit(window.position(), *windowBitmap);
         paintWindowFrame(window);
         return IteratorResult::Continue;
     });
@@ -394,10 +421,18 @@ void WindowManager::startResizing(const Point& position)
     ASSERT(m_activeWindow);
     m_resizeOption = ResizeDirection::None;
 
-    if (windowTopOuterFrameRect(*m_activeWindow).contains(position)) {
-        m_resizeOption = ResizeDirection::Top;
+    if (windowResizeUpLeftRect(*m_activeWindow).contains(position)) {
+        m_resizeOption = ResizeDirection::UpLeft;
+    } else if (windowResizeUpRightRect(*m_activeWindow).contains(position)) {
+        m_resizeOption = ResizeDirection::UpRight;
+    } else if (windowResizeDownLeftRect(*m_activeWindow).contains(position)) {
+        m_resizeOption = ResizeDirection::DownLeft;
+    } else if (windowResizeDownRightRect(*m_activeWindow).contains(position)) {
+        m_resizeOption = ResizeDirection::DownRight;
+    } else if (windowTopOuterFrameRect(*m_activeWindow).contains(position)) {
+        m_resizeOption = ResizeDirection::Up;
     } else if (windowBottomOuterFrameRect(*m_activeWindow).contains(position)) {
-        m_resizeOption = ResizeDirection::Bottom;
+        m_resizeOption = ResizeDirection::Down;
     } else if (windowLeftOuterFrameRect(*m_activeWindow).contains(position)) {
         m_resizeOption = ResizeDirection::Left;
     } else if (windowRightOuterFrameRect(*m_activeWindow).contains(position)) {
@@ -427,11 +462,11 @@ void WindowManager::updateResizing(const Point& position)
     int changeHeight = 0;
 
     switch (m_resizeOption) {
-    case ResizeDirection::Top:
+    case ResizeDirection::Up:
         changeY = diff.y();
         changeHeight = -diff.y();
         break;
-    case ResizeDirection::Bottom:
+    case ResizeDirection::Down:
         changeHeight = diff.y();
         break;
     case ResizeDirection::Left:
@@ -441,17 +476,49 @@ void WindowManager::updateResizing(const Point& position)
     case ResizeDirection::Right:
         changeWidth = diff.x();
         break;
+    case ResizeDirection::UpLeft:
+        changeX = diff.x();
+        changeWidth = -diff.x();
+        changeY = diff.y();
+        changeHeight = -diff.y();
+        break;
+    case ResizeDirection::UpRight:
+        changeY = diff.y();
+        changeHeight = -diff.y();
+        changeWidth = diff.x();
+        break;
+    case ResizeDirection::DownLeft:
+        changeHeight = diff.y();
+        changeX = diff.x();
+        changeWidth = -diff.x();
+        break;
+    case ResizeDirection::DownRight:
+        changeHeight = diff.y();
+        changeWidth = diff.x();
+        break;
     default:
         ASSERT(false);
         break;
     }
 
+    // FIXME: minSizeHint or minSize?
     const Size minSize = m_activeWindow->centralWidget()->minSizeHint();
-    const Size clampedSize { ADS::max(minSize.width(), newSize.width() + changeWidth),
-        ADS::max(minSize.height(), newSize.height() + changeHeight) };
+    Rect newRect { newPos.x() + changeX, newPos.y() + changeY, { newSize.width() + changeWidth, newSize.height() + changeHeight } };
 
-    m_activeWindow->resize(clampedSize);
-    m_activeWindow->setPosition(newPos.x() + changeX, newPos.y() + changeY);
+    // Don't resize window when minsize is hit
+    if (newRect.height() <= minSize.height()) {
+        if (changeY != 0)
+            newRect.setY(m_activeWindow->rect().bottom() - minSize.height());
+        newRect.setHeight(minSize.height());
+    }
+    if (newRect.width() <= minSize.width()) {
+        if (changeX != 0)
+            newRect.setX(m_activeWindow->rect().right() - minSize.width());
+        newRect.setWidth(minSize.width());
+    }
+
+    m_activeWindow->resize(newRect.size());
+    m_activeWindow->setPosition(newRect.position());
 }
 
 } // GUI

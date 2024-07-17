@@ -64,8 +64,12 @@ private:
         None,
         Left,
         Right,
-        Top,
-        Bottom
+        Up,
+        Down,
+        UpLeft,
+        UpRight,
+        DownLeft,
+        DownRight,
     };
 
 private:
