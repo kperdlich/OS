@@ -6,6 +6,7 @@
 #include "ASCIIFont.h"
 #include "DefaultFont8x10.h"
 #include "Window.h"
+#include <cmath>
 
 namespace GUI {
 
@@ -153,6 +154,91 @@ void Painter::drawLine(int x0, int y0, int x1, int y1, GUI::Color color)
             y += sy;
         }
     }
+}
+
+static void forEachEllipsePoint(const Rect& rect, ADS::Function<void(const Point&)>&& callback)
+{
+    // Implementation of the Midpoint ellipse drawing algorithm.
+
+    // Radii along the x and y axes
+    const int rx = rect.width() / 2;
+    const int ry = rect.height() / 2;
+
+    // Variables for the algorithm
+    int x = 0;
+    int y = ry;
+    const int rx2 = rx * rx;
+    const int ry2 = ry * ry;
+    const int twoRx2 = 2 * rx2;
+    const int twoRy2 = 2 * ry2;
+    int px = 0;
+    int py = twoRx2 * y;
+
+    // Region 1
+    int p = static_cast<int>(round(ry2 - (rx2 * ry) + (0.25 * rx2)));
+    while (px < py) {
+        callback({x, y});
+
+        x++;
+        px += twoRy2;
+        if (p < 0) {
+            p += ry2 + px;
+        } else {
+            y--;
+            py -= twoRx2;
+            p += ry2 + px - py;
+        }
+    }
+
+    // Region 2
+    p = static_cast<int>(round(ry2 * (x + 0.5) * (x + 0.5) + rx2 * (y - 1) * (y - 1) - rx2 * ry2));
+    while (y >= 0) {
+        callback({x, y});
+
+        y--;
+        py -= twoRx2;
+        if (p > 0) {
+            p += rx2 - py;
+        } else {
+            x++;
+            px += twoRy2;
+            p += rx2 - py + px;
+        }
+    }
+}
+
+void Painter::drawEllipse(const Rect& rect, GUI::Color color)
+{
+    Rect translated = rect;
+    translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
+    const Rect clippedRect = m_clipRect.intersectRect(translated);
+
+    const Point center = clippedRect.center();
+    forEachEllipsePoint(clippedRect, [this, center, color](const Point& point){
+        m_targetBuffer->setPixel(center.x() + point.x(), center.y() + point.y(), color);
+        m_targetBuffer->setPixel(center.x() - point.x(), center.y() + point.y(), color);
+        m_targetBuffer->setPixel(center.x() + point.x(), center.y() - point.y(), color);
+        m_targetBuffer->setPixel(center.x() - point.x(), center.y() - point.y(), color);
+    });
+}
+
+void Painter::drawFilledEllipse(const Rect& rect, GUI::Color color)
+{
+    Rect translated = rect;
+    translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
+    const Rect clippedRect = m_clipRect.intersectRect(translated);
+
+    auto drawHorizontalLine = [this](int xStart, int xEnd, int y, const Color& color) {
+        for (int x = xStart; x <= xEnd; x++) {
+            m_targetBuffer->setPixel(x, y, color);
+        }
+    };
+
+    const Point center = clippedRect.center();
+    forEachEllipsePoint(clippedRect, [center, color, drawHorizontalLine](const Point& point){
+        drawHorizontalLine(center.x() - point.x(), center.x() + point.x(), center.y() + point.y(), color);
+        drawHorizontalLine(center.x() - point.x(), center.x() + point.x(), center.y() - point.y(), color);
+    });
 }
 
 void Painter::drawText(const Rect& rect, const ADS::String& text, Alignment alignment, GUI::Color color)

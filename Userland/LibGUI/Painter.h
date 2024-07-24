@@ -26,6 +26,8 @@ public:
     void drawLine(const Point& x, const Point& y, GUI::Color color);
     void drawLine(int x0, int y0, int x1, int y1, GUI::Color color);
     void drawText(const Rect& rect, const ADS::String& text, Alignment alignment, GUI::Color color);
+    void drawEllipse(const Rect& rect, GUI::Color color);
+    void drawFilledEllipse(const Rect& rect, GUI::Color color);
     void drawCharacterBitmap(const Point& point, const CharacterBitmap& bitmap, Color color);
     void blit(Point point, Bitmap& source);
 

@@ -93,6 +93,11 @@ public:
         m_position.moveBy(point);
     }
 
+    [[nodiscard]] Point center() const
+    {
+        return { x() + width() / 2, y() + height() / 2 };
+    }
+
     bool contains(int x, int y) const
     {
         return x >= left() && x <= right() && y >= top() && y <= bottom();
