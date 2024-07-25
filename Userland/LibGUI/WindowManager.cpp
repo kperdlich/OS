@@ -121,11 +121,10 @@ static void paintTaskbar()
     // painter.drawFilledRect(TaskbarRect, TaskbarColor);
 }
 
-bool WindowManager::event(Event& event)
+void WindowManager::event(Event& event)
 {
     if (event.isMouseEvent()) {
-        processMouseEvent(static_cast<MouseEvent&>(event));
-        return true;
+        return processMouseEvent(static_cast<MouseEvent&>(event));
     }
 
     if (event.isKeyboardEvent()) {
@@ -137,8 +136,7 @@ bool WindowManager::event(Event& event)
 
     // Compose timer
     if (event.type() == Event::Type::Timer) {
-        compose();
-        return true;
+        return compose();
     }
 
     return CObject::event(event);

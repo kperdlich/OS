@@ -14,7 +14,7 @@ public:
     explicit CObject(CObject* parent = nullptr);
     virtual ~CObject();
 
-    virtual bool event(Event& event);
+    virtual void event(Event& event);
     virtual void onTimerEvent(TimerEvent& event);
     virtual bool isWidgetType() const;
     virtual bool isWindowType() const;

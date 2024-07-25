@@ -13,36 +13,28 @@ Widget::Widget(Widget* parent)
 {
 }
 
-bool Widget::event(Event& event)
+void Widget::event(Event& event)
 {
     switch (event.type()) {
     case Event::Type::MouseDown:
         if (acceptsFocus())
             setFocus(FocusReason::Mouse);
-        onMouseDownEvent(static_cast<MouseEvent&>(event));
-        return true;
+        return onMouseDownEvent(static_cast<MouseEvent&>(event));
     case Event::Type::MouseUp:
-        onMouseUpEvent(static_cast<MouseEvent&>(event));
-        return true;
+        return onMouseUpEvent(static_cast<MouseEvent&>(event));
     case Event::Type::MouseMove:
-        onMouseMoveEvent(static_cast<MouseEvent&>(event));
-        return true;
+        return onMouseMoveEvent(static_cast<MouseEvent&>(event));
     case Event::Type::KeyDown:
-        onKeyDownEvent(static_cast<KeyEvent&>(event));
-        return true;
+        return onKeyDownEvent(static_cast<KeyEvent&>(event));
     case Event::Type::KeyUp:
-        onKeyUpEvent(static_cast<KeyEvent&>(event));
-        return true;
+        return onKeyUpEvent(static_cast<KeyEvent&>(event));
     case Event::Type::FocusIn:
-        onFocusInEvent(static_cast<FocusEvent&>(event));
-        return true;
+        return onFocusInEvent(static_cast<FocusEvent&>(event));
     case Event::Type::FocusOut:
-        onFocusOutEvent(static_cast<FocusEvent&>(event));
-        return true;
+        return onFocusOutEvent(static_cast<FocusEvent&>(event));
     case Event::Type::Resize:
         updateLayout();
-        onResizeEvent(static_cast<ResizeEvent&>(event));
-        return true;
+        return onResizeEvent(static_cast<ResizeEvent&>(event));
     case Event::Type::Paint: {
         m_isDirty = false;
         PaintEvent& paintEvent = static_cast<PaintEvent&>(event);
@@ -67,7 +59,7 @@ bool Widget::event(Event& event)
             PaintEvent localPaintEvent(localIntersectionArea);
             childWidget->event(localPaintEvent);
         }
-        return true;
+        return;
     }
     case Event::Type::Show:
         for (auto& child : m_children) {
@@ -77,7 +69,7 @@ bool Widget::event(Event& event)
             }
         }
         onShowEvent(event);
-        return true;
+        return;
     case Event::Type::Hide:
         for (auto& child : m_children) {
             if (child->isWidgetType()) {
@@ -86,10 +78,10 @@ bool Widget::event(Event& event)
             }
         }
         onHideEvent(event);
-        return true;
+        return;
     case Event::Type::Layout:
         updateLayout();
-        return true;
+        return;
     default:
         return CObject::event(event);
     }

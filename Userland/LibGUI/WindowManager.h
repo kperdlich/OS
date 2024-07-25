@@ -27,7 +27,7 @@ public:
     void makeActive(Window* window);
     void remove(Window& window);
 
-    virtual bool event(Event& event) override;
+    virtual void event(Event& event) override;
 
     template<typename Callback>
     void forEachVisibleWindowBackToFront(Callback callback);

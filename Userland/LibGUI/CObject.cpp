@@ -28,18 +28,15 @@ CObject::~CObject()
     }
 }
 
-bool CObject::event(Event& event)
+void CObject::event(Event& event)
 {
     switch (event.type()) {
     case Event::Type::Timer:
-        onTimerEvent(static_cast<TimerEvent&>(event));
-        return true;
+        return onTimerEvent(static_cast<TimerEvent&>(event));
     case Event::Type::DeferredDestroy:
         delete this;
-        return true;
+        return;
     }
-
-    return false;
 }
 
 int CObject::startTimer(int intervalMs)

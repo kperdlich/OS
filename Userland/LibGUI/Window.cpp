@@ -28,7 +28,7 @@ void Window::close()
     // deleteLater();
 }
 
-bool Window::event(Event& event)
+void Window::event(Event& event)
 {
     if (event.isMouseEvent()) {
         MouseEvent& mouseEvent = static_cast<MouseEvent&>(event);
@@ -67,7 +67,6 @@ bool Window::event(Event& event)
         std::cout << "Window[" << title() << "] UpdateRequest from " << updateEvent.widget()->className() << " Rect: " << updateEvent.rect().toString() << std::endl;
 #endif
         WindowManager::instance().invalidateWindowLocalRect(*this, updateEvent.rect());
-        return true;
     }
 
     return CObject::event(event);

@@ -19,7 +19,7 @@ public:
     explicit Widget(Widget* parent = nullptr);
 
     virtual const char* className() const { return "Widget"; }
-    virtual bool event(Event& event) override;
+    virtual void event(Event& event) override;
     virtual bool isWidgetType() const override;
 
     void setWindow(Window* window);

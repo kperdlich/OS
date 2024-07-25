@@ -21,7 +21,7 @@ public:
     explicit Window(CObject* parent = nullptr);
     ~Window() override;
 
-    virtual bool event(Event& event) override;
+    virtual void event(Event& event) override;
     virtual bool isWindowType() const override;
 
     void show();
