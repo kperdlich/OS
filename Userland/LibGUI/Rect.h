@@ -78,7 +78,7 @@ public:
 
     bool isEmpty() const
     {
-        return width() == 0 || height() == 0;
+        return width() <= 0 || height() <= 0;
     }
 
     inline Point position() const { return m_position; }
@@ -100,7 +100,7 @@ public:
 
     bool contains(int x, int y) const
     {
-        return x >= left() && x <= right() && y >= top() && y <= bottom();
+        return x >= left() && x < right() && y >= top() && y < bottom();
     }
 
     bool contains(const Point& point) const
@@ -123,15 +123,16 @@ public:
         const int _top = ADS::max(top(), other.top());
         const int _bottom = ADS::min(bottom(), other.bottom());
 
-        if (_left < _right && _top < _bottom) {
-            m_position.setX(_left);
-            m_position.setY(_top);
-            m_size.setWidth((_right - _left));
-            m_size.setHeight((_bottom - _top));
-        } else {
+        if (_left > _right || _top > _bottom) {
             m_position = {};
             m_size = {};
+            return;
         }
+
+        m_position.setX(_left);
+        m_position.setY(_top);
+        m_size.setWidth(_right - _left);
+        m_size.setHeight(_bottom - _top);
     }
 
     Rect intersectRect(const Rect& other) const
