@@ -64,26 +64,26 @@ static Rect windowTitleBarRect(const Window& window)
 
 static Rect windowTopOuterFrameRect(const Window& window)
 {
-    const auto& rect = window.rect();
-    return { rect.x() - FrameBorder, rect.y() - TitleBarHeight - FrameBorder, rect.width() + (2 * FrameBorder), FrameBorder };
+    const auto& rect = windowOuterFrameRect(window);
+    return { rect.x(), rect.y(), rect.width(), FrameBorder };
 }
 
 static Rect windowLeftOuterFrameRect(const Window& window)
 {
-    const auto& rect = window.rect();
-    return { rect.x() - FrameBorder, rect.y() - TitleBarHeight - FrameBorder, FrameBorder, rect.height() + TitleBarHeight + (2 * FrameBorder) };
+    const auto& rect = windowOuterFrameRect(window);
+    return { rect.x(), rect.y(), FrameBorder, rect.height() };
 }
 
 static Rect windowRightOuterFrameRect(const Window& window)
 {
-    const auto& rect = window.rect();
-    return { rect.right(), rect.y() - TitleBarHeight - FrameBorder, FrameBorder, rect.height() + TitleBarHeight + (2 * FrameBorder) };
+    const auto& rect = windowOuterFrameRect(window);
+    return { rect.right() - FrameBorder, rect.y(), FrameBorder, rect.height() };
 }
 
 static Rect windowBottomOuterFrameRect(const Window& window)
 {
-    const auto& rect = window.rect();
-    return { rect.x() - FrameBorder, rect.bottom(), rect.width() + (2 * FrameBorder), FrameBorder };
+    const auto& rect = windowOuterFrameRect(window);
+    return { rect.x(), rect.bottom() - FrameBorder, rect.width(), FrameBorder };
 }
 
 static Rect windowResizeUpLeftRect(const Window& window)
@@ -386,10 +386,10 @@ void WindowManager::flushPainting()
             return IteratorResult::Continue;
         }
 
+        paintWindowFrame(window);
         Painter painter(*m_backBuffer);
         // FIXME: Only blit pixels for updated rect
         painter.blit(window.position(), *windowBitmap);
-        paintWindowFrame(window);
         return IteratorResult::Continue;
     });
 
