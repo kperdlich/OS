@@ -25,22 +25,25 @@ ScrollArea::ScrollArea(Widget* parent)
 
 void ScrollArea::onResizeEvent(ResizeEvent& event)
 {
+
+    const int heightForHorizontalScrollBar = m_horizontalScrollBar->isVisible() ? m_horizontalScrollBar->height() : 0;
+    const int widthForVerticalScrollBar = m_verticalScrollBar->isVisible() ? m_verticalScrollBar->width() : 0;
+
     m_verticalScrollBar->setRelativeRect(
         { event.size().width() - m_verticalScrollBar->preferredSizeHint().width(),
             0,
             m_verticalScrollBar->preferredSizeHint().width(),
-            event.size().height() - m_horizontalScrollBar->height() });
+            event.size().height() - heightForHorizontalScrollBar});
 
     m_horizontalScrollBar->setRelativeRect(
         { 0,
             event.size().height() - m_horizontalScrollBar->preferredSizeHint().height(),
-            event.size().width() - m_verticalScrollBar->width(),
+            event.size().width() - widthForVerticalScrollBar,
             m_horizontalScrollBar->preferredSizeHint().height() });
 
     updateWidgetSize();
     updateScrollBars();
 }
-
 
 void ScrollArea::updateScrollBars()
 {
@@ -76,7 +79,6 @@ void ScrollArea::updateWidgetSize()
     const Size newSize = m_widget->preferredSizeHint();
     m_widget->resize(newSize);
 }
-
 
 Size ScrollArea::availableContentSize() const
 {
@@ -122,13 +124,16 @@ Size ScrollArea::preferredSizeHint() const
 
 Size ScrollArea::minSizeHint() const
 {
+    if (m_widget)
+        return m_widget->minSizeHint();
+
     return Widget::minSizeHint();
 }
 
 void ScrollArea::onPaintEvent(PaintEvent& event)
 {
 #if 0
-    Painter painter(this);
+    Painter painter(*this);
     painter.setClipRect(event.rect());
     painter.drawFilledRect(rect(), Colors::Blue);
 #endif
