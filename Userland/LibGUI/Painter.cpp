@@ -21,7 +21,7 @@ Painter::Painter(Bitmap& bitmap)
 
 Painter::Painter(Widget& widget)
     : m_targetBuffer(widget.window()->backBuffer())
-    , m_clipRect(Rect { 0, 0, m_targetBuffer->size() })
+    , m_clipRect(Rect { {}, m_targetBuffer->size() })
     , m_relativeTranslationX(widget.windowRelativeRect().x())
     , m_relativeTranslationY(widget.windowRelativeRect().y())
 
@@ -32,7 +32,7 @@ void Painter::setClipRect(const Rect& clipRect)
 {
     Rect translated = clipRect;
     translated.moveBy(m_relativeTranslationX, m_relativeTranslationY);
-    m_clipRect = Rect { 0, 0, m_targetBuffer->size() }.intersectRect(translated);
+    m_clipRect = Rect { {}, m_targetBuffer->size() }.intersectRect(translated);
 }
 
 void Painter::drawFilledRect(const Rect& rect, GUI::Color color)
@@ -177,7 +177,7 @@ static void forEachEllipsePoint(const Rect& rect, ADS::Function<void(const Point
     // Region 1
     int p = static_cast<int>(round(ry2 - (rx2 * ry) + (0.25 * rx2)));
     while (px < py) {
-        callback({x, y});
+        callback({ x, y });
 
         x++;
         px += twoRy2;
@@ -193,7 +193,7 @@ static void forEachEllipsePoint(const Rect& rect, ADS::Function<void(const Point
     // Region 2
     p = static_cast<int>(round(ry2 * (x + 0.5) * (x + 0.5) + rx2 * (y - 1) * (y - 1) - rx2 * ry2));
     while (y >= 0) {
-        callback({x, y});
+        callback({ x, y });
 
         y--;
         py -= twoRx2;
@@ -214,7 +214,7 @@ void Painter::drawEllipse(const Rect& rect, GUI::Color color)
     const Rect clippedRect = m_clipRect.intersectRect(translated);
 
     const Point center = clippedRect.center();
-    forEachEllipsePoint(clippedRect, [this, center, color](const Point& point){
+    forEachEllipsePoint(clippedRect, [this, center, color](const Point& point) {
         m_targetBuffer->setPixel(center.x() + point.x(), center.y() + point.y(), color);
         m_targetBuffer->setPixel(center.x() - point.x(), center.y() + point.y(), color);
         m_targetBuffer->setPixel(center.x() + point.x(), center.y() - point.y(), color);
@@ -235,7 +235,7 @@ void Painter::drawFilledEllipse(const Rect& rect, GUI::Color color)
     };
 
     const Point center = clippedRect.center();
-    forEachEllipsePoint(clippedRect, [center, color, drawHorizontalLine](const Point& point){
+    forEachEllipsePoint(clippedRect, [center, color, drawHorizontalLine](const Point& point) {
         drawHorizontalLine(center.x() - point.x(), center.x() + point.x(), center.y() + point.y(), color);
         drawHorizontalLine(center.x() - point.x(), center.x() + point.x(), center.y() - point.y(), color);
     });

@@ -25,6 +25,7 @@ private:
     void updateScrollBars();
     void updateWidgetSize();
     Size availableContentSize() const;
+    Rect visibleContentRect() const;
 
 private:
     Widget* m_widget { nullptr };

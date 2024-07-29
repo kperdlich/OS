@@ -25,7 +25,6 @@ ScrollArea::ScrollArea(Widget* parent)
 
 void ScrollArea::onResizeEvent(ResizeEvent& event)
 {
-
     const int heightForHorizontalScrollBar = m_horizontalScrollBar->isVisible() ? m_horizontalScrollBar->height() : 0;
     const int widthForVerticalScrollBar = m_verticalScrollBar->isVisible() ? m_verticalScrollBar->width() : 0;
 
@@ -33,7 +32,7 @@ void ScrollArea::onResizeEvent(ResizeEvent& event)
         { event.size().width() - m_verticalScrollBar->preferredSizeHint().width(),
             0,
             m_verticalScrollBar->preferredSizeHint().width(),
-            event.size().height() - heightForHorizontalScrollBar});
+            event.size().height() - heightForHorizontalScrollBar });
 
     m_horizontalScrollBar->setRelativeRect(
         { 0,
@@ -52,23 +51,15 @@ void ScrollArea::updateScrollBars()
     const int exceededHeight = ADS::max(contentSize.height() - availableSize.height(), 0);
     const int exceededWidth = ADS::max(contentSize.width() - availableSize.width(), 0);
 
-    if (exceededHeight > 0) {
-        const int step = availableSize.height() - exceededHeight;
-        m_verticalScrollBar->setPageStep(step);
-        m_verticalScrollBar->setIsVisible(true);
-        m_verticalScrollBar->setRange(0, exceededHeight);
-    } else {
-        m_verticalScrollBar->setIsVisible(false);
-    }
+    m_verticalScrollBar->setPageStep(visibleContentRect().height());
+    m_verticalScrollBar->setIsVisible(true);
+    m_verticalScrollBar->setRange(0, exceededHeight);
+    m_verticalScrollBar->setIsVisible(exceededHeight > 0);
 
-    if (exceededWidth > 0) {
-        const int step = availableSize.width() - exceededWidth;
-        m_horizontalScrollBar->setPageStep(step);
-        m_horizontalScrollBar->setIsVisible(true);
-        m_horizontalScrollBar->setRange(0, exceededWidth);
-    } else {
-        m_horizontalScrollBar->setIsVisible(false);
-    }
+    m_horizontalScrollBar->setPageStep(visibleContentRect().width());
+    m_horizontalScrollBar->setIsVisible(true);
+    m_horizontalScrollBar->setRange(0, exceededWidth);
+    m_horizontalScrollBar->setIsVisible(exceededWidth > 0);
 }
 
 void ScrollArea::updateWidgetSize()
@@ -137,6 +128,19 @@ void ScrollArea::onPaintEvent(PaintEvent& event)
     painter.setClipRect(event.rect());
     painter.drawFilledRect(rect(), Colors::Blue);
 #endif
+}
+
+Rect ScrollArea::visibleContentRect() const
+{
+    Size contentSize = size();
+    contentSize.setWidth(contentSize.width() - (m_verticalScrollBar->isVisible() ? m_verticalScrollBar->size().width() : 0));
+    contentSize.setHeight(contentSize.height() - (m_horizontalScrollBar->isVisible() ? m_horizontalScrollBar->size().height() : 0));
+
+    return {
+        m_horizontalScrollBar->value(),
+        m_verticalScrollBar->value(),
+        contentSize
+    };
 }
 
 } // GUI

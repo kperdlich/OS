@@ -20,6 +20,7 @@ public:
     [[nodiscard]] int singleStep() const { return m_singleStep; }
     [[nodiscard]] int pageStep() const { return m_pageStep; }
     [[nodiscard]] int value() const { return m_sliderValue; }
+    [[nodiscard]] bool hasSlider() const;
 
     void setSingleStep(int value) { m_singleStep = value; }
     void setPageStep(int value) { m_pageStep = value; }

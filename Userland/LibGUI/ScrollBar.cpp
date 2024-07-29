@@ -89,8 +89,10 @@ void ScrollBar::onPaintEvent(PaintEvent& event)
     downButtonPos.moveBy(3, 3);
     painter.drawCharacterBitmap(downButtonPos, scrollButtonDownBitmap(), Colors::Black);
 
-    painter.drawFilledRect(sliderRect(), Colors::DarkGrey);
-    painter.drawRect(sliderRect(), Colors::Black);
+    if (hasSlider()) {
+        painter.drawFilledRect(sliderRect(), Colors::DarkGrey);
+        painter.drawRect(sliderRect(), Colors::Black);
+    }
 }
 
 void ScrollBar::onMouseMoveEvent(MouseEvent& event)
@@ -105,20 +107,12 @@ void ScrollBar::onMouseMoveEvent(MouseEvent& event)
 void ScrollBar::onMouseDownEvent(MouseEvent& event)
 {
     if (scrollUpButtonRect().contains(event.position())) {
-        const int oldValue = m_sliderValue;
-        m_sliderValue = ADS::max(m_sliderValue - m_singleStep, m_min);
-        if (m_sliderValue != oldValue && onValueChanged)
-            onValueChanged(m_sliderValue);
-        update();
+        setValue(m_sliderValue - m_singleStep);
         return;
     }
 
     if (scrollDownButtonRect().contains(event.position())) {
-        const int oldValue = m_sliderValue;
-        m_sliderValue = ADS::min(m_sliderValue + m_singleStep, m_max);
-        if (m_sliderValue != oldValue && onValueChanged)
-            onValueChanged(m_sliderValue);
-        update();
+        setValue(m_sliderValue + m_singleStep);
         return;
     }
 
@@ -132,17 +126,11 @@ void ScrollBar::onMouseDownEvent(MouseEvent& event)
     }
 
     if (sliderRect().y() < event.y()) {
-        const int oldValue = m_sliderValue;
-        m_sliderValue = ADS::min(m_sliderValue + m_pageStep, m_max);
-        if (m_sliderValue != oldValue && onValueChanged)
-            onValueChanged(m_sliderValue);
-        update();
+        setValue(m_sliderValue + m_pageStep);
+        return;
     } else {
-        const int oldValue = m_sliderValue;
-        m_sliderValue = ADS::max(m_sliderValue - m_pageStep, m_min);
-        if (m_sliderValue != oldValue && onValueChanged)
-            onValueChanged(m_sliderValue);
-        update();
+        setValue(m_sliderValue - m_pageStep);
+        return;
     }
 }
 
@@ -155,14 +143,15 @@ void ScrollBar::onMouseUpEvent(MouseEvent& event)
 
 void ScrollBar::setRange(int min, int max)
 {
-    ASSERT(max > min);
+    ASSERT(min <= max);
+    if (m_min == min && m_max == max)
+        return;
+
     m_min = min;
     m_max = max;
 
-    const int oldValue = m_sliderValue;
-    m_sliderValue = ADS::clamp(m_sliderValue, m_min, m_max);
-    if (m_sliderValue != oldValue && onValueChanged)
-        onValueChanged(m_sliderValue);
+    const int newValue = ADS::clamp(m_sliderValue, m_min, m_max);
+    setValue(newValue);
     update();
 }
 
@@ -192,9 +181,13 @@ int ScrollBar::calculateDraggingDelta(const Point& newPosition) const
 int ScrollBar::sliderLength() const
 {
     const int range = m_max - m_min;
-    ASSERT(range > 0);
-    const int length = (m_pageStep * availableRange()) / range;
-    return length;
+    if (range > 0) {
+        // The slider length should be relative to visible page and the amount of pages.
+        const int available = availableRange();
+        const int length = (m_pageStep * available) / (range + m_pageStep);
+        return length;
+    }
+    return 0;
 }
 
 int ScrollBar::availableRange() const
@@ -238,6 +231,11 @@ Rect ScrollBar::sliderRect() const
         return { 0, scrollUpButtonRect().height() + sliderPos, preferredSizeHint().width(), sliderLength() };
 
     return { scrollUpButtonRect().width() + sliderPos, 0, sliderLength(), preferredSizeHint().height() };
+}
+
+bool ScrollBar::hasSlider() const
+{
+    return m_max != m_min;
 }
 
 Size ScrollBar::preferredSizeHint() const
