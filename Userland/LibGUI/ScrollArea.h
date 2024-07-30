@@ -29,8 +29,8 @@ private:
 
 private:
     Widget* m_widget { nullptr };
-    ScrollBar* m_verticalScrollBar { nullptr };
-    ScrollBar* m_horizontalScrollBar { nullptr };
+    ADS::OwnPtr<ScrollBar> m_verticalScrollBar;
+    ADS::OwnPtr<ScrollBar> m_horizontalScrollBar;
 };
 
 } // GUI

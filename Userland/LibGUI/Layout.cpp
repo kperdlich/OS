@@ -21,14 +21,14 @@ void Layout::addWidget(Widget& widget)
     widget.setParent(parent());
 
     if (parent())
-        Application::instance().postEvent(parent(), ADS::UniquePtr<Event>(new Event(Event::Type::Layout)));
+        Application::instance().postEvent(parent(), ADS::makeOwn<Event>(Event::Type::Layout));
 }
 
 void Layout::setSpacing(int value)
 {
     m_spacing = value;
     if (parent())
-        Application::instance().postEvent(parent(), ADS::UniquePtr<Event>(new Event(Event::Type::Layout)));
+        Application::instance().postEvent(parent(), ADS::makeOwn<Event>(Event::Type::Layout));
 }
 
 } // GUI

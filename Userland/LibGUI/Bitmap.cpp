@@ -6,30 +6,30 @@
 
 namespace GUI {
 
-ADS::UniquePtr<Bitmap> Bitmap::createWrapper(Bitmap& bitmap)
+ADS::OwnPtr<Bitmap> Bitmap::createWrapper(Bitmap& bitmap)
 {
-    return ADS::UniquePtr<Bitmap>(new Bitmap(bitmap.m_format, bitmap.m_size, bitmap.m_data, bitmap.m_dataSize, OwnBitmapData::No));
+    return ADS::OwnPtr<Bitmap>(new Bitmap(bitmap.m_format, bitmap.m_size, bitmap.m_data, bitmap.m_dataSize, OwnBitmapData::No));
 }
 
-ADS::UniquePtr<Bitmap> Bitmap::createWrapper(BitmapFormat format, Size size, char* data)
+ADS::OwnPtr<Bitmap> Bitmap::createWrapper(BitmapFormat format, Size size, char* data)
 {
     ASSERT(format == BitmapFormat::RGBA32);
     const size_t bufferSize = size.width() * size.height() * byteDensityFor(format);
-    return ADS::UniquePtr<Bitmap>(new Bitmap(format, size, data, bufferSize, OwnBitmapData::No));
+    return ADS::OwnPtr<Bitmap>(new Bitmap(format, size, data, bufferSize, OwnBitmapData::No));
 }
 
-ADS::UniquePtr<Bitmap> Bitmap::createFrom(Bitmap& bitmap)
+ADS::OwnPtr<Bitmap> Bitmap::createFrom(Bitmap& bitmap)
 {
-    ADS::UniquePtr<Bitmap> copy = create(bitmap.m_format, bitmap.m_size);
+    ADS::OwnPtr<Bitmap> copy = create(bitmap.m_format, bitmap.m_size);
     ADS::memcpy(copy->data(), bitmap.data(), bitmap.width() * bitmap.height() * byteDensityFor(bitmap.m_format));
     return copy;
 }
 
-ADS::UniquePtr<Bitmap> Bitmap::create(BitmapFormat format, Size size)
+ADS::OwnPtr<Bitmap> Bitmap::create(BitmapFormat format, Size size)
 {
     const size_t bufferSize = size.width() * size.height() * byteDensityFor(format);
     auto* buffer = new char[bufferSize];
-    return ADS::UniquePtr<Bitmap>(new Bitmap(format, size, buffer, bufferSize, OwnBitmapData::Yes));
+    return ADS::OwnPtr<Bitmap>(new Bitmap(format, size, buffer, bufferSize, OwnBitmapData::Yes));
 }
 
 Bitmap::Bitmap(BitmapFormat format, Size size, char* data, size_t dataSize, OwnBitmapData ownership)

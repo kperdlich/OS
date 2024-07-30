@@ -95,7 +95,7 @@ bool CObject::isWindowType() const
 
 void CObject::deleteLater()
 {
-    Application::instance().postEvent(this, ADS::UniquePtr<Event>(new Event(Event::Type::DeferredDestroy)));
+    Application::instance().postEvent(this, ADS::makeOwn<Event>(Event::Type::DeferredDestroy));
 }
 
 } // GUI

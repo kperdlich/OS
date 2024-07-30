@@ -1,6 +1,7 @@
 
 #include "Application.h"
 #include "Array.h"
+#include "OwnPtr.h"
 #include "BoxLayout.h"
 #include "Label.h"
 #include "Rect.h"
@@ -11,6 +12,20 @@
 
 int main()
 {
+
+    ADS::OwnPtr<int> ownPtrEmpty;
+    ASSERT(ownPtrEmpty.ptr() == nullptr);
+
+    ADS::OwnPtr<int> ownPtr = ADS::makeOwn<int>(13);
+    ASSERT(*ownPtr == 13);
+
+    ownPtrEmpty = ADS::move(ownPtr);
+    ASSERT(*ownPtrEmpty == 13);
+    ASSERT(ownPtr.ptr() == nullptr);
+
+    ownPtrEmpty.reset();
+    ASSERT(ownPtrEmpty.ptr() == nullptr);
+
     TEST::Vector<int> test;
     test.pushBack(10);
     test.pushBack(20);

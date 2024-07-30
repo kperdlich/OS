@@ -23,14 +23,14 @@ public:
     [[nodiscard]] int width() const { return m_framebuffer->size().width(); }
     [[nodiscard]] int height() const { return m_framebuffer->size().height(); };
     [[nodiscard]] Size size() const { return m_framebuffer->size(); }
-    Bitmap& framebuffer() { return *m_framebuffer.get(); }
+    Bitmap& framebuffer() { return *m_framebuffer; }
 
 private:
     Screen();
     ~Screen();
 
 private:
-    ADS::UniquePtr<Bitmap> m_framebuffer;
+    ADS::OwnPtr<Bitmap> m_framebuffer;
     SDL_Window* m_window { nullptr };
     SDL_Renderer* m_renderer { nullptr };
     SDL_Texture* m_texture { nullptr };

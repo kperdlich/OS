@@ -73,8 +73,8 @@ private:
     };
 
 private:
-    ADS::UniquePtr<Bitmap> m_frontBuffer;
-    ADS::UniquePtr<Bitmap> m_backBuffer;
+    ADS::OwnPtr<Bitmap> m_frontBuffer;
+    ADS::OwnPtr<Bitmap> m_backBuffer;
     ADS::Vector<Window*> m_windows;
     ADS::Vector<Rect> m_dirtyRects;
     Window* m_activeWindow { nullptr };

@@ -18,10 +18,10 @@ class Bitmap final {
 public:
     ~Bitmap();
 
-    static ADS::UniquePtr<Bitmap> createWrapper(BitmapFormat format, Size size, char* data);
-    static ADS::UniquePtr<Bitmap> createWrapper(Bitmap& bitmap);
-    static ADS::UniquePtr<Bitmap> createFrom(Bitmap& bitmap);
-    static ADS::UniquePtr<Bitmap> create(BitmapFormat format, Size size);
+    static ADS::OwnPtr<Bitmap> createWrapper(BitmapFormat format, Size size, char* data);
+    static ADS::OwnPtr<Bitmap> createWrapper(Bitmap& bitmap);
+    static ADS::OwnPtr<Bitmap> createFrom(Bitmap& bitmap);
+    static ADS::OwnPtr<Bitmap> create(BitmapFormat format, Size size);
 
     static int byteDensityFor(BitmapFormat format);
 

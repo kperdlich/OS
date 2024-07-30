@@ -172,7 +172,7 @@ void WindowManager::makeActive(Window* window)
     }
 
     if (m_activeWindow && m_activeWindow->focusedWidget())
-        Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusOut, FocusReason::ActiveWindow)));
+        Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::makeOwn<FocusEvent>(Event::Type::FocusOut, FocusReason::ActiveWindow));
 
     Window* const previousWindow = m_activeWindow;
     m_activeWindow = window;
@@ -182,7 +182,7 @@ void WindowManager::makeActive(Window* window)
 
     if (m_activeWindow) {
         if (m_activeWindow->focusedWidget())
-            Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusIn, FocusReason::ActiveWindow)));
+            Application::instance().postEvent(m_activeWindow->focusedWidget(), ADS::makeOwn<FocusEvent>(Event::Type::FocusIn, FocusReason::ActiveWindow));
         invalidate(*m_activeWindow);
     }
 }
@@ -320,7 +320,7 @@ void WindowManager::invalidateWindowLocalRect(Window& window, const Rect& rect)
     absoluteRect.moveBy(window.position());
     invalidate(absoluteRect);
 
-    Application::instance().postEvent(&window, ADS::UniquePtr<PaintEvent>(new PaintEvent(rect)));
+    Application::instance().postEvent(&window, ADS::makeOwn<PaintEvent>(rect));
 }
 
 void WindowManager::invalidate(Window& window)

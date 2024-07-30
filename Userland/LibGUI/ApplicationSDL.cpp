@@ -33,7 +33,7 @@ public:
         }
     }
 
-    void postEvent(CObject* receiver, ADS::UniquePtr<Event>&& event)
+    void postEvent(CObject* receiver, ADS::OwnPtr<Event>&& event)
     {
         m_eventQueue.push_back({ receiver, std::move(event) });
     }
@@ -68,18 +68,18 @@ private:
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
             case SDL_QUIT:
-                Application::instance().postEvent(nullptr, ADS::UniquePtr<Event>(new Event(Event::Type::Quit)));
+                Application::instance().postEvent(nullptr, ADS::makeOwn<Event>(Event::Type::Quit));
                 break;
             case SDL_MOUSEBUTTONUP:
                 // FIXME: map mouse buttons
-                Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<MouseEvent>(new MouseEvent(Event::Type::MouseUp, event.motion.x, event.motion.y, MouseButton::Left)));
+                Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::makeOwn<MouseEvent>(Event::Type::MouseUp, event.motion.x, event.motion.y, MouseButton::Left));
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 // FIXME: map mouse buttons
-                Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<MouseEvent>(new MouseEvent(Event::Type::MouseDown, event.motion.x, event.motion.y, MouseButton::Left)));
+                Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::makeOwn<MouseEvent>(Event::Type::MouseDown, event.motion.x, event.motion.y, MouseButton::Left));
                 break;
             case SDL_MOUSEMOTION:
-                Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<MouseEvent>(new MouseEvent(Event::Type::MouseMove, event.motion.x, event.motion.y)));
+                Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::makeOwn<MouseEvent>(Event::Type::MouseMove, event.motion.x, event.motion.y));
                 break;
             case SDL_KEYDOWN:
             case SDL_KEYUP:
@@ -190,9 +190,9 @@ private:
             modifier |= KeyboardModifier::CtrlModifier;
 
         if (event.type == SDL_KEYDOWN) {
-            Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<KeyEvent>(new KeyEvent(Event::Type::KeyDown, key, static_cast<KeyboardModifier>(modifier), text)));
+            Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::makeOwn<KeyEvent>(Event::Type::KeyDown, key, static_cast<KeyboardModifier>(modifier), text));
         } else if (event.type == SDL_KEYUP) {
-            Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::UniquePtr<KeyEvent>(new KeyEvent(Event::Type::KeyUp, key, static_cast<KeyboardModifier>(modifier), text)));
+            Application::instance().postEvent(&GUI::WindowManager::instance(), ADS::makeOwn<KeyEvent>(Event::Type::KeyUp, key, static_cast<KeyboardModifier>(modifier), text));
         }
     }
 
@@ -202,14 +202,14 @@ private:
             Timer& timer = timerEntry.second;
             if (timer.timeout > std::chrono::steady_clock::now())
                 continue;
-            postEvent(timer.owner, ADS::UniquePtr<TimerEvent>(new TimerEvent()));
+            postEvent(timer.owner, ADS::makeOwn<TimerEvent>());
             timer.timeout = std::chrono::milliseconds(timer.intervalMs) + std::chrono::steady_clock::now();
         }
     }
 
     struct QueuedEvent {
         CObject* receiver { nullptr };
-        ADS::UniquePtr<Event> event;
+        ADS::OwnPtr<Event> event;
     };
 
     struct Timer {
@@ -233,7 +233,7 @@ Application& Application::instance()
 }
 
 Application::Application()
-    : m_impl(new Application::EventLoopImpl())
+    : m_impl(ADS::makeOwn<Application::EventLoopImpl>())
 {
     ASSERT(s_instance == nullptr);
     s_instance = this;
@@ -246,7 +246,7 @@ int Application::exec()
     return m_impl->exec();
 }
 
-void Application::postEvent(CObject* receiver, ADS::UniquePtr<Event>&& event)
+void Application::postEvent(CObject* receiver, ADS::OwnPtr<Event>&& event)
 {
     m_impl->postEvent(receiver, std::move(event));
 }

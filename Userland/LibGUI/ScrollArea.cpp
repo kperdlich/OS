@@ -11,12 +11,12 @@ namespace GUI {
 ScrollArea::ScrollArea(Widget* parent)
     : Widget(parent)
 {
-    m_verticalScrollBar = new ScrollBar(Orientation::Vertical, this);
+    m_verticalScrollBar = ADS::makeOwn<ScrollBar>(Orientation::Vertical, this);
     m_verticalScrollBar->onValueChanged = [this](int value) {
         m_widget->moveTo(m_widget->relativePosition().x(), -value);
         update();
     };
-    m_horizontalScrollBar = new ScrollBar(Orientation::Horizontal, this);
+    m_horizontalScrollBar = ADS::makeOwn<ScrollBar>(Orientation::Horizontal, this);
     m_horizontalScrollBar->onValueChanged = [this](int value) {
         m_widget->moveTo(-value, m_widget->relativePosition().y());
         update();

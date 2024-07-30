@@ -156,12 +156,12 @@ void Window::setFocusedWidget(Widget* widget, FocusReason reason)
         return;
 
     if (m_focusedWidget)
-        Application::instance().postEvent(m_focusedWidget, ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusOut, reason)));
+        Application::instance().postEvent(m_focusedWidget, ADS::makeOwn<FocusEvent>(Event::Type::FocusOut, reason));
 
     m_focusedWidget = widget;
 
     if (m_focusedWidget)
-        Application::instance().postEvent(m_focusedWidget, ADS::UniquePtr<FocusEvent>(new FocusEvent(Event::Type::FocusIn, reason)));
+        Application::instance().postEvent(m_focusedWidget, ADS::makeOwn<FocusEvent>(Event::Type::FocusIn, reason));
 }
 
 bool Window::isActive() const

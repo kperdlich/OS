@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include "Assert.h"
+#include "Move.h"
+#include "OwnPtr.h"
 #include <cassert>
 #include <cstring>
 #include <functional>
@@ -13,8 +16,6 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
-
-#define ASSERT(X) assert(X)
 
 namespace ADS {
 
@@ -28,9 +29,6 @@ using WeakPtr = std::weak_ptr<T>;
 
 template<typename T>
 using SharedPtr = std::shared_ptr<T>;
-
-template<typename T>
-using UniquePtr = std::unique_ptr<T>;
 
 template<typename T>
 using Optional = std::optional<T>;

@@ -52,10 +52,10 @@ public:
 
     bool isActive() const;
 
-    Bitmap* backBuffer() { return m_backBuffer.get(); }
+    Bitmap* backBuffer() { return m_backBuffer.ptr(); }
 
 private:
-    ADS::UniquePtr<Bitmap> m_backBuffer;
+    ADS::OwnPtr<Bitmap> m_backBuffer;
     ADS::String m_title {};
     Rect m_rect { 100, 100, 640, 480 };
     Widget* m_centralWidget { nullptr };
