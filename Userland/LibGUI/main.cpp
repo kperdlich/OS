@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "Array.h"
 #include "OwnPtr.h"
+#include "RefPtr.h"
 #include "BoxLayout.h"
 #include "Label.h"
 #include "Rect.h"
@@ -13,7 +14,9 @@
 int main()
 {
 
-    ADS::OwnPtr<int> ownPtrEmpty;
+    /************* OwnPtr tests *************/
+    ADS::OwnPtr<int> ownPtrDefault;
+    ADS::OwnPtr<int> ownPtrEmpty = nullptr;
     ASSERT(ownPtrEmpty.ptr() == nullptr);
 
     ADS::OwnPtr<int> ownPtr = ADS::makeOwn<int>(13);
@@ -26,6 +29,24 @@ int main()
     ownPtrEmpty.clear();
     ASSERT(ownPtrEmpty.ptr() == nullptr);
 
+    /************* RefPtr tests *************/
+    ADS::RefPtr<int> refPtrDefault = nullptr;
+    ADS::RefPtr<int> refPtr = nullptr;
+    ASSERT(refPtr.refCount() == 0);
+    ASSERT(refPtrDefault.refCount() == 0);
+
+    ADS::RefPtr<int> refPtrInt = ADS::makeRef<int>(2);
+    ASSERT(*refPtrInt == 2);
+    ASSERT(refPtrInt.refCount() == 1);
+    {
+        ADS::RefPtr<int> refPtrIntCopy = refPtrInt;
+        ASSERT(*refPtrIntCopy == 2);
+        ASSERT(refPtrIntCopy.refCount() == 2);
+        ASSERT(refPtrInt == refPtrIntCopy);
+    }
+    ASSERT(refPtrInt.refCount() == 1);
+
+    /************* Vector tests *************/
     TEST::Vector<int> test;
     test.pushBack(10);
     test.pushBack(20);
@@ -53,8 +74,9 @@ int main()
         std::cout << it << std::endl;
     }
 
-    GUI::Application app;
 
+    /************* LibGUI tests *************/
+    GUI::Application app;
     {
         GUI::Widget* buttonListLayoutWidget = new GUI::Widget();
         GUI::VBoxLayout* buttonList = new GUI::VBoxLayout(buttonListLayoutWidget);
