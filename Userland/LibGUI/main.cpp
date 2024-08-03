@@ -23,7 +23,7 @@ int main()
     ASSERT(*ownPtrEmpty == 13);
     ASSERT(ownPtr.ptr() == nullptr);
 
-    ownPtrEmpty.reset();
+    ownPtrEmpty.clear();
     ASSERT(ownPtrEmpty.ptr() == nullptr);
 
     TEST::Vector<int> test;

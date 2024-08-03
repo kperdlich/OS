@@ -32,7 +32,7 @@ public:
 
     ~OwnPtr()
     {
-        reset();
+        clear();
     }
 
     const T* ptr() const { return m_ptr; }
@@ -63,8 +63,9 @@ public:
         return *this;
     }
 
-    void reset()
+    void clear()
     {
+        // FIXME: Add custom deleter
         delete m_ptr;
         m_ptr = nullptr;
     }
