@@ -14,6 +14,8 @@ class OwnPtr {
 public:
     OwnPtr() = default;
 
+    OwnPtr(ADS::nullptr_t) {};
+
     explicit OwnPtr(T* ptr)
         : m_ptr(ptr)
     {

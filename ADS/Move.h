@@ -6,7 +6,7 @@
 
 namespace ADS {
 
-template <typename T>
+template<typename T>
 T&& move(T& arg)
 {
     return static_cast<T&&>(arg);
@@ -22,5 +22,7 @@ T&& forward(typename RemoveReference<T>::Type& param)
 {
     return static_cast<T&&>(param);
 }
+
+typedef decltype(nullptr) nullptr_t;
 
 }
