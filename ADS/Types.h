@@ -7,6 +7,7 @@
 #include "Assert.h"
 #include "Move.h"
 #include "OwnPtr.h"
+#include "RefPtr.h"
 #include <cassert>
 #include <cstring>
 #include <functional>
@@ -23,12 +24,6 @@ using String = std::string;
 
 template<typename T>
 using Function = std::function<T>;
-
-template<typename T>
-using WeakPtr = std::weak_ptr<T>;
-
-template<typename T>
-using SharedPtr = std::shared_ptr<T>;
 
 template<typename T>
 using Optional = std::optional<T>;

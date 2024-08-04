@@ -1,11 +1,11 @@
 
 #include "Application.h"
 #include "Array.h"
-#include "OwnPtr.h"
-#include "RefPtr.h"
 #include "BoxLayout.h"
 #include "Label.h"
+#include "OwnPtr.h"
 #include "Rect.h"
+#include "RefPtr.h"
 #include "ScrollArea.h"
 #include "TextBox.h"
 #include "Vector.h"
@@ -13,38 +13,82 @@
 
 int main()
 {
-
     /************* OwnPtr tests *************/
-    ADS::OwnPtr<int> ownPtrDefault;
-    ADS::OwnPtr<int> ownPtrEmpty = nullptr;
-    ASSERT(ownPtrEmpty.ptr() == nullptr);
+    {
+        ADS::OwnPtr<int> ownPtrDefault;
+        ADS::OwnPtr<int> ownPtrEmpty = nullptr;
+        ASSERT(ownPtrEmpty.ptr() == nullptr);
 
-    ADS::OwnPtr<int> ownPtr = ADS::makeOwn<int>(13);
-    ASSERT(*ownPtr == 13);
+        ADS::OwnPtr<int> ownPtr = ADS::makeOwn<int>(13);
+        ASSERT(*ownPtr == 13);
 
-    ownPtrEmpty = ADS::move(ownPtr);
-    ASSERT(*ownPtrEmpty == 13);
-    ASSERT(ownPtr.ptr() == nullptr);
+        ownPtrEmpty = ADS::move(ownPtr);
+        ASSERT(*ownPtrEmpty == 13);
+        ASSERT(ownPtr.ptr() == nullptr);
 
-    ownPtrEmpty.clear();
-    ASSERT(ownPtrEmpty.ptr() == nullptr);
+        ownPtrEmpty.clear();
+        ASSERT(ownPtrEmpty.ptr() == nullptr);
+    }
 
     /************* RefPtr tests *************/
-    ADS::RefPtr<int> refPtrDefault = nullptr;
-    ADS::RefPtr<int> refPtr = nullptr;
-    ASSERT(refPtr.refCount() == 0);
-    ASSERT(refPtrDefault.refCount() == 0);
-
-    ADS::RefPtr<int> refPtrInt = ADS::makeRef<int>(2);
-    ASSERT(*refPtrInt == 2);
-    ASSERT(refPtrInt.refCount() == 1);
     {
-        ADS::RefPtr<int> refPtrIntCopy = refPtrInt;
-        ASSERT(*refPtrIntCopy == 2);
-        ASSERT(refPtrIntCopy.refCount() == 2);
-        ASSERT(refPtrInt == refPtrIntCopy);
+        ADS::RefPtr<int> refPtrDefault = nullptr;
+        ADS::RefPtr<int> refPtr = nullptr;
+        ASSERT(refPtr.refCount() == 0);
+        ASSERT(refPtrDefault.refCount() == 0);
+
+        ADS::RefPtr<int> refPtrInt = ADS::makeRef<int>(2);
+        ASSERT(*refPtrInt == 2);
+        ASSERT(refPtrInt.refCount() == 1);
+        {
+            ADS::RefPtr<int> refPtrIntCopy = refPtrInt;
+            ASSERT(*refPtrIntCopy == 2);
+            ASSERT(refPtrIntCopy.refCount() == 2);
+            ASSERT(refPtrInt == refPtrIntCopy);
+        }
+        ASSERT(refPtrInt.refCount() == 1);
     }
-    ASSERT(refPtrInt.refCount() == 1);
+
+    /************* WeakPtr tests *************/
+    {
+        ADS::WeakPtr<int> weakPtrDefault;
+        ASSERT(weakPtrDefault.refCount() == 0);
+        ASSERT(weakPtrDefault.isNull());
+
+        ADS::WeakPtr<int> weakPtrNull = nullptr;
+        ASSERT(weakPtrNull.refCount() == 0);
+        ASSERT(weakPtrNull.isNull());
+
+        ADS::RefPtr<int> refPtrEmpty = nullptr;
+        ADS::WeakPtr<int> weakPtrEmptyRefPtr = refPtrEmpty;
+        ASSERT(weakPtrEmptyRefPtr.refCount() == 0);
+        ASSERT(weakPtrEmptyRefPtr.isNull());
+
+        ADS::RefPtr<int> refPtrInt = ADS::makeRef<int>(30);
+        ADS::WeakPtr<int> weakPtrInt = refPtrInt;
+        ASSERT(weakPtrInt.refCount() == 1);
+        ASSERT(!weakPtrInt.isNull());
+        {
+            if (ADS::RefPtr scopedRefPtrInt = weakPtrInt.lock()) {
+                ASSERT(scopedRefPtrInt.refCount() == 2);
+                ASSERT(refPtrInt.refCount() == 2);
+                ASSERT(weakPtrInt.refCount() == 2);
+                ASSERT(*scopedRefPtrInt == 30);
+            } else {
+                ASSERT(false);
+            }
+            ASSERT(refPtrInt.refCount() == 1);
+        }
+
+        ASSERT(weakPtrInt.refCount() == 1);
+        ASSERT(!weakPtrInt.isNull());
+        weakPtrInt.clear();
+        ASSERT(weakPtrInt.isNull());
+        ASSERT(weakPtrInt.refCount() == 0);
+
+        ADS::RefPtr emptyRefPtr = weakPtrInt.lock();
+        ASSERT(emptyRefPtr == nullptr);
+    }
 
     /************* Vector tests *************/
     TEST::Vector<int> test;
@@ -73,7 +117,6 @@ int main()
     for (auto it : vector) {
         std::cout << it << std::endl;
     }
-
 
     /************* LibGUI tests *************/
     GUI::Application app;
