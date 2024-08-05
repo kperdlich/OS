@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "Iterator.h"
-#include "ReverseIterator.h"
 #include "Types.h"
 #include "initializer_list"
 
@@ -14,9 +12,161 @@ namespace TEST {
 template<typename T>
 class Vector {
 public:
-    using Iterator = ADS::Iterator<Vector, T>;
-    using ReverseIterator = ADS::ReverseIterator<Vector, T>;
+    class Iterator {
+    public:
+        Iterator(Vector& vector, size_t index)
+            : m_vector(vector)
+            , m_index(index)
+        {
+        }
 
+        Iterator operator++()
+        {
+            ++m_index;
+            return *this;
+        }
+
+        Iterator operator++(int)
+        {
+            ++m_index;
+            return *this;
+        }
+
+        Iterator operator--()
+        {
+            --m_index;
+            return *this;
+        }
+
+        Iterator operator--(int)
+        {
+            --m_index;
+            return *this;
+        }
+
+        const T& operator*() const
+        {
+            return m_vector[m_index];
+        }
+
+        T& operator*()
+        {
+            return m_vector[m_index];
+        }
+
+        bool operator!=(Iterator other) const
+        {
+            return m_index != other.m_index;
+        }
+
+        bool operator==(Iterator other) const
+        {
+            return m_index == other.m_index;
+        }
+
+        bool operator>(Iterator other) const
+        {
+            return m_index > other.m_index;
+        }
+
+        bool operator<(Iterator other) const
+        {
+            return m_index < other.m_index;
+        }
+
+        bool operator>=(Iterator other) const
+        {
+            return m_index >= other.m_index;
+        }
+
+        bool operator<=(Iterator other) const
+        {
+            return m_index <= other.m_index;
+        }
+
+    private:
+        Vector& m_vector;
+        size_t m_index { 0 };
+    };
+
+    class ReverseIterator {
+    public:
+        ReverseIterator(Vector& vector, int index)
+            : m_vector(vector)
+            , m_index(index)
+        {
+        }
+
+        ReverseIterator operator++()
+        {
+            --m_index;
+            return *this;
+        }
+
+        ReverseIterator operator++(int)
+        {
+            --m_index;
+            return *this;
+        }
+
+        ReverseIterator operator--()
+        {
+            ++m_index;
+            return *this;
+        }
+
+        ReverseIterator operator--(int)
+        {
+            ++m_index;
+            return *this;
+        }
+
+        const T& operator*() const
+        {
+            return m_vector[m_index];
+        }
+
+        T& operator*()
+        {
+            return m_vector[m_index];
+        }
+
+        bool operator!=(ReverseIterator other) const
+        {
+            return m_index != other.m_index;
+        }
+
+        bool operator==(ReverseIterator other) const
+        {
+            return m_index == other.m_index;
+        }
+
+        bool operator>(ReverseIterator other) const
+        {
+            return m_index > other.m_index;
+        }
+
+        bool operator<(ReverseIterator other) const
+        {
+            return m_index < other.m_index;
+        }
+
+        bool operator>=(ReverseIterator other) const
+        {
+            return m_index >= other.m_index;
+        }
+
+        bool operator<=(ReverseIterator other) const
+        {
+            return m_index <= other.m_index;
+        }
+
+    private:
+        Vector& m_vector;
+        int m_index { 0 };
+    };
+
+public:
     static constexpr size_t s_capacityIncrement = 5;
 
     Vector() = default;
@@ -88,24 +238,24 @@ public:
         --m_size;
     }
 
-    inline Iterator end()
-    {
-        return Iterator::end(*this);
-    }
-
     inline Iterator begin()
     {
-        return Iterator::begin(*this);
+        return { *this, 0 };
+    }
+
+    inline Iterator end()
+    {
+        return { *this, size() };
     }
 
     inline ReverseIterator rend()
     {
-        return ReverseIterator::end(*this);
+        return { *this, -1 };
     }
 
     inline ReverseIterator rbegin()
     {
-        return ReverseIterator::begin(*this);
+        return { *this, static_cast<int>(size()) - 1 };
     }
 
     inline const T& operator[](int index) const
