@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "Array.h"
 #include "BoxLayout.h"
+#include "DoublyLinkedList.h"
 #include "Label.h"
 #include "OwnPtr.h"
 #include "Rect.h"
@@ -106,7 +107,6 @@ int main()
         filledList.add(30);
         filledList.add(ADS::move(test));
         ASSERT(!filledList.isEmpty());
-        std::cout << "/************* SinglyLinkedList tests *************/" << std::endl;
         for (auto item : filledList) {
             std::cout << item << std::endl;
         }
@@ -123,6 +123,41 @@ int main()
         filledList.clear();
         ASSERT(filledList.isEmpty());
     }
+
+    /************* DoublyLinkedList tests *************/
+    {
+        ADS::DoublyLinkedList<int> emptyList;
+        ASSERT(emptyList.isEmpty());
+        for (auto item : emptyList) {
+            ASSERT(false);
+        }
+    }
+
+    {
+        ADS::DoublyLinkedList<int> filledList;
+        int test = 20;
+        filledList.add(10);
+        filledList.add(30);
+        filledList.add(ADS::move(test));
+        ASSERT(!filledList.isEmpty());
+        for (auto item : filledList) {
+            std::cout << item << std::endl;
+        }
+        auto iterator = filledList.find(30);
+        ASSERT(iterator != filledList.end());
+        ASSERT(*iterator == 30);
+        ASSERT(*(--iterator) == 10);
+        ASSERT(filledList.remove(iterator));
+        ASSERT(!filledList.remove(filledList.end()));
+        ASSERT(filledList.remove(filledList.begin()));
+        ASSERT(filledList.find(20) != filledList.end());
+        for (auto item : filledList) {
+            ASSERT(item == 20);
+        }
+        filledList.clear();
+        ASSERT(filledList.isEmpty());
+    }
+
 
     /************* Vector tests *************/
     std::cout << "/************* Vector tests *************/" << std::endl;
