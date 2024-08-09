@@ -27,8 +27,6 @@ private:
 
 public:
     class Iterator {
-        friend class HashMap;
-
     public:
         enum class LookForFirstEntry {
             Yes,
@@ -110,8 +108,6 @@ public:
     };
 
     class ConstIterator {
-        friend class HashMap;
-
     public:
         enum class LookForFirstEntry {
             Yes,
