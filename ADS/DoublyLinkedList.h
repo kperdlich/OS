@@ -27,6 +27,11 @@ public:
         friend class DoublyLinkedList;
 
     public:
+        static Iterator end()
+        {
+            return Iterator(nullptr);
+        }
+
         Iterator(Node* node)
             : m_node(node)
         {
@@ -36,6 +41,16 @@ public:
         {
             ASSERT(m_node != nullptr);
             return m_node->m_data;
+        }
+
+        const T* operator->() const
+        {
+            return &m_node->m_data;
+        }
+
+        T* operator->()
+        {
+            return &m_node->m_data;
         }
 
         Iterator& operator++()
@@ -68,12 +83,17 @@ public:
         friend class DoublyLinkedList;
 
     public:
+        static ConstIterator end()
+        {
+            return ConstIterator(nullptr);
+        }
+
         ConstIterator(Node* node)
             : m_node(node)
         {
         }
 
-        const T& operator*()
+        const T& operator*() const
         {
             ASSERT(m_node != nullptr);
             return m_node->m_data;
@@ -91,12 +111,12 @@ public:
             return *this;
         }
 
-        bool operator==(const ConstIterator& other)
+        bool operator==(const ConstIterator& other) const
         {
             return m_node == other.m_node;
         }
 
-        bool operator!=(const ConstIterator& other)
+        bool operator!=(const ConstIterator& other) const
         {
             return m_node != other.m_node;
         }
@@ -119,6 +139,7 @@ public:
     {
         other.m_head = nullptr;
         other.m_tail = nullptr;
+        other.m_size = 0;
     }
 
     DoublyLinkedList& operator=(const DoublyLinkedList& other) = delete;
@@ -130,6 +151,7 @@ public:
             m_tail = other.m_tail;
             other.m_head = nullptr;
             other.m_tail = nullptr;
+            other.m_size = 0;
         }
     }
 
@@ -156,6 +178,23 @@ public:
             node->m_prev = m_tail;
             m_tail = node;
         }
+    }
+
+    template<typename Predicate>
+    size_t removeIf(Predicate&& pred)
+    {
+        size_t removedElements = 0;
+        for (Iterator it = begin(); it != end();) {
+            if (pred(it)) {
+                Iterator elementToDelete = it;
+                ++it;
+                remove(elementToDelete);
+                ++removedElements;
+            } else {
+                ++it;
+            }
+        }
+        return removedElements;
     }
 
     bool remove(const Iterator& iterator)
@@ -214,6 +253,15 @@ public:
         return m_head == nullptr;
     }
 
+    // Returns the number of items in the list in O(n).
+    size_t size() const
+    {
+        size_t size = 0;
+        for (auto it = begin(); it != end(); ++it)
+            ++size;
+        return size;
+    }
+
     Iterator begin()
     {
         return Iterator(m_head);
@@ -221,7 +269,7 @@ public:
 
     Iterator end()
     {
-        return Iterator(nullptr);
+        return Iterator::end();
     }
 
     ConstIterator begin() const
