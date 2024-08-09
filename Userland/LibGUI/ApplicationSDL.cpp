@@ -4,6 +4,7 @@
 
 #include "Application.h"
 #include "Event.h"
+#include "HashMap.h"
 #include "Screen.h"
 #include "WindowManager.h"
 
@@ -46,7 +47,8 @@ public:
             .timeout = std::chrono::steady_clock::now() + std::chrono::milliseconds(intervalMs),
             .owner = &object
         };
-        m_timers[timer.timerId] = timer;
+
+        m_timers.set(timer.timerId, timer);
 
         // FIXME: Handle overflow
         ++m_nextTimerId;
@@ -58,7 +60,7 @@ public:
         if (!m_timers.contains(timerId))
             return;
 
-        m_timers.erase(timerId);
+        m_timers.remove(timerId);
     }
 
 private:
@@ -199,7 +201,7 @@ private:
     void updateTimer()
     {
         for (auto& timerEntry : m_timers) {
-            Timer& timer = timerEntry.second;
+            Timer& timer = timerEntry.value;
             if (timer.timeout > std::chrono::steady_clock::now())
                 continue;
             postEvent(timer.owner, ADS::makeOwn<TimerEvent>());
