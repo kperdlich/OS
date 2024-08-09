@@ -3,6 +3,7 @@
 #include "Array.h"
 #include "BoxLayout.h"
 #include "DoublyLinkedList.h"
+#include "HashMap.h"
 #include "Label.h"
 #include "OwnPtr.h"
 #include "Rect.h"
@@ -140,6 +141,7 @@ int main()
         filledList.add(30);
         filledList.add(ADS::move(test));
         ASSERT(!filledList.isEmpty());
+        ASSERT(filledList.size() == 3);
         for (auto item : filledList) {
             std::cout << item << std::endl;
         }
@@ -148,14 +150,76 @@ int main()
         ASSERT(*iterator == 30);
         ASSERT(*(--iterator) == 10);
         ASSERT(filledList.remove(iterator));
+        ASSERT(filledList.size() == 2);
         ASSERT(!filledList.remove(filledList.end()));
         ASSERT(filledList.remove(filledList.begin()));
+        ASSERT(filledList.size() == 1);
         ASSERT(filledList.find(20) != filledList.end());
         for (auto item : filledList) {
             ASSERT(item == 20);
         }
         filledList.clear();
+        ASSERT(filledList.size() == 0);
         ASSERT(filledList.isEmpty());
+    }
+
+    /************* HashMap tests *************/
+    {
+        ADS::HashMap<int, int> map;
+        for (auto& entry : map)
+            ASSERT(false);
+        ASSERT(map.isEmpty());
+        map.set(1, 10);
+        ASSERT(!map.isEmpty());
+        ASSERT(map.contains(1));
+        ASSERT(!map.contains(2));
+        ASSERT(map.getValueOrDefault(1, -1) == 10);
+        ASSERT(map.getValueOrDefault(2, -1) == -1);
+        {
+            int test;
+            ASSERT(map.tryGetValue(1, test));
+            ASSERT(test == 10);
+            ASSERT(!map.tryGetValue(2, test));
+        }
+
+        {
+            map.set(10, 20);
+            ASSERT(map.contains(10));
+            ASSERT(map.size() == 2);
+            ASSERT(map.remove(10) == 1);
+            ASSERT(map.remove(100) == 0);
+            ASSERT(map.size() == 1);
+        }
+        // Rehash tests
+        {
+            map.clear();
+            ASSERT(map.isEmpty());
+            map.set(1, 20);
+            map.set(2, 20);
+            map.set(3, 20);
+            map.set(4, 20);
+            map.set(5, 20);
+            map.set(6, 20);
+
+            ASSERT(map.contains(1));
+            ASSERT(map.contains(2));
+            ASSERT(map.contains(3));
+            ASSERT(map.contains(4));
+            ASSERT(map.contains(5));
+            ASSERT(map.contains(6));
+
+            std::cout << "HashMap iterator:" << std::endl;
+            for (auto& entry : map)
+                std::cout << "[" << entry.key << " -> " << entry.value << "]" << std::endl;
+
+
+            const ADS::HashMap<int, int> constMap = ADS::move(map);
+            std::cout << "HashMap ConstIterator:" << std::endl;
+            for (const auto& entry : constMap)
+                std::cout << "[" << entry.key << " -> " << entry.value << "]" << std::endl;
+
+            std::cout << "HashMap: " << map.toString() << std::endl;
+        }
     }
 
 
