@@ -4,83 +4,20 @@
 
 #pragma once
 
-#include "Assert.h"
-#include "Move.h"
-#include "OwnPtr.h"
-#include "RefPtr.h"
-#include <cassert>
-#include <cstring>
-#include <functional>
-#include <iostream>
-#include <memory>
-#include <optional>
-#include <thread>
-#include <unordered_map>
-#include <vector>
+#include <stdint.h>
 
 namespace ADS {
 
-using String = std::string;
+typedef decltype(sizeof(0)) size_t; // valid since C++11
+typedef signed int ssize_t;
 
-template<typename T>
-using Function = std::function<T>;
+typedef uint8_t uint8;
+typedef uint16_t uint16;
+typedef uint32_t uint32;
+typedef uint64_t uint64;
 
-template<typename T>
-using Optional = std::optional<T>;
-
-template<typename T>
-using Vector = std::vector<T>;
-
-template<typename T>
-using LockGuard = std::lock_guard<T>;
-
-template<typename Key, typename Value>
-using HashMap = std::unordered_map<Key, Value>;
-
-using Mutex = std::mutex;
-
-inline void* memcpy(void* dest, const void* src, std::size_t count)
-{
-    return std::memcpy(dest, src, count);
-}
-
-inline void* memset(void* s, int c, size_t n)
-{
-    return std::memset(s, c, n);
-}
-
-template<typename T>
-T abs(T value)
-{
-    return std::abs(value);
-}
-
-template<typename T>
-void swap(T& a, T& b)
-{
-    std::swap(a, b);
-}
-
-template<typename T>
-T min(T a, T b)
-{
-    if (a < b)
-        return a;
-    return b;
-}
-
-template<typename T>
-T max(T a, T b)
-{
-    if (a > b)
-        return a;
-    return b;
-}
-
-template<typename T>
-T clamp(T value, T low, T high)
-{
-    return max(low, min(value, high));
-}
-
+typedef int8_t int8;
+typedef int16_t int16;
+typedef int32_t int32;
+typedef int64_t int64;
 }
