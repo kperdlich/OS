@@ -182,7 +182,7 @@ int ScrollBar::sliderLength() const
 {
     const int range = m_max - m_min;
     if (range > 0) {
-        // The slider length should be relative to visible page and the amount of pages.
+        // The slider length should be relative to the visible page and the amount of pages.
         const int available = availableRange();
         const int length = (m_pageStep * available) / (range + m_pageStep);
         return length;
