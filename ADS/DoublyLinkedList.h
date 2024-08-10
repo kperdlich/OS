@@ -139,7 +139,6 @@ public:
     {
         other.m_head = nullptr;
         other.m_tail = nullptr;
-        other.m_size = 0;
     }
 
     DoublyLinkedList& operator=(const DoublyLinkedList& other) = delete;
@@ -151,7 +150,6 @@ public:
             m_tail = other.m_tail;
             other.m_head = nullptr;
             other.m_tail = nullptr;
-            other.m_size = 0;
         }
     }
 
