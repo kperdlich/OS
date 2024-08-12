@@ -7,6 +7,7 @@
 #include "Assert.h"
 #include "Move.h"
 #include "OwnPtr.h"
+#include "Function.h"
 #include "RefPtr.h"
 #include "Types.h"
 #include <cassert>
@@ -22,9 +23,6 @@
 namespace ADS {
 
 using String = std::string;
-
-template<typename T>
-using Function = std::function<T>;
 
 template<typename T>
 using Optional = std::optional<T>;

@@ -87,11 +87,11 @@ public:
         return *m_ptr;
     }
 
-    bool operator!() { return !m_ptr; }
-    operator bool() { return m_ptr; }
+    bool operator!() const { return !m_ptr; }
+    operator bool() const { return m_ptr; }
 
-    bool operator==(T* ptr) { return m_ptr == ptr; }
-    bool operator!=(T* ptr) { return m_ptr != ptr; }
+    bool operator==(T* ptr) const { return m_ptr == ptr; }
+    bool operator!=(T* ptr) const { return m_ptr != ptr; }
 
 private:
     T* m_ptr { nullptr };

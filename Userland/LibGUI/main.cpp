@@ -16,6 +16,19 @@
 
 int main()
 {
+    /************* Function tests *************/
+    {
+        constexpr const int expectedIntValue = 10;
+
+        ADS::Function<int(int)> fx = [expectedIntValue](int x) -> int {
+            ASSERT(x == expectedIntValue);
+            return x;
+        };
+        ASSERT(fx(expectedIntValue) == expectedIntValue);
+
+        ADS::Function<int(int)> movedFx = ADS::move(fx);
+        ASSERT(movedFx(expectedIntValue) == expectedIntValue);
+    }
     /************* OwnPtr tests *************/
     {
         ADS::OwnPtr<int> ownPtrDefault;
@@ -212,7 +225,6 @@ int main()
             for (auto& entry : map)
                 std::cout << "[" << entry.key << " -> " << entry.value << "]" << std::endl;
 
-
             const ADS::HashMap<int, int> constMap = ADS::move(map);
             std::cout << "HashMap ConstIterator:" << std::endl;
             for (const auto& entry : constMap)
@@ -221,7 +233,6 @@ int main()
             std::cout << "HashMap: " << map.toString() << std::endl;
         }
     }
-
 
     /************* Vector tests *************/
     std::cout << "/************* Vector tests *************/" << std::endl;
