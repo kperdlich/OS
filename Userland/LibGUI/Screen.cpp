@@ -11,11 +11,11 @@ static const int internalHeight = 720;
 
 Screen::Screen()
 {
-    const ADS::String title = "OS GUI Emulator";
+    constexpr const char* title = "OS GUI Emulator";
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 
-    m_window = SDL_CreateWindow(title.c_str(),
+    m_window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, internalWidth, internalHeight, 0);
 
     m_renderer = SDL_CreateRenderer(m_window, -1, 0);

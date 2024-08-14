@@ -106,7 +106,7 @@ void TextBox::onPaintEvent(PaintEvent& event)
         painter.drawFilledRect(selectionRect(), Colors::Blue);
     }
 
-    const ADS::String visibleText = m_text.substr(m_scrollOffset, ADS::min(static_cast<int>(m_text.length()) - m_scrollOffset, maxVisibleChars()));
+    const ADS::String visibleText = m_text.substring(m_scrollOffset, ADS::min(static_cast<int>(m_text.length()) - m_scrollOffset, maxVisibleChars()));
     for (size_t i = 0; i < visibleText.length(); ++i) {
         Rect charRect = innerRect();
         charRect.moveBy(static_cast<int>(i) * fontWidth(), 0);
@@ -163,7 +163,7 @@ void TextBox::onKeyDownEvent(KeyEvent& event)
 
     if (event.text().length() > 0) {
         if (m_cursor.hasSelection()) {
-            m_text.erase(m_cursor.selectionStart(), m_cursor.selectionEnd() - m_cursor.selectionStart());
+            m_text.remove(m_cursor.selectionStart(), m_cursor.selectionEnd() - m_cursor.selectionStart());
             m_cursor.setPosition(m_cursor.selectionStart());
             m_cursor.clearSelection();
         }
@@ -254,7 +254,7 @@ void TextBox::removeSelectedText()
 {
     ASSERT(m_cursor.hasSelection());
     const int newCursorPos = m_cursor.selectionStart();
-    m_text.erase(m_cursor.selectionStart(), m_cursor.selectionEnd() - m_cursor.selectionStart());
+    m_text.remove(m_cursor.selectionStart(), m_cursor.selectionEnd() - m_cursor.selectionStart());
     m_cursor.setPosition(newCursorPos);
     m_cursor.clearSelection();
     scrollCursorIntoView();
@@ -263,7 +263,7 @@ void TextBox::removeSelectedText()
 
 void TextBox::selectAll()
 {
-    if (m_text.empty())
+    if (m_text.isEmpty())
         return;
 
     const int textLength = static_cast<int>(m_text.length());
@@ -336,7 +336,7 @@ void TextBox::handleKeyBackspace(KeyEvent& event)
         removeSelectedText();
     } else if (m_cursor.position() > 0 && m_text.length() > 0) {
         m_cursor.moveCursorLeft();
-        m_text.erase(m_cursor.position(), 1);
+        m_text.remove(m_cursor.position(), 1);
         m_scrollOffset = ADS::max(m_scrollOffset - 1, 0);
     }
     update();
@@ -353,7 +353,7 @@ void TextBox::cleanup()
 
 Size TextBox::preferredSizeHint() const
 {
-    if (m_text.empty())
+    if (m_text.isEmpty())
         return minSizeHint();
 
     Size size = minSizeHint();

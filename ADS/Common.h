@@ -5,9 +5,9 @@
 #pragma once
 
 #include "Assert.h"
+#include "Function.h"
 #include "Move.h"
 #include "OwnPtr.h"
-#include "Function.h"
 #include "RefPtr.h"
 #include "Types.h"
 #include <cassert>
@@ -18,11 +18,8 @@
 #include <optional>
 #include <thread>
 #include <unordered_map>
-#include <vector>
 
 namespace ADS {
-
-using String = std::string;
 
 template<typename T>
 using Optional = std::optional<T>;
@@ -43,6 +40,31 @@ inline void* memcpy(void* dest, const void* src, std::size_t count)
 inline void* memset(void* s, int c, size_t n)
 {
     return std::memset(s, c, n);
+}
+
+inline size_t strlen(const char* ptr)
+{
+    return std::strlen(ptr);
+}
+
+inline void* memmove(void* dest, const void* src, size_t count)
+{
+    return std::memmove(dest, src, count);
+}
+
+inline int memcmp(const void* a, const void* b, size_t size)
+{
+    return std::memcmp(a, b, size);
+}
+
+inline double strtod(const char* str, char** endptr)
+{
+    return std::strtod(str, endptr);
+}
+
+inline long int strtol(const char* str, char** endptr, int base)
+{
+    return std::strtol(str, endptr, base);
 }
 
 template<typename T>

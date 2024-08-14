@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Common.h"
+#include "String.h"
 
 namespace GUI {
 
@@ -54,7 +55,13 @@ public:
 
     ADS::String toString() const
     {
-        return "[" + std::to_string(m_width) + "," + std::to_string(m_height) + "]";
+        ADS::String builder;
+        builder.append("[");
+        builder.append(m_width);
+        builder.append(",");
+        builder.append(m_height);
+        builder.append("]");
+        return builder;
     }
 
 private:

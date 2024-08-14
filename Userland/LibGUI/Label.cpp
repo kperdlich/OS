@@ -44,7 +44,7 @@ void Label::shrinkToFit()
 
 Size Label::preferredSizeHint() const
 {
-    if (m_text.empty())
+    if (m_text.isEmpty())
         return minSizeHint();
 
     Size size = minSizeHint();

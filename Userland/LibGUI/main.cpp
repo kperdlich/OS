@@ -10,12 +10,93 @@
 #include "RefPtr.h"
 #include "ScrollArea.h"
 #include "SinglyLinkedList.h"
+#include "String.h"
 #include "TextBox.h"
 #include "Vector.h"
 #include "Window.h"
 
 int main()
 {
+    /************* String tests *************/
+    {
+        ADS::String str;
+        ASSERT(str.length() == 0);
+        ASSERT(str.isEmpty());
+
+        const ADS::String test = "test";
+        ASSERT(test.length() == 4);
+        ASSERT(!test.isEmpty());
+        ASSERT(test != str);
+        const ADS::String testCpy = test;
+        ASSERT(testCpy == test);
+        ASSERT(testCpy != str);
+
+        const ADS::String splitTest = "test1 test2 test3";
+        ASSERT(splitTest == "test1 test2 test3");
+        const auto splits = splitTest.split(' ');
+        ASSERT(splits.size() == 3);
+        ASSERT(splits[0] == "test1");
+        ASSERT(splits[1] == "test2");
+        ASSERT(splits[2] == "test3");
+
+        ADS::String concatStr = "ABC";
+        concatStr.append(" DEF");
+        ASSERT(concatStr == "ABC DEF");
+        concatStr.append('G');
+        ASSERT(concatStr == "ABC DEFG");
+        const ADS::String additionalString = " HIJK";
+        concatStr.append(additionalString);
+        ASSERT(concatStr == "ABC DEFG HIJK");
+
+        {
+            const ADS::String str = "ABCDEF";
+            ASSERT(str.substring(0) == "ABCDEF");
+            ASSERT(str.substring(1, 3) == "BCDE");
+            ASSERT(str.substring(1, 20) == "BCDEF");
+        }
+
+        {
+            ADS::String str = "ABCDEF";
+            ASSERT(str.remove(2, 1) == "ABDEF");
+            ASSERT(str.remove(0, 1) == "BDEF");
+            ASSERT(str.remove(1, 10) == "B");
+            const ADS::String copy = str;
+            ASSERT(copy == "B");
+        }
+
+        {
+            ADS::String str = "ABCDEF";
+            ASSERT(str.insert(0, "1") == "1ABCDEF");
+            ASSERT(str.insert(1, "23") == "123ABCDEF");
+            ASSERT(str.insert(1, "A") == "1A23ABCDEF");
+            ASSERT(str.insert(str.length(), "-XXX") == "1A23ABCDEF-XXX");
+            ASSERT(str.insert(3, "ZZZ") == "1A2ZZZ3ABCDEF-XXX");
+        }
+
+        {
+            ADS::String intStr = "1230";
+            int intValue {};
+            ASSERT(intStr.toInt(intValue));
+            ASSERT(intValue == 1230);
+
+            ADS::String floatStr = "1230.3";
+            float floatValue {};
+            ASSERT(floatStr.toFloat(floatValue));
+            ASSERT(floatValue == 1230.3f);
+
+            ADS::String doubleStr = "1230.30";
+            double doubleValue {};
+            ASSERT(doubleStr.toDouble(doubleValue));
+            ASSERT(doubleValue == 1230.30);
+
+            //ADS::String fromFloatValue;
+            //fromFloatValue.fromFloat(floatValue);
+            //ASSERT(fromFloatValue == "1230.3");
+        }
+    }
+
+    std::cout << "Rect to string: " << GUI::Rect { 100, 100, 20, 20}.toString() << std::endl;
+
     /************* Function tests *************/
     {
         constexpr const int expectedIntValue = 10;

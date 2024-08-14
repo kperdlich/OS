@@ -159,7 +159,17 @@ public:
     ADS::String toString() const
     {
         // FIXME: use format
-        return ADS::String("[") + std::to_string(x()) + "," + std::to_string(y()) + " " + std::to_string(width()) + "x" + std::to_string(height()) + "]";
+        ADS::String builder;
+        builder.append("[");
+        builder.append(x());
+        builder.append(",");
+        builder.append(y());
+        builder.append(" ");
+        builder.append(width());
+        builder.append("/");
+        builder.append(height());
+        builder.append("]");
+        return builder;
     }
 
 private:

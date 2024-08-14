@@ -243,7 +243,7 @@ void Painter::drawFilledEllipse(const Rect& rect, GUI::Color color)
 
 void Painter::drawText(const Rect& rect, const ADS::String& text, Alignment alignment, GUI::Color color)
 {
-    if (text.empty())
+    if (text.isEmpty())
         return;
 
     Rect translated = rect;
@@ -263,7 +263,7 @@ void Painter::drawText(const Rect& rect, const ADS::String& text, Alignment alig
     translated.moveBy(0, (rect.height() - s_defaultFont.height()) / 2);
 
     const auto clippedRect = m_clipRect.intersectRect(translated);
-    for (size_t i = 0; i < text.size(); ++i) {
+    for (size_t i = 0; i < text.length(); ++i) {
         const char asciiChar = text[i];
         if (asciiChar == ' ') {
             continue;

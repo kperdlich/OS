@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Common.h"
 #include "Types.h"
 #include "initializer_list"
 
