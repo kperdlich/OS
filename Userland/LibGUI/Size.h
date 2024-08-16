@@ -57,9 +57,9 @@ public:
     {
         ADS::String builder;
         builder.append("[");
-        builder.append(m_width);
+        builder.appendInt(m_width);
         builder.append(",");
-        builder.append(m_height);
+        builder.appendInt(m_height);
         builder.append("]");
         return builder;
     }

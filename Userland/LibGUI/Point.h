@@ -48,9 +48,9 @@ public:
     [[nodiscard]] ADS::String toString() const
     {
         ADS::String builder = "[";
-        builder.append(m_x);
+        builder.appendInt(m_x);
         builder.append(",");
-        builder.append(m_y);
+        builder.appendInt(m_y);
         builder.append("]");
         return builder;
     }

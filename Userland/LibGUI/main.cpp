@@ -42,7 +42,7 @@ int main()
         ADS::String concatStr = "ABC";
         concatStr.append(" DEF");
         ASSERT(concatStr == "ABC DEF");
-        concatStr.append('G');
+        concatStr.appendChar('G');
         ASSERT(concatStr == "ABC DEFG");
         const ADS::String additionalString = " HIJK";
         concatStr.append(additionalString);
@@ -92,6 +92,32 @@ int main()
             //ADS::String fromFloatValue;
             //fromFloatValue.fromFloat(floatValue);
             //ASSERT(fromFloatValue == "1230.3");
+        }
+
+        {
+            const ADS::String test = "test1";
+            ASSERT(test.startsWith("test"));
+            ASSERT(!test.startsWith("test123"));
+            ASSERT(!test.startsWith(""));
+            ASSERT(test.startsWith("test1"));
+        }
+
+        {
+            const ADS::String test = "test1";
+            ASSERT(test.endsWith("test1"));
+            ASSERT(test.endsWith("t1"));
+            ASSERT(!test.endsWith("ttest1"));
+            ASSERT(!test.endsWith(""));
+        }
+
+        {
+            ADS::String test = "aB!cD";
+            ASSERT(test.toUpper() == "AB!CD");
+        }
+
+        {
+            ADS::String test = "aB!cD";
+            ASSERT(test.toLower() == "ab!cd");
         }
     }
 

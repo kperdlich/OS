@@ -161,13 +161,13 @@ public:
         // FIXME: use format
         ADS::String builder;
         builder.append("[");
-        builder.append(x());
+        builder.appendInt(x());
         builder.append(",");
-        builder.append(y());
+        builder.appendInt(y());
         builder.append(" ");
-        builder.append(width());
+        builder.appendInt(width());
         builder.append("/");
-        builder.append(height());
+        builder.appendInt(height());
         builder.append("]");
         return builder;
     }

@@ -9,7 +9,7 @@
 #include "Vector.h"
 
 #if 1
-    #include <ostream>
+#include <ostream>
 #endif
 
 namespace ADS {
@@ -210,7 +210,7 @@ public:
         m_length += len;
     }
 
-    void append(const T& character)
+    void appendChar(const T& character)
     {
         if (length() + 2 > capacity())
             reserve(length() + 1);
@@ -219,24 +219,24 @@ public:
         m_length += 1;
     }
 
-    void append(float value)
+    void appendFloat(float value)
     {
         // FIXME: This is not ideal
         const int length = snprintf(nullptr, 0, "%f", value);
         char* buffer = new char[length + 1] { 0 };
         snprintf(buffer, length + 1, "%f", value);
         append(buffer);
-        delete [] buffer;
+        delete[] buffer;
     }
 
-    void append(int32 value)
+    void appendInt(int32 value)
     {
         // FIXME: This is not ideal
         const int length = snprintf(nullptr, 0, "%d", value);
         char* buffer = new char[length + 1] { 0 };
         snprintf(buffer, length + 1, "%d", value);
         append(buffer);
-        delete [] buffer;
+        delete[] buffer;
     }
 
     BasicString substring(size_t start, size_t len) const
@@ -269,6 +269,68 @@ public:
         m_capacity = newCapacity;
     }
 
+    bool startsWith(const BasicString& str) const
+    {
+        if (str.isEmpty())
+            return false;
+
+        if (isEmpty())
+            return false;
+
+        if (length() < str.length())
+            return false;
+
+        for (size_t i = 0; i < str.length(); ++i) {
+            if (str[i] != m_charBuffer[i])
+                return false;
+        }
+
+        return true;
+    }
+
+    bool endsWith(const BasicString& str) const
+    {
+        if (str.isEmpty())
+            return false;
+
+        if (isEmpty())
+            return false;
+
+        if (length() < str.length())
+            return false;
+
+        for (size_t i = length() - str.length(); i < str.length(); ++i) {
+            if (str[i] != m_charBuffer[i])
+                return false;
+        }
+
+        return true;
+    }
+
+    BasicString toUpper() const
+    {
+        BasicString uppercaseStr;
+        uppercaseStr.reserve(length());
+        constexpr const char offset = 'a' - 'A';
+        for (size_t i = 0; i < length(); ++i) {
+            const char c = m_charBuffer[i];
+            uppercaseStr.appendChar(m_charBuffer[i] - (c >= 'a' && c <= 'z' ? offset : 0));
+        }
+        return uppercaseStr;
+    }
+
+    BasicString toLower() const
+    {
+        BasicString lowercaseStr;
+        lowercaseStr.reserve(length());
+        constexpr const char offset = 'a' - 'A';
+        for (size_t i = 0; i < length(); ++i) {
+            const char c = m_charBuffer[i];
+            lowercaseStr.appendChar(m_charBuffer[i] + (c >= 'A' && c <= 'Z' ? offset : 0));
+        }
+        return lowercaseStr;
+    }
+
     TEST::Vector<BasicString> split(const char delimiter) const
     {
         TEST::Vector<BasicString> tokens;
@@ -282,7 +344,7 @@ public:
                     buffer = "";
                 }
             } else {
-                buffer.append(c);
+                buffer.appendChar(c);
             }
         }
 
