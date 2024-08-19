@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "Array.h"
 #include "BoxLayout.h"
+#include "Terminal.h"
 #include "DoublyLinkedList.h"
 #include "HashMap.h"
 #include "Label.h"
@@ -444,6 +445,14 @@ int main()
         win2->setTitle("Window 2");
         win2->setCentralWidget(*root);
         win2->show();
+    }
+
+    {
+        GUI::Terminal* terminalWidget = new GUI::Terminal();
+        GUI::Window* terminalWindow = new GUI::Window();
+        terminalWindow->setTitle("Terminal");
+        terminalWindow->setCentralWidget(*terminalWidget);
+        terminalWindow->show();
     }
 
     return app.exec();

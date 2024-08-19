@@ -14,7 +14,8 @@ enum class Colors {
     DarkGrey,
     Blue,
     DarkBlue,
-    Red
+    Red,
+    Green,
 };
 
 class Color {

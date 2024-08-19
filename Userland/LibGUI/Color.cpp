@@ -37,6 +37,9 @@ Color::Color(Colors color)
     case Colors::DarkBlue:
         m_rgba = { 0, 0, 104, 255 };
         break;
+    case Colors::Green:
+        m_rgba = { 0, 255, 0, 255 };
+        break;
     }
 }
 

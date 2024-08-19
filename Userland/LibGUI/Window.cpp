@@ -117,6 +117,7 @@ void Window::setCentralWidget(Widget& widget)
     m_centralWidget->setWindow(this);
 
     Rect newRect = rect();
+    // FIXME: The current size policy is not very intuitive. :/
     if (m_centralWidget->verticalSizePolicy() == Widget::SizePolicy::Fixed)
         newRect.setHeight(m_centralWidget->minimumSize().height());
     else
