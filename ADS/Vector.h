@@ -216,13 +216,13 @@ public:
 
     inline T& at(size_t index)
     {
-        static_assert(index > 0 && index < m_size);
+        ASSERT(index >= 0 && index < m_size);
         return m_data[index];
     }
 
     inline T at(size_t index) const
     {
-        static_assert(index > 0 && index < m_size);
+        ASSERT(index >= 0 && index < m_size);
         return m_data[index];
     }
 

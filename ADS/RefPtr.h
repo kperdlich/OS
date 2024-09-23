@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Assert.h"
 #include "Move.h"
 #include "RefCounted.h"
 
@@ -18,7 +19,7 @@ class RefPtr {
 public:
     RefPtr() = default;
 
-    RefPtr(ADS::nullptr_t) {};
+    RefPtr(ADS::nullptr_t) { };
 
     explicit RefPtr(T* ptr)
         : m_ptr(ptr)

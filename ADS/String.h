@@ -185,6 +185,11 @@ public:
         return memcmp(m_charBuffer, other.m_charBuffer, length()) == 0;
     }
 
+    bool operator!=(const BasicString& other) const
+    {
+        return !(*this == other);
+    }
+
     void append(const BasicString& str)
     {
         if (length() + str.length() + 1 > capacity())
@@ -428,6 +433,8 @@ public:
 
     BasicString& fromFloat(float value)
     {
+        // FIXME: Implement precision.
+
         const int length = snprintf(nullptr, 0, "%f", value);
         if (length + 1 > m_capacity)
             reserve(length + 1);

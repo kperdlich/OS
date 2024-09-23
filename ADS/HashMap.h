@@ -33,7 +33,7 @@ public:
             No,
         };
 
-        Iterator(HashMap& hashMap, const DoublyLinkedList<Entry>::Iterator& startIterator, LookForFirstEntry lookForFirstEntry, size_t bucketIndex = 0)
+        Iterator(HashMap& hashMap, const typename DoublyLinkedList<Entry>::Iterator& startIterator, LookForFirstEntry lookForFirstEntry, size_t bucketIndex = 0)
             : m_hashMap(hashMap)
             , m_bucketIterator(startIterator)
             , m_bucketIndex(bucketIndex)
@@ -114,7 +114,7 @@ public:
             No,
         };
 
-        ConstIterator(const HashMap& hashMap, const DoublyLinkedList<Entry>::ConstIterator& startIterator, LookForFirstEntry lookForFirstEntry, size_t bucketIndex = 0)
+        ConstIterator(const HashMap& hashMap, const typename DoublyLinkedList<Entry>::ConstIterator& startIterator, LookForFirstEntry lookForFirstEntry, size_t bucketIndex = 0)
             : m_hashMap(hashMap)
             , m_bucketIterator(startIterator)
             , m_bucketIndex(bucketIndex)
@@ -286,7 +286,7 @@ public:
     {
         const size_t bucketIndex = getIndexFor(key);
         Bucket& bucket = m_buckets[bucketIndex];
-        const size_t removedElements = bucket.list.removeIf([&key](const DoublyLinkedList<Entry>::Iterator& it) {
+        const size_t removedElements = bucket.list.removeIf([&key](const typename DoublyLinkedList<Entry>::Iterator& it) {
             return it->key == key;
         });
         m_elementCount -= removedElements;
@@ -370,7 +370,7 @@ private:
         m_elementCount = 0;
         m_buckets = new Bucket[m_bucketCount];
 
-#if 1
+#if 0
         std::cout << "HashMap::rehash: From " << oldBucketSize << " buckets to " << m_elementCount << std::endl;
 #endif
 
