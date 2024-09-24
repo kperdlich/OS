@@ -1,10 +1,11 @@
-# OS Sandbox
+![Linux-Build](https://github.com/kperdlich/OS/actions/workflows/linux-build.yml/badge.svg)
 
+# OS Sandbox
 - ADS: Custom algorithm & data structures. Replacement for STL.
 - Userland: List of user-space running applications. Currently only LibGUI which runs on Linux using SDL2. 
 - Kernel: Old i386 Kernel
 
-## Kernel Build instructions
+## Kernel build instructions
 
 ### Prerequisites 
 Install all dependencies
