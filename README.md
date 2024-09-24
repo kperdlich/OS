@@ -2,7 +2,9 @@
 
 # OS Sandbox
 - ADS: Custom algorithm & data structures. Replacement for STL.
-- Userland: List of user-space running applications. Currently only LibGUI which runs on Linux using SDL2. 
+- Userland: List of user-space running applications.
+    - LibGUI: Qt style GUI library which currently runs on Linux using SDL2. ![LibGUI](/Docs/Screenshot%20at%202024-08-22%2017-46-16.png)
+  
 - Kernel: Old i386 Kernel
 
 ## Kernel build instructions
