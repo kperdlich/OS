@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 
-include_directories(../../ADS)
-
 add_executable(LibGUI
         main.cpp
         Widget.cpp
@@ -20,6 +18,7 @@ add_executable(LibGUI
         Bitmap.h
         Color.cpp
         Color.h
+        Common.h
         Size.h
         WindowManager.cpp
         WindowManager.h
@@ -57,4 +56,4 @@ add_executable(LibGUI
         Terminal.h
         Terminal.cpp)
 
-target_link_libraries(LibGUI ${SDL2_LIBRARIES})
+target_link_libraries(LibGUI PRIVATE ADS ${SDL2_LIBRARIES})

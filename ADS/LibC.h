@@ -1,37 +1,14 @@
 //
-// Created by n3dry on 09.08.24.
+// Created by n3dry on 24.09.24.
 //
 
 #pragma once
 
-#include "Assert.h"
-#include "Function.h"
-#include "Move.h"
-#include "OwnPtr.h"
-#include "RefPtr.h"
-#include "Types.h"
-#include <cassert>
+#include <cstdlib>
 #include <cstring>
-#include <functional>
-#include <iostream>
 #include <memory>
-#include <mutex>
-#include <optional>
-#include <thread>
-#include <unordered_map>
 
 namespace ADS {
-
-template<typename T>
-using Optional = std::optional<T>;
-
-template<typename T>
-using Vector = std::vector<T>;
-
-template<typename T>
-using LockGuard = std::lock_guard<T>;
-
-using Mutex = std::mutex;
 
 inline void* memcpy(void* dest, const void* src, std::size_t count)
 {

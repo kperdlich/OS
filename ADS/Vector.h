@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include "Common.h"
+#include "LibC.h"
+#include "Assert.h"
 #include "Types.h"
 #include "initializer_list"
 
@@ -15,7 +16,7 @@ class Vector {
 public:
     class Iterator {
     public:
-        Iterator(Vector& vector, size_t index)
+        Iterator(Vector& vector, ADS::size_t index)
             : m_vector(vector)
             , m_index(index)
         {
@@ -87,7 +88,7 @@ public:
 
     private:
         Vector& m_vector;
-        size_t m_index { 0 };
+        ADS::size_t m_index { 0 };
     };
 
     class ReverseIterator {
@@ -168,7 +169,7 @@ public:
     };
 
 public:
-    static constexpr size_t s_capacityIncrement = 5;
+    static constexpr ADS::size_t s_capacityIncrement = 5;
 
     Vector() = default;
 
@@ -187,14 +188,14 @@ public:
         m_capacity = 0;
     };
 
-    inline size_t size() const
+    inline ADS::size_t size() const
     {
         return m_size;
     }
 
     inline bool isEmpty() const { return m_size == 0; }
 
-    inline void reserve(size_t newCapacity)
+    inline void reserve(ADS::size_t newCapacity)
     {
         if (newCapacity == m_capacity) {
             return;
@@ -214,13 +215,13 @@ public:
         return &m_data;
     }
 
-    inline T& at(size_t index)
+    inline T& at(ADS::size_t index)
     {
         ASSERT(index >= 0 && index < m_size);
         return m_data[index];
     }
 
-    inline T at(size_t index) const
+    inline T at(ADS::size_t index) const
     {
         ASSERT(index >= 0 && index < m_size);
         return m_data[index];
@@ -270,8 +271,8 @@ public:
     }
 
 private:
-    size_t m_size { 0 };
-    size_t m_capacity { 0 };
+    ADS::size_t m_size { 0 };
+    ADS::size_t m_capacity { 0 };
     T* m_data { nullptr };
 };
 
