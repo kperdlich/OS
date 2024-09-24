@@ -3,7 +3,7 @@ name: Linux Build
 on: [push, pull_request]
 
 jobs:
-  build:
+  Linux-Build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
         working-directory: ./build
         run: cmake --build .
 
-      - name: Runs tests
+      - name: Run tests
         working-directory: ./build
         run: ctest
 
