@@ -1,0 +1,29 @@
+name: Linux Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get install cmake gcc g++ ninja-build libsdl2-dev catch2
+
+      - name: Create build directory
+        run: mkdir -p build
+
+      - name: Configure CMake
+        working-directory: ./build
+        run: cmake -G Ninja ..
+
+      - name: Build
+        working-directory: ./build
+        run: cmake --build .
+
+      - name: Runs tests
+        working-directory: ./build
+        run: ctest
+
+
