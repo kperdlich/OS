@@ -50,7 +50,7 @@ public:
     OwnPtr& operator=(OwnPtr&& other)
     {
         if (this != &other) {
-            delete m_ptr;
+            clear();
             m_ptr = other.release();
         }
         return *this;
@@ -59,7 +59,7 @@ public:
     OwnPtr& operator=(T* other)
     {
         if (m_ptr != other) {
-            delete m_ptr;
+            clear();
             m_ptr = other;
         }
         return *this;

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Move.h"
 #include <cstdlib>
 #include <cstring>
 #include <memory>

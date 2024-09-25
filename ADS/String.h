@@ -335,9 +335,9 @@ public:
         return lowercaseStr;
     }
 
-    TEST::Vector<BasicString> split(const char delimiter) const
+    ADS::Vector<BasicString> split(const char delimiter) const
     {
-        TEST::Vector<BasicString> tokens;
+        ADS::Vector<BasicString> tokens;
         BasicString buffer;
         buffer.reserve(length());
         for (size_t i = 0; i < m_length; ++i) {
