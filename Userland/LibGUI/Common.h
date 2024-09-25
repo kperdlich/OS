@@ -10,16 +10,11 @@
 #include "OwnPtr.h"
 #include "RefPtr.h"
 #include "Types.h"
+#include "Vector.h"
 
 // FIXME: Replace with ADS
 #include <iostream>
 #include <chrono>
 #include <vector>
 
-namespace ADS {
 
-// FIXME: Use ADS::Vector
-template<typename T>
-using Vector = std::vector<T>;
-
-}

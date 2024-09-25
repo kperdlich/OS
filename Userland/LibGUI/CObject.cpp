@@ -51,15 +51,12 @@ void CObject::killTimer(int id)
 
 void CObject::addChild(CObject& child)
 {
-    m_children.emplace_back(&child);
+    m_children.pushBack(&child);
 }
 
 void CObject::removeChild(CObject& child)
 {
-    m_children.erase(
-        std::remove_if(m_children.begin(), m_children.end(),
-            [&child](CObject* obj) { return obj == &child; }),
-        m_children.end());
+    m_children.removeAll(&child);
 }
 
 void CObject::setParent(CObject* parent)

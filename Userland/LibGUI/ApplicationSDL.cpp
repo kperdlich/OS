@@ -18,7 +18,7 @@ public:
             processSDLEvents();
             updateTimer();
 
-            if (!m_eventQueue.empty()) {
+            if (!m_eventQueue.isEmpty()) {
                 ADS::Vector<QueuedEvent> queue = std::move(m_eventQueue);
                 for (auto& queuedEvent : queue) {
                     if (queuedEvent.receiver) {
@@ -36,7 +36,7 @@ public:
 
     void postEvent(CObject* receiver, ADS::OwnPtr<Event>&& event)
     {
-        m_eventQueue.push_back({ receiver, std::move(event) });
+        m_eventQueue.pushBack({ receiver, std::move(event) });
     }
 
     int startTimer(int intervalMs, CObject& object)
@@ -250,7 +250,7 @@ int Application::exec()
 
 void Application::postEvent(CObject* receiver, ADS::OwnPtr<Event>&& event)
 {
-    m_impl->postEvent(receiver, std::move(event));
+    m_impl->postEvent(receiver, ADS::move(event));
 }
 
 int Application::startTimer(int intervalMs, CObject& object)

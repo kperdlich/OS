@@ -17,7 +17,7 @@ void Layout::addWidget(Widget& widget)
     ASSERT(parent());
     ASSERT(parent()->isWidgetType());
 
-    m_layoutItems.emplace_back(LayoutItem { .widget = &widget });
+    m_layoutItems.pushBack(LayoutItem { .widget = &widget });
     widget.setParent(parent());
 
     if (parent())

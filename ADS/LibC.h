@@ -11,6 +11,16 @@
 
 namespace ADS {
 
+inline void* malloc(std::size_t size)
+{
+    return std::malloc(size);
+}
+
+inline void free(void* ptr)
+{
+    return std::free(ptr);
+}
+
 inline void* memcpy(void* dest, const void* src, std::size_t count)
 {
     return std::memcpy(dest, src, count);

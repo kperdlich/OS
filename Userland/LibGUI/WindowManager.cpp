@@ -144,20 +144,12 @@ void WindowManager::event(Event& event)
 
 void WindowManager::show(Window& window)
 {
-    m_windows.emplace_back(&window);
+    m_windows.pushBack(&window);
 }
 
 void WindowManager::remove(Window& window)
 {
-    // FIXME: This sucks
-    for (auto iter = m_windows.begin(); iter != m_windows.end();) {
-        if (*iter == &window) {
-            m_windows.erase(iter++);
-            break;
-        } else {
-            ++iter;
-        }
-    }
+    m_windows.removeAll(&window);
 }
 
 void WindowManager::makeActive(Window* window)
@@ -335,7 +327,7 @@ void WindowManager::invalidate(const Rect& rect)
             return;
     }
 
-    m_dirtyRects.push_back(rect);
+    m_dirtyRects.pushBack(rect);
 
     if (m_composeTimer < 0)
         m_composeTimer = startTimer(1000 / 60); // 60hz
@@ -348,7 +340,7 @@ void WindowManager::hide(Window& window)
 
 void WindowManager::compose()
 {
-    if (m_dirtyRects.empty())
+    if (m_dirtyRects.isEmpty())
         return;
 
     if (!m_frontBuffer)
