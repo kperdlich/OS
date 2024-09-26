@@ -17,15 +17,19 @@ Window::Window(CObject* parent)
 
 Window::~Window()
 {
+#if 0
+    std::cout << "~Window[" << title() << "]" << std::endl;
+#endif
+
     GUI::WindowManager::instance().remove(*this);
+    delete m_centralWidget;
+    m_centralWidget = nullptr;
 }
 
 void Window::close()
 {
     hide();
     GUI::WindowManager::instance().remove(*this);
-    // FIXME: handle deletion
-    // deleteLater();
 }
 
 void Window::event(Event& event)
