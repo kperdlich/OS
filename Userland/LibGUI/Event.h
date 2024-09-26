@@ -33,7 +33,6 @@ public:
         Timer,
         Quit,
         UpdateRequest,
-        DeferredDestroy,
     };
 
     explicit Event(Type type)

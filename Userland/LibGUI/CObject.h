@@ -19,8 +19,6 @@ public:
     virtual bool isWidgetType() const;
     virtual bool isWindowType() const;
 
-    void deleteLater();
-
     int startTimer(int intervalMs);
     void killTimer(int id);
 

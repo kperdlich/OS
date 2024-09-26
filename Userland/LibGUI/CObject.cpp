@@ -33,9 +33,6 @@ void CObject::event(Event& event)
     switch (event.type()) {
     case Event::Type::Timer:
         return onTimerEvent(static_cast<TimerEvent&>(event));
-    case Event::Type::DeferredDestroy:
-        delete this;
-        return;
     }
 }
 
@@ -90,9 +87,5 @@ bool CObject::isWindowType() const
     return false;
 }
 
-void CObject::deleteLater()
-{
-    Application::instance().postEvent(this, ADS::makeOwn<Event>(Event::Type::DeferredDestroy));
-}
 
 } // GUI
