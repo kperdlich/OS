@@ -54,12 +54,12 @@ TEST_CASE("HashMap: rehash works", "[HashMap]")
     REQUIRE(map.contains(5));
     REQUIRE(map.contains(6));
 
-    std::cout << "HashMap iterator:" << std::endl;
+    INFO("HashMap iterator:");
     for (auto& entry : map)
         INFO("[" << entry.key << " -> " << entry.value << "]");
 
     const ADS::HashMap<int, int> constMap = ADS::move(map);
-    std::cout << "HashMap ConstIterator:" << std::endl;
+    INFO("HashMap ConstIterator:");
     for (const auto& entry : constMap)
         INFO("[" << entry.key << " -> " << entry.value << "]");
 
