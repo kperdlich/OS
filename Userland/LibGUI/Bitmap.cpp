@@ -44,7 +44,7 @@ Bitmap::Bitmap(BitmapFormat format, Size size, char* data, size_t dataSize, OwnB
 Bitmap::~Bitmap()
 {
     if (m_isOwning && m_data) {
-        delete m_data;
+        delete[] m_data;
         m_data = nullptr;
     }
 }

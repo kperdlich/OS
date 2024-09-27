@@ -18,6 +18,11 @@ class BasicString {
 public:
     BasicString() = default;
 
+    ~BasicString()
+    {
+        clear();
+    }
+
     explicit BasicString(const T value)
     {
         m_capacity = 2;

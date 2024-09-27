@@ -402,7 +402,7 @@ public:
             if (m_capacity < newSize)
                 reserve(newSize + s_capacityIncrement);
             for (ADS::size_t i = m_size; i < newSize; ++i)
-                m_data[i] = {};
+                new (&m_data[i]) T{};
             m_size = newSize;
             return;
         }
