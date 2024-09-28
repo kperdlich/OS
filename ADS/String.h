@@ -435,28 +435,31 @@ public:
         return true;
     }
 
-    BasicString& fromFloat(float value)
+    static BasicString fromFloat(float value)
     {
         // FIXME: Implement precision.
-
         const int length = snprintf(nullptr, 0, "%f", value);
-        if (length + 1 > m_capacity)
-            reserve(length + 1);
 
-        snprintf(m_charBuffer, length + 1, "%f", value);
-        m_length = length;
-        return *this;
+        // FIXME: use resize when implemented
+        ADS::BasicString<T> str;
+        str.reserve(length + 1);
+
+        snprintf(str.m_charBuffer, length + 1, "%f", value);
+        str.m_length = length;
+        return str;
     }
 
-    BasicString& fromInt(int32 value)
+    static BasicString fromInt(int32 value)
     {
         const int length = snprintf(nullptr, 0, "%d", value);
-        if (length + 1 > m_capacity)
-            reserve(length + 1);
 
-        snprintf(m_charBuffer, length + 1, "%d", value);
-        m_length = length;
-        return *this;
+        // FIXME: use resize when implemented
+        ADS::BasicString<T> str;
+        str.reserve(length + 1);
+
+        snprintf(str.m_charBuffer, length + 1, "%d", value);
+        str.m_length = length;
+        return str;
     }
 
 #if 1
@@ -468,6 +471,14 @@ public:
         return os;
     }
 #endif
+
+    friend BasicString operator+(const BasicString& a, const BasicString& b)
+    {
+        BasicString combinedStr;
+        combinedStr.append(a);
+        combinedStr.append(b);
+        return combinedStr;
+    }
 
 private:
     T* m_charBuffer { nullptr };

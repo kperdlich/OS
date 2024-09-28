@@ -92,9 +92,14 @@ TEST_CASE("String: toDouble works", "[String]")
 
 TEST_CASE("String: fromFloat works", "[String]")
 {
-    ADS::String fromFloatValue;
-    fromFloatValue.fromFloat(1230.30f);
+    ADS::String fromFloatValue = ADS::String::fromFloat(1230.30f);
     ASSERT(fromFloatValue.startsWith("1230.3"));
+}
+
+TEST_CASE("String: fromInt works", "[String]")
+{
+    ADS::String fromIntValue = ADS::String::fromInt(1230);
+    ASSERT(fromIntValue == "1230");
 }
 
 TEST_CASE("String: startsWith works", "[String]")
