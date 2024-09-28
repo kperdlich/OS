@@ -36,7 +36,6 @@ void Widget::event(Event& event)
         updateLayout();
         return onResizeEvent(static_cast<ResizeEvent&>(event));
     case Event::Type::Paint: {
-        m_isDirty = false;
         PaintEvent& paintEvent = static_cast<PaintEvent&>(event);
         Painter painter(*this);
         painter.setClipRect(paintEvent.rect());
@@ -114,8 +113,10 @@ void Widget::updateLayout()
     if (!m_isVisible)
         return;
 
-    if (m_layout)
+    if (m_layout) {
         m_layout->activate();
+        update();
+    }
 }
 
 void Widget::onShowEvent(Event& event)
@@ -162,26 +163,15 @@ void Widget::setRelativeRect(const Rect& rect)
     update();
 }
 
-void Widget::setWindow(Window* window)
-{
-    m_window = window;
-    for (auto& child : m_children) {
-        if (child->isWidgetType()) {
-            Widget* childWidget = static_cast<Widget*>(child);
-            childWidget->setWindow(window);
-        }
-    }
-}
-
 bool Widget::hasFocus() const
 {
-    return m_window && m_window->focusedWidget() == this && m_window->isActive();
+    return window() && window()->focusedWidget() == this && window()->isActive();
 }
 
 void Widget::setFocus(FocusReason reason)
 {
-    ASSERT(m_window != nullptr);
-    m_window->setFocusedWidget(this, reason);
+    ASSERT(window() != nullptr);
+    window()->setFocusedWidget(this, reason);
 }
 
 bool Widget::isWidgetType() const
@@ -304,9 +294,6 @@ void Widget::update()
 
 void Widget::update(const Rect& rect)
 {
-    if (m_isDirty)
-        return;
-    m_isDirty = true;
     if (Window* widgetWindow = window()) {
         Rect widgetRelativeRect = rect;
         widgetRelativeRect.moveBy(windowRelativeRect().position());

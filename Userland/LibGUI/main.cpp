@@ -20,11 +20,10 @@ int main()
     GUI::Widget* buttonListLayoutWidget = new GUI::Widget();
     GUI::VBoxLayout* buttonList = new GUI::VBoxLayout(buttonListLayoutWidget);
     buttonList->setSpacing(10);
-    buttonList->addWidget(*new GUI::Button("Btn1"));
-    buttonList->addWidget(*new GUI::Button("Btn2"));
-    buttonList->addWidget(*new GUI::Button("Btn3"));
-    buttonList->addWidget(*new GUI::Button("Btn4"));
-    buttonList->addWidget(*new GUI::Button("Btn5"));
+
+    static int buttonCounter = 5;
+    for (int i = 0; i < buttonCounter; ++i)
+        buttonList->addWidget(*new GUI::Button("Btn" + ADS::String::fromInt(i)));
     buttonListLayoutWidget->setLayout(buttonList);
 
     GUI::ScrollArea* scrollArea = new GUI::ScrollArea();
@@ -33,7 +32,7 @@ int main()
     GUI::Widget* rootWidget = new GUI::Widget();
     GUI::VBoxLayout* rootLayout = new GUI::VBoxLayout(rootWidget);
     GUI::Button* button = new GUI::Button(rootWidget);
-    button->setText("Resize and translate");
+    button->setText("Add to list");
     rootLayout->addWidget(*button);
     rootLayout->addWidget(*scrollArea);
     rootWidget->setLayout(rootLayout);
@@ -42,10 +41,9 @@ int main()
     win1.resize(640, 480);
     win1.setCentralWidget(*rootWidget);
     win1.setTitle("Window 1");
-    button->onClick = [&win1]() {
+    button->onClick = [buttonList]() {
         std::cout << "Button clicked" << std::endl;
-        win1.resize(720, 480);
-        win1.setPosition(100, 100);
+        buttonList->addWidget(*new GUI::Button("Btn" + ADS::String::fromInt(buttonCounter++)));
     };
     win1.show();
 

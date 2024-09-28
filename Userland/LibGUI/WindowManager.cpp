@@ -372,13 +372,14 @@ void WindowManager::flushPainting()
         if (!bigDirtyRect.intersects(windowOuterFrameRect(window))) {
             return IteratorResult::Continue;
         }
+
+        paintWindowFrame(window);
         Bitmap* const windowBitmap = window.backBuffer();
         if (!windowBitmap) {
             std::cout << "[compose] no bitmap for window: " << window.title() << std::endl;
             return IteratorResult::Continue;
         }
 
-        paintWindowFrame(window);
         Painter painter(*m_backBuffer);
         // FIXME: Only blit pixels for updated rect
         painter.blit(window.position(), *windowBitmap);

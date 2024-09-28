@@ -117,7 +117,6 @@ void Window::setCentralWidget(Widget& widget)
         return;
 
     m_centralWidget = &widget;
-    m_centralWidget->setParent(this);
     m_centralWidget->setWindow(this);
 
     Rect newRect = rect();
@@ -133,7 +132,6 @@ void Window::setCentralWidget(Widget& widget)
         newRect.setWidth(m_centralWidget->preferredSizeHint().width());
 
     resize(newRect.size());
-    m_centralWidget->resize(newRect.width(), newRect.height());
 }
 
 void Window::show()

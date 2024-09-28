@@ -22,9 +22,19 @@ public:
     virtual void event(Event& event) override;
     virtual bool isWidgetType() const override;
 
-    void setWindow(Window* window);
-    [[nodiscard]] Window* window() { return m_window; }
-    [[nodiscard]] const Window* window() const { return m_window; }
+    void setWindow(Window* window) { m_window = window; }
+    [[nodiscard]] Window* window()
+    {
+        if (Widget* const parent = parentWidget())
+            return parent->window();
+        return m_window;
+    }
+    [[nodiscard]] const Window* window() const
+    {
+        if (const Widget* const parent = parentWidget())
+            return parent->window();
+        return m_window;
+    }
 
     [[nodiscard]] Rect windowRelativeRect() const;
 
@@ -111,7 +121,6 @@ protected:
     SizePolicy m_verticalSizePolicy { SizePolicy::Automatic };
     SizePolicy m_horizontalSizePolicy { SizePolicy::Automatic };
     bool m_isVisible { true };
-    bool m_isDirty { false };
 };
 
 } // GUI
