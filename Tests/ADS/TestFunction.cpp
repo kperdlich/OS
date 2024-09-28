@@ -10,7 +10,7 @@ TEST_CASE("Function: basic lambda works", "[Function]")
     constexpr const int expectedIntValue = 10;
 
     ADS::Function<int(int)> fx = [expectedIntValue](int x) -> int {
-        ASSERT(x == expectedIntValue);
+        REQUIRE(x == expectedIntValue);
         return x;
     };
     REQUIRE(fx(expectedIntValue) == expectedIntValue);
