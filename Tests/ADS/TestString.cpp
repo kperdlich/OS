@@ -130,3 +130,13 @@ TEST_CASE("String: toLower works", "[String]")
     ADS::String test = "aB!cD";
     REQUIRE(test.toLower() == "ab!cd");
 }
+
+TEST_CASE("String: cStr works", "[String]")
+{
+    const ADS::String empty;
+    REQUIRE(empty.cStr() == nullptr);
+
+    const ADS::String test = "aB!cD";
+    CHECK(test.cStr() != nullptr);
+    REQUIRE(strcmp(test.cStr(), "aB!cD") == 0);
+}

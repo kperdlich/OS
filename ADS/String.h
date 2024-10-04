@@ -181,6 +181,14 @@ public:
         m_capacity = 0;
     }
 
+    const T* cStr() const
+    {
+        if (isEmpty())
+            return nullptr;
+
+        return m_charBuffer;
+    }
+
     bool operator==(const BasicString& other) const
     {
         if (length() != other.length())
