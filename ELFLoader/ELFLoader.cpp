@@ -7,6 +7,29 @@
 
 namespace ELF {
 
+static const char* symbolTypeFor(uint8_t type)
+{
+    switch (type) {
+    case STT_NOTYPE:
+        return "NOTYPE";
+    case STT_OBJECT:
+        return "OBJECT";
+    case STT_FUNC:
+        return "FUNC";
+    case STT_SECTION:
+        return "SECTION";
+    case STT_FILE:
+        return "FILE";
+    case STT_COMMON:
+        return "COMMON";
+    case STT_TLS:
+        return "TLS";
+    default:
+        ASSERT(false);
+        return "Unknown";
+    }
+}
+
 ELFLoader::ELFLoader(ADS::String elfFilePath)
     : m_elfFilePath(ADS::move(elfFilePath))
 {
@@ -88,6 +111,32 @@ void ELFLoader::dump()
         printf("        physical address: %p\n", reinterpret_cast<void*>(phdr.p_paddr));
         printf("        flags: %u\n", phdr.p_flags);
         printf("\n");
+    }
+
+    // Dump symbols
+    const Elf32_Shdr* symtab = nullptr;
+    const Elf32_Shdr* strtab = nullptr;
+    for (ADS::size_t i = 0; i < elfHeader->e_shnum; ++i) {
+        const Elf32_Shdr& shdr = sectionHeader()[i];
+        if (shdr.sh_type == SHT_SYMTAB) {
+            symtab = &shdr;
+            strtab = &sectionHeader()[shdr.sh_link];
+            break;
+        }
+    }
+    ASSERT(symtab != nullptr);
+    ASSERT(strtab != nullptr);
+
+    const uint8_t* symtabData = reinterpret_cast<const uint8_t*>(m_elfFile) + symtab->sh_offset;
+    const uint8_t* strtabData = reinterpret_cast<const uint8_t*>(m_elfFile) + strtab->sh_offset;
+    const ADS::size_t numSymbols = symtab->sh_size / sizeof(Elf32_Sym);
+
+    printf("Symbol table '%s' contains %zu entries:\n", sectionHeaderStringTable() + symtab->sh_name, numSymbols);
+    printf("%-5s %-8s %-20s\n", "Num", "Type", "Name");
+    for (ADS::size_t i = 0; i < numSymbols; ++i) {
+        const Elf32_Sym* symbol = reinterpret_cast<const Elf32_Sym*>(symtabData + i * sizeof(Elf32_Sym));
+        const char* symbolStr = reinterpret_cast<const char*>(strtabData + symbol->st_name);
+        printf("%-5zu %-8s %-20s\n", i, symbolTypeFor(ELF32_ST_TYPE(symbol->st_info)), symbolStr);
     }
 }
 
