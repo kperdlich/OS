@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[])
 {
-    ELF::ELFLoader loader("ELFLoaderTest");
+    ELF::ELFLoader loader("ELFTestProgram");
     if (loader.load()) {
         loader.dump();
     }

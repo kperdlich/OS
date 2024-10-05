@@ -20,6 +20,9 @@ public:
 private:
     bool isValidElfFile();
     Elf32_Ehdr* header();
+    Elf32_Shdr* sectionHeader();
+    Elf32_Phdr* programHeader();
+    uint8_t* sectionHeaderStringTable();
 
 private:
     ADS::String m_elfFilePath;
