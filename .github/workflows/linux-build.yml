@@ -12,7 +12,7 @@ jobs:
         run: sudo apt-get install cmake gcc g++ g++-multilib ninja-build libsdl2-dev catch2
 
       - name: Create build directory
-        run: mkdir -p build
+        run: mkdir build
 
       - name: Configure CMake
         working-directory: ./build
