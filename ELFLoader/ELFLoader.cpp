@@ -76,9 +76,9 @@ bool ELFLoader::load()
     return true;
 }
 
-void ELFLoader::dump()
+void ELFLoader::dump() const
 {
-    const Elf32_Ehdr* elfHeader = header();
+    const Elf32_Ehdr* const elfHeader = header();
 
     ASSERT(elfHeader->e_machine == EM_386);
 
@@ -127,45 +127,45 @@ void ELFLoader::dump()
     ASSERT(symtab != nullptr);
     ASSERT(strtab != nullptr);
 
-    const uint8_t* symtabData = reinterpret_cast<const uint8_t*>(m_elfFile) + symtab->sh_offset;
-    const uint8_t* strtabData = reinterpret_cast<const uint8_t*>(m_elfFile) + strtab->sh_offset;
+    const uint8_t* const symtabData = reinterpret_cast<const uint8_t*>(m_elfFile) + symtab->sh_offset;
+    const uint8_t* const strtabData = reinterpret_cast<const uint8_t*>(m_elfFile) + strtab->sh_offset;
     const ADS::size_t numSymbols = symtab->sh_size / sizeof(Elf32_Sym);
 
     printf("Symbol table '%s' contains %zu entries:\n", sectionHeaderStringTable() + symtab->sh_name, numSymbols);
     printf("%-5s %-8s %-20s\n", "Num", "Type", "Name");
     for (ADS::size_t i = 0; i < numSymbols; ++i) {
-        const Elf32_Sym* symbol = reinterpret_cast<const Elf32_Sym*>(symtabData + i * sizeof(Elf32_Sym));
-        const char* symbolStr = reinterpret_cast<const char*>(strtabData + symbol->st_name);
+        const Elf32_Sym* const symbol = reinterpret_cast<const Elf32_Sym*>(symtabData + i * sizeof(Elf32_Sym));
+        const char* const symbolStr = reinterpret_cast<const char*>(strtabData + symbol->st_name);
         printf("%-5zu %-8s %-20s\n", i, symbolTypeFor(ELF32_ST_TYPE(symbol->st_info)), symbolStr);
     }
 }
 
-Elf32_Ehdr* ELFLoader::header()
+const Elf32_Ehdr* ELFLoader::header() const
 {
     ASSERT(m_elfFile != nullptr);
     return reinterpret_cast<Elf32_Ehdr*>(m_elfFile);
 }
 
-bool ELFLoader::isValidElfFile()
+bool ELFLoader::isValidElfFile() const
 {
     return memcmp(header()->e_ident, ELFMAG, SELFMAG) == 0;
 }
 
-Elf32_Shdr* ELFLoader::sectionHeader()
+const Elf32_Shdr* ELFLoader::sectionHeader() const
 {
     return reinterpret_cast<Elf32_Shdr*>(
         reinterpret_cast<uint8_t*>(m_elfFile) + header()->e_shoff);
 }
 
-uint8_t* ELFLoader::sectionHeaderStringTable()
+const uint8_t* ELFLoader::sectionHeaderStringTable() const
 {
     // Get Section Header that contains the offset to the string table.
     const Elf32_Shdr& sectionHeaderStringTable = sectionHeader()[header()->e_shstrndx];
     // Lookup string table via offset.
-    return reinterpret_cast<uint8_t*>(reinterpret_cast<uint8_t*>(m_elfFile) + sectionHeaderStringTable.sh_offset);
+    return reinterpret_cast<uint8_t*>(m_elfFile) + sectionHeaderStringTable.sh_offset;
 }
 
-Elf32_Phdr* ELFLoader::programHeader()
+const Elf32_Phdr* ELFLoader::programHeader() const
 {
     return reinterpret_cast<Elf32_Phdr*>(
         reinterpret_cast<uint8_t*>(m_elfFile) + header()->e_phoff);

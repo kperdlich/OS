@@ -15,14 +15,14 @@ public:
     ~ELFLoader();
 
     bool load();
-    void dump();
+    void dump() const;
 
 private:
-    bool isValidElfFile();
-    Elf32_Ehdr* header();
-    Elf32_Shdr* sectionHeader();
-    Elf32_Phdr* programHeader();
-    uint8_t* sectionHeaderStringTable();
+    [[nodiscard]] bool isValidElfFile() const;
+    [[nodiscard]] const Elf32_Ehdr* header() const;
+    [[nodiscard]] const Elf32_Shdr* sectionHeader() const;
+    [[nodiscard]] const Elf32_Phdr* programHeader() const;
+    [[nodiscard]] const uint8_t* sectionHeaderStringTable() const;
 
 private:
     ADS::String m_elfFilePath;
