@@ -3,6 +3,7 @@
 //
 
 #include "HashMap.h"
+#include "String.h"
 #include <catch2/catch.hpp>
 #include <iostream>
 
@@ -36,6 +37,23 @@ TEST_CASE("HashMap: insert and remove works", "[HashMap]")
         REQUIRE(map.size() == 1);
     }
 }
+
+TEST_CASE("HashMap: ADS::String works as key", "[HashMap]")
+{
+    ADS::HashMap<ADS::String, ADS::String> map;
+    map.set("Key1", "Value1");
+    map.set("Key2", "Value2");
+    map.set("Key3", "Value3");
+    CHECK(map.size() == 3);
+    REQUIRE(map.contains("Key1"));
+    REQUIRE(map.contains("Key2"));
+    REQUIRE(map.contains("Key3"));
+
+    REQUIRE(map.getValueOrDefault("Key1", " ") == "Value1");
+    REQUIRE(map.getValueOrDefault("Key2", " ") == "Value2");
+    REQUIRE(map.getValueOrDefault("Key3", " ") == "Value3");
+}
+
 
 TEST_CASE("HashMap: rehash works", "[HashMap]")
 {

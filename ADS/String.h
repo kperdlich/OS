@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Hash.h"
 #include "Types.h"
 #include "Vector.h"
 
@@ -492,6 +493,25 @@ private:
     T* m_charBuffer { nullptr };
     size_t m_length { 0 };
     size_t m_capacity { 0 };
+};
+
+template<>
+struct Hash<BasicString<char>> {
+    uint32 operator()(const BasicString<char>& str ) const
+    {
+        if (str.isEmpty())
+            return 0;
+
+        // FIXME: Cache the hash value
+        uint32_t hashValue = 0;
+        for (ADS::size_t i = 0; i < str.length(); ++i) {
+            hashValue += str[i];
+            hashValue += (hashValue << 10);
+            hashValue ^= (hashValue >> 6);
+        }
+        hashValue ^= hashValue >> 13;
+        return hashValue;
+    }
 };
 
 using String = BasicString<char>;
