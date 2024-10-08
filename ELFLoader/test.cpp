@@ -2,10 +2,12 @@
 // Created by n3dry on 04.10.24.
 //
 
-#include <cstdio>
+extern "C" int TestFunc(int a)
+{
+    return 30 + a;
+}
 
 int main()
 {
-    printf("Test Program for ELF loader!\n");
     return 0;
 }

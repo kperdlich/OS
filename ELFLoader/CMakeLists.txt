@@ -14,4 +14,6 @@ add_executable(ELFLoader
         ELFLoader.h
 )
 
+set_target_properties(ELFLoader PROPERTIES COMPILE_OPTIONS "-m32" LINK_FLAGS "-m32")
+
 target_link_libraries(ELFLoader PRIVATE ADS)
