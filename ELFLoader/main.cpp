@@ -8,7 +8,7 @@ typedef int(*TestFunc)(int);
 
 int main()
 {
-    ELF::ELFLoader loader("test.cpp.o");
+    ELF::ELFLoader loader("test.o");
     const char* const func = "TestFunc";
     if (loader.load()) {
         loader.dump();
