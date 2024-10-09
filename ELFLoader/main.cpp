@@ -8,11 +8,12 @@ typedef int(*TestFunc)(int);
 
 int main(int argc, char* argv[])
 {
-    ELF::ELFLoader loader("ELFTestProgram");
+    ELF::ELFLoader loader("test.cpp.o");
     const char* const func = "TestFunc";
     if (loader.load()) {
         loader.dump();
         TestFunc testFunc = reinterpret_cast<TestFunc>(loader.findFunc(func));
-        printf("Found function '%s' at location '%p'", func, testFunc);
+        static constexpr const int arg = 20;
+        printf("Calling '%s' at location '%p' with value '%d' returns: '%d'", func, testFunc, arg, testFunc(arg));
     }
 }
