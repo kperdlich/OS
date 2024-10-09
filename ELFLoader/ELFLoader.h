@@ -17,6 +17,7 @@ public:
 
     bool load();
     void dump() const;
+    void clear();
 
     void* findFunc(const ADS::String& name);
 
@@ -36,15 +37,16 @@ private:
 private:
     ADS::HashMap<ADS::String, const Elf64_Sym*> m_funcSymbols;
     ADS::String m_elfFilePath;
-    void* m_elfFile { nullptr };
+    ADS::size_t m_mappedFileSize {};
+    char* m_mappedElfFile { nullptr };
     const Elf64_Shdr* m_symbolTableSectionHeader { nullptr };
-    uint8_t* m_executableTextSection { nullptr };
+    char* m_executableTextSection { nullptr };
 };
 
 template<typename Func>
 void ELFLoader::forEachSymbolIndexed(Func func) const
 {
-    const uint8_t* const symbolData = reinterpret_cast<uint8_t*>(m_elfFile) + m_symbolTableSectionHeader->sh_offset;
+    const uint8_t* const symbolData = reinterpret_cast<uint8_t*>(m_mappedElfFile) + m_symbolTableSectionHeader->sh_offset;
     const ADS::size_t numSymbols = m_symbolTableSectionHeader->sh_size / sizeof(Elf64_Sym);
 
     for (ADS::size_t i = 0; i < numSymbols; ++i) {

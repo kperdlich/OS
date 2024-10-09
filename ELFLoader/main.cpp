@@ -6,7 +6,7 @@
 
 typedef int(*TestFunc)(int);
 
-int main(int argc, char* argv[])
+int main()
 {
     ELF::ELFLoader loader("test.cpp.o");
     const char* const func = "TestFunc";
