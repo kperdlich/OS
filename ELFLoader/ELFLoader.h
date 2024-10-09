@@ -46,12 +46,11 @@ private:
 template<typename Func>
 void ELFLoader::forEachSymbolIndexed(Func func) const
 {
-    const uint8_t* const symbolData = reinterpret_cast<uint8_t*>(m_mappedElfFile) + m_symbolTableSectionHeader->sh_offset;
+    const Elf64_Sym* const symbolData = reinterpret_cast<const Elf64_Sym*>(m_mappedElfFile + m_symbolTableSectionHeader->sh_offset);
     const ADS::size_t numSymbols = m_symbolTableSectionHeader->sh_size / sizeof(Elf64_Sym);
 
     for (ADS::size_t i = 0; i < numSymbols; ++i) {
-        const Elf64_Sym* const symbol = reinterpret_cast<const Elf64_Sym*>(symbolData + i * sizeof(Elf64_Sym));
-        func(i, *symbol);
+        func(i, symbolData[i]);
     }
 }
 
