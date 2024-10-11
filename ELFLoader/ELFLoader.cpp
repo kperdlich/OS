@@ -45,10 +45,17 @@ ELFLoader::~ELFLoader()
 
 void ELFLoader::clear()
 {
+    m_funcSymbols.clear();
     if (m_mappedElfFile) {
         munmap(m_mappedElfFile, m_mappedFileSize);
         m_mappedElfFile = nullptr;
         m_mappedFileSize = {};
+    }
+
+    if (m_executableTextSection) {
+        munmap(m_executableTextSection, m_executableTextSectionSize);
+        m_executableTextSection = nullptr;
+        m_executableTextSectionSize = {};
     }
 }
 
@@ -76,6 +83,7 @@ bool ELFLoader::load()
     }
 
     loadSymbols();
+    applyRelocations();
     return true;
 }
 
@@ -171,6 +179,27 @@ const char* ELFLoader::getStringFromSectionStringTable(const Elf64_Shdr& section
     return stringTable + stringTableIndex;
 }
 
+const Elf64_Sym* ELFLoader::symbolTable() const
+{
+    return reinterpret_cast<const Elf64_Sym*>(m_mappedElfFile + m_symbolTableSectionHeader->sh_offset);
+}
+
+const Elf64_Sym* ELFLoader::symbolByIndex(uint32_t index) const
+{
+    return &symbolTable()[index];
+}
+
+const Elf64_Shdr* ELFLoader::findSection(const char* name) const
+{
+    for (ADS::size_t i = 0; i < header()->e_shnum; ++i) {
+        const Elf64_Shdr& shdr = sectionHeader()[i];
+        const ADS::String sectionName = sectionHeaderStringTable() + shdr.sh_name;
+        if (sectionName == name)
+            return &shdr;
+    }
+    return nullptr;
+}
+
 void ELFLoader::loadSymbols()
 {
     for (ADS::size_t i = 0; i < header()->e_shnum; ++i) {
@@ -183,8 +212,7 @@ void ELFLoader::loadSymbols()
                 m_executableTextSection = static_cast<char*>(mmap(nullptr, sh.sh_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
                 ASSERT(m_executableTextSection != MAP_FAILED);
                 memcpy(m_executableTextSection, m_mappedElfFile + sh.sh_offset, sh.sh_size);
-                const int ret = mprotect(m_executableTextSection, sh.sh_size, PROT_READ | PROT_EXEC);
-                ASSERT(ret == 0);
+                m_executableTextSectionSize = sh.sh_size;
             }
         }
         if (m_symbolTableSectionHeader && m_executableTextSection)
@@ -200,6 +228,47 @@ void ELFLoader::loadSymbols()
             m_funcSymbols.set(symbolStr, &symbol);
         }
     });
+}
+
+void ELFLoader::applyRelocations()
+{
+    // For now only .text section
+    const Elf64_Shdr* relaTextSection = findSection(".rela.text");
+    if (relaTextSection)
+        applyRelocation(*relaTextSection, m_executableTextSection);
+
+    const int ret = mprotect(m_executableTextSection, m_executableTextSectionSize, PROT_READ | PROT_EXEC);
+    ASSERT(ret == 0);
+}
+
+void ELFLoader::applyRelocation(const Elf64_Shdr& section, char* runtimeSectionMemory)
+{
+    const ADS::size_t numRelocations = section.sh_size / section.sh_entsize;
+    const Elf64_Rela* const relocations = reinterpret_cast<Elf64_Rela*>(m_mappedElfFile + section.sh_offset);
+    for (ADS::size_t i = 0; i < numRelocations; i++) {
+        const uint32_t symbolIndex = ELF64_R_SYM(relocations[i].r_info);
+        const uint32_t type = ELF64_R_TYPE(relocations[i].r_info);
+        char* const addressToPatch = runtimeSectionMemory + relocations[i].r_offset;
+
+        const Elf64_Sym* const symbol = symbolByIndex(symbolIndex);
+        const Elf64_Shdr& symbolSection = sectionHeader()[symbol->st_shndx];
+
+        const ADS::String symbolName = getStringFromSectionStringTable(*m_symbolTableSectionHeader, symbol->st_name);
+        const ADS::String sectionName = sectionHeaderStringTable() + symbolSection.sh_name;
+
+        const char* const symbolAddress = runtimeSectionMemory + symbol->st_value;
+        const uint32_t valueBeforeRelocation = *reinterpret_cast<uint32_t*>(addressToPatch);
+
+        switch (type) {
+        case R_X86_64_PLT32:
+            *reinterpret_cast<uint32_t*>(addressToPatch) = symbolAddress + relocations[i].r_addend - addressToPatch;
+            printf("Apply PLT32 relocation: section '%s', symbol '%s' from '0x%08x' to '0x%08x'\n", sectionName.cStr(), symbolName.cStr(), valueBeforeRelocation, *reinterpret_cast<uint32_t*>(addressToPatch));
+            break;
+        default:
+            ASSERT(false);
+            break;
+        }
+    }
 }
 
 }

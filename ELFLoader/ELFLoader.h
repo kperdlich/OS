@@ -23,13 +23,18 @@ public:
 
 private:
     void loadSymbols();
+    void applyRelocations();
+    void applyRelocation(const Elf64_Shdr& section, char* runtimeSectionMemory);
 
     [[nodiscard]] bool isValidElfFile() const;
     [[nodiscard]] const Elf64_Ehdr* header() const;
     [[nodiscard]] const Elf64_Shdr* sectionHeader() const;
     [[nodiscard]] const Elf64_Phdr* programHeader() const;
     [[nodiscard]] const char* sectionHeaderStringTable() const;
+    [[nodiscard]] const Elf64_Shdr* findSection(const char* sectionName) const;
     [[nodiscard]] const char* getStringFromSectionStringTable(const Elf64_Shdr& section, ADS::size_t stringTableIndex) const;
+    [[nodiscard]] const Elf64_Sym* symbolTable() const;
+    [[nodiscard]] const Elf64_Sym* symbolByIndex(uint32_t index) const;
 
     template<typename Func>
     void forEachSymbolIndexed(Func func) const;
@@ -41,6 +46,7 @@ private:
     char* m_mappedElfFile { nullptr };
     const Elf64_Shdr* m_symbolTableSectionHeader { nullptr };
     char* m_executableTextSection { nullptr };
+    ADS::size_t m_executableTextSectionSize {};
 };
 
 template<typename Func>
