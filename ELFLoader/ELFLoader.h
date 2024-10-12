@@ -24,7 +24,8 @@ public:
 private:
     void ParseAndLoad();
     void applyRelocations();
-    void applyRelocation(const Elf64_Shdr& section, char* runtimeSectionMemory);
+    void applyRelocation(const Elf64_Shdr& section);
+    void applyRuntimeSectionsMemoryProtection();
 
     [[nodiscard]] bool isValidElfFile() const;
     [[nodiscard]] const Elf64_Ehdr* header() const;
@@ -43,20 +44,21 @@ private:
     const Elf64_Shdr* findSectionHeader(Func func) const;
 
 private:
+    struct RuntimeMemorySection {
+        char* Ptr { nullptr };
+        ADS::size_t Size {};
+        int32_t ProtectionFlags {};
+    };
+
     ADS::HashMap<ADS::String, const Elf64_Sym*> m_funcSymbols;
     ADS::HashMap<ADS::String, char*> m_externalSymbols;
+    ADS::HashMap<ADS::String, RuntimeMemorySection> m_runtimeSections;
     ADS::String m_elfFilePath;
     ADS::size_t m_mappedFileSize {};
     char* m_mappedElfFile { nullptr };
     const Elf64_Shdr* m_symbolTableSectionHeader { nullptr };
     char* m_runtimeMemory { nullptr };
     ADS::size_t m_runtimeMemorySize {};
-    char* m_runtimeMemoryTextSection { nullptr };
-    ADS::size_t m_runtimeTextSectionSize {};
-    char* m_runtimeMemoryDataSection { nullptr };
-    ADS::size_t m_runtimeDataSectionSize {};
-    char* m_runtimeMemoryRodataSection { nullptr };
-    ADS::size_t m_runtimeRodataSectionSize {};
 };
 
 template<typename Func>

@@ -4,9 +4,8 @@
 
 #include "ELFLoader.h"
 
-typedef int(*TestFunc)(int);
-typedef int(*MainFunc)();
-
+typedef int (*TestFunc)(int);
+typedef int (*MainFunc)();
 
 int main()
 {

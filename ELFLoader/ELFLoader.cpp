@@ -10,7 +10,7 @@
 
 namespace ELF {
 
-static uint64_t s_pageSize {};
+static uint64_t s_pageSize { 0 };
 
 static uint64_t pageAlign(uint64_t n)
 {
@@ -64,12 +64,7 @@ void ELFLoader::clear()
         munmap(m_runtimeMemory, m_runtimeMemorySize);
         m_runtimeMemory = nullptr;
         m_runtimeMemorySize = {};
-        m_runtimeMemoryRodataSection = nullptr;
-        m_runtimeRodataSectionSize = {};
-        m_runtimeMemoryTextSection = nullptr;
-        m_runtimeTextSectionSize = {};
-        m_runtimeMemoryDataSection = nullptr;
-        m_runtimeDataSectionSize = {};
+        m_runtimeSections.clear();
     }
 }
 
@@ -185,7 +180,7 @@ void* ELFLoader::findFunc(const ADS::String& name)
     if (!m_funcSymbols.tryGetValue(name, symbol))
         return nullptr;
 
-    return m_runtimeMemoryTextSection + symbol->st_value;
+    return m_runtimeMemory + symbol->st_value;
 }
 
 const char* ELFLoader::getStringFromSectionStringTable(const Elf64_Shdr& section, ADS::size_t stringTableIndex) const
@@ -247,25 +242,29 @@ void ELFLoader::ParseAndLoad()
     m_runtimeMemory = static_cast<char*>(mmap(nullptr, m_runtimeMemorySize, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
     ASSERT(m_runtimeMemory != MAP_FAILED);
 
-    m_runtimeMemoryTextSection = m_runtimeMemory;
-    m_runtimeTextSectionSize = m_runtimeMemorySize;
+    // copy sections from ELF to runtime memory in order: .text -> .data -> .rodata
+    char* runtimeSectionPtr = m_runtimeMemory;
+    const ADS::size_t runtimeTextSectionSize = pageAlign(textSectionHeader->sh_size);
+    const RuntimeMemorySection textRuntimeSection { .Ptr = runtimeSectionPtr, .Size = runtimeTextSectionSize, .ProtectionFlags = PROT_READ | PROT_EXEC };
+    m_runtimeSections.set(".text", textRuntimeSection);
+    memcpy(textRuntimeSection.Ptr, m_mappedElfFile + textSectionHeader->sh_offset, textSectionHeader->sh_size);
+    runtimeSectionPtr += runtimeTextSectionSize;
 
-    if (dataSectionHeader) {
-        m_runtimeDataSectionSize = pageAlign(dataSectionHeader->sh_size);
-        m_runtimeMemoryDataSection = m_runtimeMemory + m_runtimeDataSectionSize;
+    if (dataSectionHeader && dataSectionHeader->sh_size > 0) {
+        const ADS::size_t sectionSize = pageAlign(dataSectionHeader->sh_size);
+        const RuntimeMemorySection runtimeSection { .Ptr = runtimeSectionPtr, .Size = sectionSize, .ProtectionFlags = PROT_READ | PROT_WRITE };
+        m_runtimeSections.set(".data", runtimeSection);
+        memcpy(runtimeSection.Ptr, m_mappedElfFile + dataSectionHeader->sh_offset, dataSectionHeader->sh_size);
+        runtimeSectionPtr += sectionSize;
     }
 
-    if (rodataSectionHeader) {
-        m_runtimeRodataSectionSize = pageAlign(rodataSectionHeader->sh_size);
-        m_runtimeMemoryRodataSection = m_runtimeMemory + m_runtimeRodataSectionSize;
+    if (rodataSectionHeader && rodataSectionHeader->sh_size > 0) {
+        const ADS::size_t sectionSize = pageAlign(rodataSectionHeader->sh_size);
+        const RuntimeMemorySection runtimeSection { .Ptr = runtimeSectionPtr, .Size = sectionSize, .ProtectionFlags = PROT_READ };
+        m_runtimeSections.set(".rodata", runtimeSection);
+        memcpy(runtimeSection.Ptr, m_mappedElfFile + rodataSectionHeader->sh_offset, rodataSectionHeader->sh_size);
+        runtimeSectionPtr += sectionSize;
     }
-
-    // copy sections from ELF
-    memcpy(m_runtimeMemoryTextSection, m_mappedElfFile + textSectionHeader->sh_offset, textSectionHeader->sh_size);
-    if (dataSectionHeader)
-        memcpy(m_runtimeMemoryDataSection, m_mappedElfFile + dataSectionHeader->sh_offset, dataSectionHeader->sh_size);
-    if (rodataSectionHeader)
-        memcpy(m_runtimeMemoryRodataSection, m_mappedElfFile + rodataSectionHeader->sh_offset, rodataSectionHeader->sh_size);
 
     // Load and cache func symbols
     forEachSymbolIndexed([this](ADS::size_t, const Elf64_Sym& symbol) {
@@ -276,16 +275,7 @@ void ELFLoader::ParseAndLoad()
     });
 
     applyRelocations();
-
-    // make the `.text` copy readonly and executable
-    const int protectTextSectionRet = mprotect(m_runtimeMemoryTextSection, m_runtimeTextSectionSize, PROT_READ | PROT_EXEC);
-    ASSERT(protectTextSectionRet == 0);
-
-    // make `.rodata` readonly
-    if (m_runtimeMemoryRodataSection) {
-        const int protectRoDataSectionRet = mprotect(m_runtimeMemoryRodataSection, m_runtimeRodataSectionSize, PROT_READ);
-        ASSERT(protectRoDataSectionRet == 0);
-    }
+    applyRuntimeSectionsMemoryProtection();
 }
 
 void ELFLoader::applyRelocations()
@@ -300,17 +290,17 @@ void ELFLoader::applyRelocations()
     });
 
     if (relaTextSection)
-        applyRelocation(*relaTextSection, m_runtimeMemory);
+        applyRelocation(*relaTextSection);
 }
 
-void ELFLoader::applyRelocation(const Elf64_Shdr& section, char* runtimeSectionMemory)
+void ELFLoader::applyRelocation(const Elf64_Shdr& section)
 {
     const ADS::size_t numRelocations = section.sh_size / section.sh_entsize;
     const Elf64_Rela* const relocations = reinterpret_cast<Elf64_Rela*>(m_mappedElfFile + section.sh_offset);
     for (ADS::size_t i = 0; i < numRelocations; i++) {
         const uint32_t symbolIndex = ELF64_R_SYM(relocations[i].r_info);
         const uint32_t type = ELF64_R_TYPE(relocations[i].r_info);
-        char* const addressToPatch = runtimeSectionMemory + relocations[i].r_offset;
+        char* const addressToPatch = m_runtimeMemory + relocations[i].r_offset;
         const Elf64_Sym* const symbol = symbolByIndex(symbolIndex);
 
         const char* symbolAddress = nullptr;
@@ -347,17 +337,24 @@ void ELFLoader::applyRelocation(const Elf64_Shdr& section, char* runtimeSectionM
 
 const char* ELFLoader::getRuntimeAddressFromSectionName(const ADS::String& sectionName) const
 {
-    // FIXME: Not ideal :/
-    if (sectionName == ".text")
-        return m_runtimeMemoryTextSection;
+    RuntimeMemorySection runtimeMemorySection {};
+    const bool found = m_runtimeSections.tryGetValue(sectionName, runtimeMemorySection);
+    if (found)
+        return runtimeMemorySection.Ptr;
 
-    if (sectionName == ".data")
-        return m_runtimeMemoryDataSection;
-
-    if (sectionName == ".rodata")
-        return m_runtimeMemoryRodataSection;
-
+    ASSERT_NOT_REACHED();
     return nullptr;
+}
+
+void ELFLoader::applyRuntimeSectionsMemoryProtection()
+{
+    for (const auto& entry : m_runtimeSections) {
+        if (entry.value.ProtectionFlags <= 0)
+            continue;
+
+        const int protectionStatus = mprotect(entry.value.Ptr, entry.value.Size, entry.value.ProtectionFlags);
+        ASSERT(protectionStatus == 0);
+    }
 }
 
 }
