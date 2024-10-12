@@ -43,6 +43,7 @@ static const char* symbolTypeFor(uint8_t type)
 ELFLoader::ELFLoader(ADS::String elfFilePath)
     : m_elfFilePath(ADS::move(elfFilePath))
 {
+    m_externalSymbols.set("puts", reinterpret_cast<char*>(puts));
 }
 
 ELFLoader::~ELFLoader()
@@ -207,7 +208,7 @@ const Elf64_Sym* ELFLoader::symbolByIndex(uint32_t index) const
 void ELFLoader::ParseAndLoad()
 {
     const Elf64_Shdr* textSectionHeader = findSectionHeader([this](const Elf64_Shdr& sh) {
-        ADS::String sectionName = sectionHeaderStringTable() + sh.sh_name;
+        const ADS::String sectionName = sectionHeaderStringTable() + sh.sh_name;
         if (sectionName == ".text") {
             return true;
         }
@@ -215,7 +216,7 @@ void ELFLoader::ParseAndLoad()
     });
 
     const Elf64_Shdr* dataSectionHeader = findSectionHeader([this](const Elf64_Shdr& sh) {
-        ADS::String sectionName = sectionHeaderStringTable() + sh.sh_name;
+        const ADS::String sectionName = sectionHeaderStringTable() + sh.sh_name;
         if (sectionName == ".data") {
             return true;
         }
@@ -223,7 +224,7 @@ void ELFLoader::ParseAndLoad()
     });
 
     const Elf64_Shdr* rodataSectionHeader = findSectionHeader([this](const Elf64_Shdr& sh) {
-        ADS::String sectionName = sectionHeaderStringTable() + sh.sh_name;
+        const ADS::String sectionName = sectionHeaderStringTable() + sh.sh_name;
         if (sectionName == ".rodata") {
             return true;
         }
@@ -309,28 +310,33 @@ void ELFLoader::applyRelocation(const Elf64_Shdr& section, char* runtimeSectionM
     for (ADS::size_t i = 0; i < numRelocations; i++) {
         const uint32_t symbolIndex = ELF64_R_SYM(relocations[i].r_info);
         const uint32_t type = ELF64_R_TYPE(relocations[i].r_info);
-
         char* const addressToPatch = runtimeSectionMemory + relocations[i].r_offset;
-
         const Elf64_Sym* const symbol = symbolByIndex(symbolIndex);
-        const Elf64_Shdr& symbolSection = sectionHeader()[symbol->st_shndx];
 
-        const ADS::String symbolName = getStringFromSectionStringTable(*m_symbolTableSectionHeader, symbol->st_name);
-        const ADS::String sectionName = sectionHeaderStringTable() + symbolSection.sh_name;
-
-        const char* const sectionRuntimeAddress = getRuntimeAddressFromSectionName(sectionName);
-        ASSERT(sectionRuntimeAddress != nullptr);
-
-        const char* const symbolAddress = sectionRuntimeAddress + symbol->st_value;
-        const uint32_t valueBeforeRelocation = *reinterpret_cast<uint32_t*>(addressToPatch);
+        const char* symbolAddress = nullptr;
+        const bool isExternalSymbol = symbol->st_shndx == SHN_UNDEF;
+        if (isExternalSymbol) {
+            const ADS::String symbolName = getStringFromSectionStringTable(*m_symbolTableSectionHeader, symbol->st_name);
+            const char* const externalSymbol = m_externalSymbols.getValueOrDefault(symbolName);
+            ASSERT(externalSymbol != nullptr);
+            symbolAddress = externalSymbol;
+            printf("Relocation: patch external symbol '%s'\n", symbolName.cStr());
+        } else {
+            const Elf64_Shdr& symbolSection = sectionHeader()[symbol->st_shndx];
+            const ADS::String symbolName = getStringFromSectionStringTable(*m_symbolTableSectionHeader, symbol->st_name);
+            const ADS::String sectionName = sectionHeaderStringTable() + symbolSection.sh_name;
+            const char* const sectionRuntimeAddress = getRuntimeAddressFromSectionName(sectionName);
+            ASSERT(sectionRuntimeAddress != nullptr);
+            symbolAddress = sectionRuntimeAddress + symbol->st_value;
+            printf("Relocation: patch internal symbol; section '%s', symbol '%s'\n", sectionName.cStr(), symbolName.cStr());
+        }
 
         switch (type) {
         case R_X86_64_PC32:
-            /* S + A - P, 32 bit output, S == L here */
+            // S + A - P, 32 bit output, S == L here
         case R_X86_64_PLT32:
-            /* L + A - P, 32 bit output */
+            // L + A - P, 32 bit output
             *reinterpret_cast<uint32_t*>(addressToPatch) = symbolAddress + relocations[i].r_addend - addressToPatch;
-            printf("Apply relocation: section '%s', symbol '%s' from '0x%08x' to '0x%08x'\n", sectionName.cStr(), symbolName.cStr(), valueBeforeRelocation, *reinterpret_cast<uint32_t*>(addressToPatch));
             break;
         default:
             ASSERT(false);

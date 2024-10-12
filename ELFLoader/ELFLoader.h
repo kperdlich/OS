@@ -44,6 +44,7 @@ private:
 
 private:
     ADS::HashMap<ADS::String, const Elf64_Sym*> m_funcSymbols;
+    ADS::HashMap<ADS::String, char*> m_externalSymbols;
     ADS::String m_elfFilePath;
     ADS::size_t m_mappedFileSize {};
     char* m_mappedElfFile { nullptr };

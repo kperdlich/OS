@@ -2,7 +2,9 @@
 // Created by n3dry on 04.10.24.
 //
 
-extern "C" const char* getHelloWorld()
+#include <stdio.h>
+
+const char* getHelloWorld()
 {
     return "Hello World";
 }
@@ -19,5 +21,8 @@ extern "C" int TestFunc(int a)
 
 int main()
 {
-    return 0;
+    puts("main called!");
+    puts(getHelloWorld());
+    const int a = add(10, -10);
+    return a;
 }
