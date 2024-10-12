@@ -2,6 +2,11 @@
 // Created by n3dry on 04.10.24.
 //
 
+extern "C" const char* getHelloWorld()
+{
+    return "Hello World";
+}
+
 int add(int a, int b)
 {
     return a + b;
@@ -9,7 +14,7 @@ int add(int a, int b)
 
 extern "C" int TestFunc(int a)
 {
-    return add(a, 5);
+    return add(a, 10);
 }
 
 int main()

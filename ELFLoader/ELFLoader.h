@@ -22,7 +22,7 @@ public:
     void* findFunc(const ADS::String& name);
 
 private:
-    void loadSymbols();
+    void ParseAndLoad();
     void applyRelocations();
     void applyRelocation(const Elf64_Shdr& section, char* runtimeSectionMemory);
 
@@ -31,13 +31,16 @@ private:
     [[nodiscard]] const Elf64_Shdr* sectionHeader() const;
     [[nodiscard]] const Elf64_Phdr* programHeader() const;
     [[nodiscard]] const char* sectionHeaderStringTable() const;
-    [[nodiscard]] const Elf64_Shdr* findSection(const char* sectionName) const;
     [[nodiscard]] const char* getStringFromSectionStringTable(const Elf64_Shdr& section, ADS::size_t stringTableIndex) const;
     [[nodiscard]] const Elf64_Sym* symbolTable() const;
     [[nodiscard]] const Elf64_Sym* symbolByIndex(uint32_t index) const;
+    [[nodiscard]] const char* getRuntimeAddressFromSectionName(const ADS::String& sectionName) const;
 
     template<typename Func>
     void forEachSymbolIndexed(Func func) const;
+
+    template<typename Func>
+    const Elf64_Shdr* findSectionHeader(Func func) const;
 
 private:
     ADS::HashMap<ADS::String, const Elf64_Sym*> m_funcSymbols;
@@ -45,9 +48,26 @@ private:
     ADS::size_t m_mappedFileSize {};
     char* m_mappedElfFile { nullptr };
     const Elf64_Shdr* m_symbolTableSectionHeader { nullptr };
-    char* m_executableTextSection { nullptr };
-    ADS::size_t m_executableTextSectionSize {};
+    char* m_runtimeMemory { nullptr };
+    ADS::size_t m_runtimeMemorySize {};
+    char* m_runtimeMemoryTextSection { nullptr };
+    ADS::size_t m_runtimeTextSectionSize {};
+    char* m_runtimeMemoryDataSection { nullptr };
+    ADS::size_t m_runtimeDataSectionSize {};
+    char* m_runtimeMemoryRodataSection { nullptr };
+    ADS::size_t m_runtimeRodataSectionSize {};
 };
+
+template<typename Func>
+const Elf64_Shdr* ELFLoader::findSectionHeader(Func func) const
+{
+    for (ADS::size_t i = 0; i < header()->e_shnum; ++i) {
+        const Elf64_Shdr& sh = sectionHeader()[i];
+        if (func(sh))
+            return &sh;
+    }
+    return nullptr;
+}
 
 template<typename Func>
 void ELFLoader::forEachSymbolIndexed(Func func) const
