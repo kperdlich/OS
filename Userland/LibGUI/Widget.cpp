@@ -225,7 +225,7 @@ Size Widget::preferredSizeHint() const
         return m_layout->preferredSizeHint();
 
     std::cerr << "[Widget::preferredSizeHint] used for " << className() << " where no layout is provided. Probably you forgot to override preferredSizeHint()" << std::endl;
-    // ASSERT(false);
+    // ASSERT_NOT_REACHED();
     return Size::Invalid();
 }
 
@@ -235,7 +235,7 @@ Size Widget::minSizeHint() const
         return m_layout->minSizeHint();
 
     std::cerr << "[Widget::minSizeHint] used for " << className() << " where no layout is provided. Probably you forgot to override minSizeHint()." << std::endl;
-    // ASSERT(false);
+    // ASSERT_NOT_REACHED();
     return Size::Invalid();
 }
 

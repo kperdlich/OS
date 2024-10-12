@@ -35,7 +35,7 @@ static const char* symbolTypeFor(uint8_t type)
     case STT_TLS:
         return "TLS";
     default:
-        ASSERT(false);
+        ASSERT_NOT_REACHED();
         return "Unknown";
     }
 }
@@ -339,7 +339,7 @@ void ELFLoader::applyRelocation(const Elf64_Shdr& section, char* runtimeSectionM
             *reinterpret_cast<uint32_t*>(addressToPatch) = symbolAddress + relocations[i].r_addend - addressToPatch;
             break;
         default:
-            ASSERT(false);
+            ASSERT_NOT_REACHED();
             break;
         }
     }

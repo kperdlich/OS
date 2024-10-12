@@ -9,5 +9,6 @@
 namespace ADS {
 
 #define ASSERT(X) assert(X)
+#define ASSERT_NOT_REACHED() assert(false)
 
 }

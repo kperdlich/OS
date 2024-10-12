@@ -61,7 +61,7 @@ void Bitmap::setPixel(int x, int y, GUI::Color color)
         break;
     }
     default:
-        ASSERT(false);
+        ASSERT_NOT_REACHED();
     }
 }
 
@@ -79,7 +79,7 @@ int Bitmap::byteDensityFor(BitmapFormat format)
     case BitmapFormat::RGBA32:
         return 4;
     default:
-        ASSERT(false);
+        ASSERT_NOT_REACHED();
     }
 }
 

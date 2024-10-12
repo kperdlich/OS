@@ -488,7 +488,7 @@ void WindowManager::updateResizing(const Point& position)
         changeWidth = diff.x();
         break;
     default:
-        ASSERT(false);
+        ASSERT_NOT_REACHED();
         break;
     }
 
