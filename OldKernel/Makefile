@@ -1,4 +1,4 @@
-TOOLCHAIN := Toolchain/Local/i686/bin
+TOOLCHAIN := ../Toolchain/Local/i686/bin
 LD := $(TOOLCHAIN)/i686-elf-g++
 
 OBJDIR := Build
@@ -18,7 +18,7 @@ OBJ=$(OBJDIR)/gdt_setup.o \
 
 
 all: clean
-	make -C ./Kernel
+	make -C ./src
 	$(LD) -T linker.ld -o OS.bin -ffreestanding -O2 -nostdlib Build/Boot.o $(OBJ) -lgcc
 	qemu-system-i386 -kernel OS.bin
 

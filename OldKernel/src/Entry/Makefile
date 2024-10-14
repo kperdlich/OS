@@ -1,4 +1,4 @@
-TOOLCHAIN := ../../Toolchain/Local/i686/bin
+TOOLCHAIN := ../../../Toolchain/Local/i686/bin
 AS := $(TOOLCHAIN)/i686-elf-as
 
 all:
