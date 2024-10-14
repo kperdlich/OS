@@ -8,7 +8,7 @@ set(CMAKE_ASM_COMPILER ${TOOLCHAIN_BIN_PATH}/i686-elf-as)
 set(CMAKE_LINKER ${TOOLCHAIN_BIN_PATH}/i686-elf-ld)
 
 if (${CMAKE_GENERATOR} STREQUAL "Ninja")
-    # Compile asm without the `-MF` option which seems to cause problems.
+    # By default ninja adds `-MF` as an option which doesn't seem to be available in i686-elf-as.
     set(CMAKE_ASM_COMPILE_OBJECT "<CMAKE_ASM_COMPILER> -c <SOURCE> -o <OBJECT>")
 endif ()
 
