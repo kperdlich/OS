@@ -2,6 +2,7 @@
 // Created by n3dry on 14.10.24.
 //
 
+#include "SerialDebug.h"
 #include "Types.h"
 #include "VGA.h"
 
@@ -19,6 +20,8 @@
 
 extern "C" void kmain()
 {
+    SerialDebug::initialize();
+
     VGA::initialize();
     VGA::writeString("Hello, kernel World!\n");
 }
