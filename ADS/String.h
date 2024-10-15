@@ -497,7 +497,7 @@ private:
 
 template<>
 struct Hash<BasicString<char>> {
-    uint32 operator()(const BasicString<char>& str ) const
+    uint32 operator()(const BasicString<char>& str) const
     {
         if (str.isEmpty())
             return 0;

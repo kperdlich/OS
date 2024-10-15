@@ -27,6 +27,10 @@ add_executable(Kernel ${SOURCES})
 set_target_properties(Kernel PROPERTIES LINK_FLAGS "-T ${LINKER_SCRIPT} -ffreestanding -nostdlib")
 set_target_properties(Kernel PROPERTIES OUTPUT_NAME ${KERNEL_BIN})
 
+target_link_libraries(Kernel PRIVATE ADS)
+
+target_compile_definitions(Kernel PUBLIC KERNEL)
+
 add_custom_target(BuildAndRunKernel
         DEPENDS Kernel
         COMMAND qemu-system-i386 -kernel ${PROJECT_BINARY_DIR}/${KERNEL_BIN}
