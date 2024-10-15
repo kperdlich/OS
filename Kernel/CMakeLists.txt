@@ -17,6 +17,10 @@ set(CMAKE_CXX_FLAGS "-m32 -ffreestanding -fno-stack-protector -fno-pic -fno-exce
 set(SOURCES
         boot.s
         Kernel.cpp
+        VGA.h
+        VGA.cpp
+        StdLib.h
+        StdLib.cpp
 )
 
 set(LINKER_SCRIPT ${PROJECT_SOURCE_DIR}/linker.ld)
