@@ -25,6 +25,7 @@ set(SOURCES
         IO.h
         SerialDebug.cpp
         SerialDebug.h
+        Assert.h
 )
 
 set(LINKER_SCRIPT ${PROJECT_SOURCE_DIR}/linker.ld)

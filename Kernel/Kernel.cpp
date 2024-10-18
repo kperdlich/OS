@@ -5,9 +5,10 @@
 #include "SerialDebug.h"
 #include "Types.h"
 #include "VGA.h"
+#include "Assert.h"
 
 #ifdef __linux__
-    #error "Kernel needs to be compiled with an cross-compiler"
+    #error "Kernel needs to be compiled with a cross-compiler"
 #endif
 
 #ifndef __i386__
@@ -20,8 +21,9 @@
 
 extern "C" void kmain()
 {
-    SerialDebug::initialize();
-
+    SerialDebugInterface::initialize();
     VGA::initialize();
+
     VGA::writeString("Hello, kernel World!\n");
+
 }

@@ -4,11 +4,11 @@
 
 #pragma once
 
-namespace SerialDebug {
+#include "Types.h"
+
+namespace SerialDebugInterface {
 
 void initialize();
-void putChar(char a);
-void putChar(char a);
-void write(const char* str);
+int printf(const char* format, ...);
 
 }

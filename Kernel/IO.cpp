@@ -8,13 +8,13 @@ namespace IO {
 
 void out8(uint16_t port, uint8_t value)
 {
-    asm("outb %0, %1" : : "a"(value), "Nd"(port));
+    asm volatile("outb %0, %1" : : "a"(value), "Nd"(port));
 }
 
 uint8_t inb(uint16_t port)
 {
     uint8_t ret;
-    asm("inb %1, %0" : "=a"(ret) : "Nd"(port));
+    asm volatile("inb %1, %0" : "=a"(ret) : "Nd"(port));
     return ret;
 }
 
