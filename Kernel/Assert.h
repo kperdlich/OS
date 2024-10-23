@@ -4,13 +4,11 @@
 
 #pragma once
 
-#include "SerialDebug.h"
-
 #define ASSERT(x)                                                                                                           \
     do {                                                                                                                    \
         if (!(x)) {                                                                                                         \
             asm volatile("cli");                                                                                            \
-            SerialDebugInterface::printf("ASSERTION Failed: '" #x "':\n%s:%u %s", __FILE__, __LINE__, __PRETTY_FUNCTION__); \
+            dbgPrintf("ASSERTION Failed: '" #x "':\n%s:%u %s", __FILE__, __LINE__, __PRETTY_FUNCTION__); \
             asm volatile("hlt");                                                                                            \
         }                                                                                                                   \
     } while (false)

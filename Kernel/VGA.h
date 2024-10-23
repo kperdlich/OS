@@ -31,7 +31,8 @@ void initialize();
 void setColor(uint8_t color);
 void putChar(char c);
 void write(const char* data, ADS::size_t size);
-void writeString(const char* data);
+int writeString(const char* data);
 void putCharAt(char c, uint8_t color, ADS::size_t x, ADS::size_t y);
+bool isInitialized();
 
 }

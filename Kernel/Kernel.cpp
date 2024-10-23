@@ -4,6 +4,7 @@
 
 #include "SerialDebug.h"
 #include "Types.h"
+#include "Kprintf.h"
 #include "VGA.h"
 #include "Assert.h"
 
@@ -24,6 +25,8 @@ extern "C" void kmain()
     SerialDebugInterface::initialize();
     VGA::initialize();
 
-    VGA::writeString("Hello, kernel World!\n");
-
+    kprintf("kprintf Test:\n");
+    kprintf("Hello %s!\n", "World");
+    VGA::setColor(VGA::VGA_COLOR_GREEN);
+    kprintf("Hello Newline: Signed %u, Unsigned: %d", 12, -12);
 }

@@ -9,6 +9,8 @@
 namespace SerialDebugInterface {
 
 void initialize();
-int printf(const char* format, ...);
+bool isInitialized();
+void putChar(char a);
+int write(const char* str);
 
 }
