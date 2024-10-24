@@ -28,6 +28,8 @@ set(SOURCES
         Assert.h
         Kprintf.h
         Kprintf.cpp
+        i386.h
+        i386.cpp
 )
 
 set(LINKER_SCRIPT ${PROJECT_SOURCE_DIR}/linker.ld)

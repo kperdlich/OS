@@ -40,6 +40,7 @@ void initialize()
         }
     }
     s_isInitialized = true;
+    dbgPrintf("VGA initialized\n");
 }
 
 void putChar(char c)

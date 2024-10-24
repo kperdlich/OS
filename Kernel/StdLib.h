@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Assert.h"
+#include "Kprintf.h"
 #include "Types.h"
 
 ADS::size_t strlen(const char* str);

@@ -2,11 +2,12 @@
 // Created by n3dry on 14.10.24.
 //
 
+#include "Assert.h"
+#include "Kprintf.h"
 #include "SerialDebug.h"
 #include "Types.h"
-#include "Kprintf.h"
 #include "VGA.h"
-#include "Assert.h"
+#include "i386.h"
 
 #ifdef __linux__
     #error "Kernel needs to be compiled with a cross-compiler"
@@ -24,6 +25,7 @@ extern "C" void kmain()
 {
     SerialDebugInterface::initialize();
     VGA::initialize();
+    initializeGDT();
 
     kprintf("kprintf Test:\n");
     kprintf("Hello %s!\n", "World");
