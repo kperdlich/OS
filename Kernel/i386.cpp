@@ -72,3 +72,13 @@ void initializeGDT()
     updateSegmentRegisters();
     dbgPrintf("GDT initialized\n");
 }
+
+void disableInterrupts()
+{
+    asm volatile("cli");
+}
+
+void enableInterrupts()
+{
+    asm volatile("sti");
+}

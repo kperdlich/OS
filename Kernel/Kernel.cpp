@@ -23,9 +23,11 @@
 
 extern "C" void kmain()
 {
+    disableInterrupts();
     SerialDebugInterface::initialize();
     VGA::initialize();
     initializeGDT();
+    enableInterrupts();
 
     kprintf("kprintf Test:\n");
     kprintf("Hello %s!\n", "World");
