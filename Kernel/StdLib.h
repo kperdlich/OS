@@ -9,6 +9,7 @@
 #include "Types.h"
 
 ADS::size_t strlen(const char* str);
+void* memset(void* ptr, uint8_t value, ADS::size_t num);
 
 template<typename PerCharCallback>
 int int32ToString(int32_t number, PerCharCallback callback);

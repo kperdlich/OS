@@ -11,3 +11,10 @@ ADS::size_t strlen(const char* str)
         len++;
     return len;
 }
+
+void* memset(void* ptr, uint8_t value, ADS::size_t num)
+{
+    for (ADS::size_t i = 0; i < num; ++i)
+        static_cast<uint8_t*>(ptr)[i] = value;
+    return ptr;
+}
