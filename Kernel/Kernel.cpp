@@ -23,12 +23,12 @@
 
 extern "C" void kmain()
 {
-    disableInterrupts();
+    cli();
     SerialDebugInterface::initialize();
     VGA::initialize();
     initializeGDT();
     initializeIDT();
-    enableInterrupts();
+    sti();
 
     kprintf("kprintf Test:\n");
     kprintf("Hello %s!\n", "World");
@@ -42,5 +42,5 @@ extern "C" void kmain()
     int result = numerator / denominator; // This will trigger the divide-by-zero exception
     kprintf("Result: %d", result);
 #endif
-    HANG();
+    hang();
 }

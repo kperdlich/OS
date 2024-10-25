@@ -4,9 +4,9 @@
 
 #pragma once
 
-#define HANG() asm volatile("cli; hlt")
-#define disableInterrupts() asm volatile("cli")
-#define enableInterrupts() asm volatile("sti")
+#define hang() asm volatile("cli; hlt")
+#define cli() asm volatile("cli")
+#define sti() asm volatile("sti")
 
 void initializeGDT();
 void initializeIDT();

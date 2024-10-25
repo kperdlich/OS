@@ -90,7 +90,7 @@ static constexpr const int IDTEntries = 256;
 static InterruptDescriptor s_idtEntries[IDTEntries] {};
 static IDTPointer s_idtPointer;
 
-static void flushIDT()
+static inline void flushIDT()
 {
     asm volatile("lidt (%0)" ::"m"(s_idtPointer));
 }
@@ -98,9 +98,9 @@ static void flushIDT()
 #define EXCEPTION_HANDLER(i, message)          \
     static void exception_##i()                \
     {                                          \
-        disableInterrupts();                   \
+        cli();                                 \
         dbgPrintf("Exception: " message "\n"); \
-        HANG();                                \
+        hang();                                \
     }
 
 EXCEPTION_HANDLER(0, "Divide Error")
