@@ -4,7 +4,7 @@
 
 #pragma once
 
-#define HANG() asm volatile( "cli; hlt" )
+#define HANG() asm volatile("cli; hlt")
 #define disableInterrupts() asm volatile("cli")
 #define enableInterrupts() asm volatile("sti")
 
