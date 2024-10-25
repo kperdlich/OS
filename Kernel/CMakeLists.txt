@@ -37,6 +37,10 @@ set(KERNEL_BIN "Kernel-i386.bin")
 
 add_executable(Kernel ${SOURCES})
 
+if(KERNEL_RUN_DIVIDE_BY_ZERO_TEST)
+    target_compile_definitions(Kernel PUBLIC RUN_DIVIDE_BY_ZERO_TEST)
+endif()
+
 set_target_properties(Kernel PROPERTIES LINK_FLAGS "-T ${LINKER_SCRIPT} -ffreestanding -nostdlib")
 set_target_properties(Kernel PROPERTIES OUTPUT_NAME ${KERNEL_BIN})
 
