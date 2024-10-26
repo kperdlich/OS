@@ -21,7 +21,7 @@
     #error "Kernel is compiled but KERNEL is not defined"
 #endif
 
-extern "C" void kmain()
+extern "C" [[noreturn]] void kmain()
 {
     cli();
     SerialDebugInterface::initialize();
@@ -35,6 +35,8 @@ extern "C" void kmain()
     VGA::setColor(VGA::VGA_COLOR_GREEN);
     kprintf("Hello Newline: Signed %u, Unsigned: %d\n", 12, -12);
 
+    enableIRQ(0);
+
 #ifdef RUN_DIVIDE_BY_ZERO_TEST
     // Force a divide-by-zero exception
     int numerator = 1;
@@ -42,5 +44,7 @@ extern "C" void kmain()
     int result = numerator / denominator; // This will trigger the divide-by-zero exception
     kprintf("Result: %d", result);
 #endif
-    hang();
+
+    for (;;)
+        ;
 }

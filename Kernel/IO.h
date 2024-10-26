@@ -9,6 +9,6 @@
 namespace IO {
 
 void out8(uint16_t port, uint8_t value);
-uint8_t inb(uint16_t port);
+uint8_t inb8(uint16_t port);
 
 }

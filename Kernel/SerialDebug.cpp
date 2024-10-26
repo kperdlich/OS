@@ -13,7 +13,7 @@ static constexpr const uint32_t COM1 = 0x3F8;
 
 static inline int isTransmitEmpty()
 {
-    return IO::inb(COM1 + 5) & 0x20;
+    return IO::inb8(COM1 + 5) & 0x20;
 }
 
 void putChar(char a)
