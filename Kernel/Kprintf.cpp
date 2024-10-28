@@ -29,6 +29,10 @@ inline int printfTemplate(PerCharCallback callback, const char*& format, va_list
             case 's':
                 characters += forEachCharIn(va_arg(args, const char*), callback);
                 break;
+            case 'c':
+                callback(static_cast<char>(va_arg(args, int)));
+                ++characters;
+                break;
             case 'd':
                 characters += int32ToString(va_arg(args, int32_t), callback);
                 break;

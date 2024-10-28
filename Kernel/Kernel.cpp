@@ -3,6 +3,7 @@
 //
 
 #include "Assert.h"
+#include "Keyboard.h"
 #include "Kprintf.h"
 #include "PIT.h"
 #include "SerialDebug.h"
@@ -33,6 +34,7 @@ extern "C" [[noreturn]] void kmain()
     GDT::initialize();
     IDT::initialize();
     PIT::initialize();
+    Keyboard::initialize();
     sti();
 
     kprintf("kprintf Test:\n");
@@ -49,7 +51,7 @@ extern "C" [[noreturn]] void kmain()
 #endif
 
     for (;;) {
-        sleep(1000);
-        kprintf("Uptime in secs: '%u'\n", getSystemUptimeSecs());
+        //sleep(1000);
+        //kprintf("Uptime in secs: '%u'\n", getSystemUptimeSecs());
     }
 }

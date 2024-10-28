@@ -34,6 +34,8 @@ set(SOURCES
         PIT.cpp
         System.h
         System.cpp
+        Keyboard.cpp
+        Keyboard.h
 )
 
 set(LINKER_SCRIPT ${PROJECT_SOURCE_DIR}/linker.ld)
