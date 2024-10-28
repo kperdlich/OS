@@ -6,6 +6,8 @@
 #include "IO.h"
 #include "StdLib.h"
 
+namespace GDT {
+
 static constexpr const int GDTEntries = 5;
 
 struct GDTEntry {
@@ -58,7 +60,7 @@ static inline void updateSegmentRegisters()
         : "memory");
 }
 
-void initializeGDT()
+void initialize()
 {
     s_gdtPointer.limit = (sizeof(GDTEntry) * GDTEntries) - 1;
     s_gdtPointer.base = reinterpret_cast<uint32_t>(&s_gdtEntries);
@@ -73,6 +75,10 @@ void initializeGDT()
     updateSegmentRegisters();
     dbgPrintf("GDT initialized\n");
 }
+
+}
+
+namespace IDT {
 
 struct InterruptDescriptor {
     uint16_t baseLow; // offset bits 0..15
@@ -160,6 +166,8 @@ static const constexpr uint32_t PIC_SlaveCmd = 0xA0;
 static const constexpr uint32_t PIC_SlaveData = 0xA1;
 static const constexpr uint32_t PIC_EOI = 0x020;
 
+static IRQHandler s_irqHandler[IRQ_Count] { nullptr };
+
 static void sendEOIToPIC(uint8_t irq)
 {
     if (irq >= 8)
@@ -225,8 +233,13 @@ void handleIRQ()
             break;
         }
     }
-    ASSERT(irq >= 0);
-    kprintf("Handle IRQ: %u\n", irq);
+    ASSERT(irq >= 0 && irq < IRQ_Count);
+
+    if (s_irqHandler[irq])
+        s_irqHandler[irq]();
+    else
+        dbgPrintf("No IRQ handler found for irq: %u\n", irq);
+
     sendEOIToPIC(irq);
 }
 
@@ -236,7 +249,7 @@ static void initializeIRQs()
         setIDTEntry(IRQ_Base + i, reinterpret_cast<uint32_t>(commonIRQEntry), 0x08, 0x8E);
 }
 
-void initializeIDT()
+void initialize()
 {
     s_idtPointer.limit = (sizeof(InterruptDescriptor) * IDTEntries) - 1;
     s_idtPointer.base = reinterpret_cast<uint32_t>(&s_idtEntries);
@@ -275,4 +288,12 @@ void disableIRQ(uint8_t irq)
 
     const uint8_t value = IO::inb8(port) | (1 << irq); // Set bit to disable the IRQ
     IO::out8(port, value);
+}
+
+void registerIRQHandler(uint8_t irq, IRQHandler handler)
+{
+    ASSERT(irq >= 0 && irq < IRQ_Count);
+    s_irqHandler[irq] = handler;
+}
+
 }

@@ -30,6 +30,10 @@ set(SOURCES
         Kprintf.cpp
         i386.h
         i386.cpp
+        PIT.h
+        PIT.cpp
+        System.h
+        System.cpp
 )
 
 set(LINKER_SCRIPT ${PROJECT_SOURCE_DIR}/linker.ld)
