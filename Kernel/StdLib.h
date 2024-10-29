@@ -53,3 +53,21 @@ int uint32ToString(uint32_t value, PerCharCallback callback)
 
     return ret;
 }
+
+template<typename PerCharCallback>
+int uint32ToHexString(uint32_t value, PerCharCallback callback)
+{
+    static constexpr const char hexChars[] = "0123456789abcdef";
+    static constexpr const uint32_t msNibble = 28; // Reading nibbles left to right (from MSB to LSB)
+    static constexpr const uint32_t nibbles = 8;
+
+    int ret = 0;
+    for (ADS::size_t i = 0; i < nibbles; ++i) {
+        const uint32_t shift = msNibble - (i * 4);
+        const uint32_t nibble = (value >> shift) & 0xF;
+        callback(hexChars[nibble]);
+        ++ret;
+    }
+
+    return ret;
+}
