@@ -3,7 +3,9 @@
 //
 
 #include "VGA.h"
+#include "IO.h"
 #include "StdLib.h"
+#include "i386.h"
 
 namespace VGA {
 
@@ -27,6 +29,16 @@ static inline uint16_t combined(unsigned char character, uint8_t color)
     return (uint16_t)character | (uint16_t)color << 8;
 }
 
+static void updateCursor(ADS::size_t x, ADS::size_t y)
+{
+    const uint16_t pos = y * VGA_WIDTH + x;
+
+    IO::out8(0x3D4, 0x0F);
+    IO::out8(0x3D5, LSB(pos));
+    IO::out8(0x3D4, 0x0E);
+    IO::out8(0x3D5, MSB(pos));
+}
+
 void initialize()
 {
     s_currentRow = 0;
@@ -40,6 +52,7 @@ void initialize()
         }
     }
     s_isInitialized = true;
+    updateCursor(s_currentColumn, s_currentRow);
     dbgPrintf("VGA initialized\n");
 }
 
@@ -48,6 +61,7 @@ void putChar(char c)
     if (c == '\n') {
         s_currentColumn = 0;
         ++s_currentRow;
+        updateCursor(s_currentColumn, s_currentRow);
         return;
     }
 
@@ -57,6 +71,7 @@ void putChar(char c)
         if (++s_currentRow == VGA_HEIGHT)
             s_currentRow = 0;
     }
+    updateCursor(s_currentColumn, s_currentRow);
 }
 
 void putCharAt(char c, uint8_t color, ADS::size_t x, ADS::size_t y)
