@@ -5,6 +5,8 @@
 #include "Assert.h"
 #include "Keyboard.h"
 #include "Kprintf.h"
+#include "MemoryManager.h"
+#include "Multiboot.h"
 #include "PIT.h"
 #include "SerialDebug.h"
 #include "System.h"
@@ -26,15 +28,18 @@
 
 System g_system {};
 
-extern "C" [[noreturn]] void kmain()
+extern "C" [[noreturn]] void kmain(uint32_t magic, multiboot_info_t* multibootInfo)
 {
     cli();
     SerialDebugInterface::initialize();
+    ASSERT(magic == MULTIBOOT_BOOTLOADER_MAGIC);
+
     VGA::initialize();
     GDT::initialize();
     IDT::initialize();
     PIT::initialize();
     Keyboard::initialize();
+    MemoryManager::Initialize(*multibootInfo);
     sti();
 
     kprintf("kprintf Test:\n");
@@ -51,7 +56,7 @@ extern "C" [[noreturn]] void kmain()
 #endif
 
     for (;;) {
-        //sleep(1000);
-        //kprintf("Uptime in secs: '%u'\n", getSystemUptimeSecs());
+        // sleep(1000);
+        // kprintf("Uptime in secs: '%u'\n", getSystemUptimeSecs());
     }
 }

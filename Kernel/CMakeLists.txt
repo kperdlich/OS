@@ -36,6 +36,9 @@ set(SOURCES
         System.cpp
         Keyboard.cpp
         Keyboard.h
+        Multiboot.h
+        MemoryManager.h
+        MemoryManager.cpp
 )
 
 set(LINKER_SCRIPT ${PROJECT_SOURCE_DIR}/linker.ld)
