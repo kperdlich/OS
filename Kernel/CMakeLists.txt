@@ -39,6 +39,8 @@ set(SOURCES
         Multiboot.h
         MemoryManager.h
         MemoryManager.cpp
+        Kmalloc.h
+        Kmalloc.cpp
 )
 
 set(LINKER_SCRIPT ${PROJECT_SOURCE_DIR}/linker.ld)
@@ -59,7 +61,7 @@ target_compile_definitions(Kernel PUBLIC KERNEL)
 
 add_custom_target(BuildAndRunKernel
         DEPENDS Kernel
-        COMMAND qemu-system-i386 -kernel ${PROJECT_BINARY_DIR}/${KERNEL_BIN} -serial file:kernel.log
+        COMMAND qemu-system-i386 -m 1G -kernel ${PROJECT_BINARY_DIR}/${KERNEL_BIN} -serial file:kernel.log
         COMMAND echo "Log output:" && cat kernel.log
         COMMENT "Running the kernel in QEMU..."
 )

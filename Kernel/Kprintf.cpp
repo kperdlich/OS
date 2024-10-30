@@ -42,6 +42,12 @@ inline int printfTemplate(PerCharCallback callback, const char*& format, va_list
             case 'x':
                 characters += uint32ToHexString(va_arg(args, uint32_t), callback);
                 break;
+            case 'p':
+                callback('0');
+                callback('x');
+                characters += 2;
+                characters += uint32ToHexString(va_arg(args, uint32_t), callback);
+                break;
             default:
                 ASSERT_NOT_REACHED();
             }
