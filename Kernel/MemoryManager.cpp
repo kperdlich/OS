@@ -57,6 +57,7 @@ void Initialize(multiboot_info_t& multibootInfo)
     dbgPrintf("[MemoryManager] Located Kernel: Memory Section: %p | Ends: %p\n", heapMemorySection, &kernelEnd);
 
     const uint32_t kernelEndAligned = alignToPage(reinterpret_cast<uint32_t>(&kernelEnd));
+    ASSERT(reinterpret_cast<uint32_t>(kernelEndAligned) > reinterpret_cast<uint32_t>(&kernelEnd));
     const uint32_t kernelAlignedSize = kernelEndAligned - reinterpret_cast<uint32_t>(heapMemorySection);
     void* const heapStart = reinterpret_cast<void*>(kernelEndAligned);
     const ADS::size_t heapSize = heapMemorySectionSize - kernelAlignedSize;
