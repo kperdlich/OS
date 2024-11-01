@@ -75,8 +75,6 @@ void Initialize(multiboot_info_t& multibootInfo)
         heapSize = heapMemorySectionSize - alignmentSizeDiff;
     }
     Heap::initialize(heapStart, heapSize);
-
-    dbgPrintf("MemoryManager initialized\n");
 }
 
 uint32_t alignToPage(uint32_t addr)

@@ -4,6 +4,7 @@
 
 #include "Assert.h"
 #include "Keyboard.h"
+#include "Kmalloc.h"
 #include "Kprintf.h"
 #include "MemoryManager.h"
 #include "Multiboot.h"
@@ -46,6 +47,24 @@ extern "C" [[noreturn]] void kmain(uint32_t magic, multiboot_info_t* multibootIn
     kprintf("Hello %s!\n", "World");
     VGA::setColor(VGA::VGA_COLOR_GREEN);
     kprintf("Hello Newline: Signed %u, Unsigned: %d\n", 12, -12);
+
+    {
+        char* ptr = reinterpret_cast<char*>(kmalloc(10000));
+        ptr[0] = 'A';
+        ptr[1] = 'B';
+        ptr[2] = 'C';
+        ptr[3] = 0;
+        kprintf("Heap allocated string: %s\n", ptr);
+
+        char* ptr2 = reinterpret_cast<char*>(kmalloc(12000));
+        kfree(ptr2);
+        kfree(ptr);
+    }
+
+    {
+        char* ptr = reinterpret_cast<char*>(kmalloc(10000));
+        kfree(ptr);
+    }
 
 #ifdef RUN_DIVIDE_BY_ZERO_TEST
     // Force a divide-by-zero exception
