@@ -66,6 +66,15 @@ extern "C" [[noreturn]] void kmain(uint32_t magic, multiboot_info_t* multibootIn
         kfree(ptr);
     }
 
+    {
+        char* charBuffer = new char[1337];
+        delete [] charBuffer;
+
+        uint32_t* intHeap = new uint32_t(42);
+        ASSERT(*intHeap == 42);
+        delete intHeap;
+    }
+
 #ifdef RUN_DIVIDE_BY_ZERO_TEST
     // Force a divide-by-zero exception
     int numerator = 1;

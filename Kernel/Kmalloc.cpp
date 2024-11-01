@@ -40,6 +40,11 @@ public:
             return m_data & HAS_NEXT_FLAG;
         }
 
+        [[nodiscard]] inline uint8_t data() const
+        {
+            return m_data;
+        }
+
         inline void setToFree()
         {
             m_data = IS_FREE_FLAG;
@@ -60,11 +65,6 @@ public:
             m_data |= HAS_NEXT_FLAG;
         }
 
-        inline uint8_t data() const
-        {
-            return m_data;
-        }
-
     private:
         uint8_t m_data;
     };
@@ -83,19 +83,19 @@ public:
         m_totalBlockTableEntries = heapSize / BlockSize;
         m_blockTableEntries = reinterpret_cast<BlockTableEntry*>(heapStart);
         memset(m_blockTableEntries, BlockTableEntry::IS_FREE_FLAG, m_totalBlockTableEntries);
-        const char* finalHeapStartAddress = static_cast<char*>(heapStart) + (m_totalBlockTableEntries * sizeof(BlockTableEntry));
-        m_pageAlignedHeapStart = reinterpret_cast<void*>(MemoryManager::alignToPage(reinterpret_cast<uint32_t>(finalHeapStartAddress)));
-        dbgPrintf("[Heap] Initialized: Block Table: %p | Total Entries: %u | Entry Size: %u Bytes | Heap Start: %p\n", m_blockTableEntries, m_totalBlockTableEntries, BlockSize, m_pageAlignedHeapStart);
+        const void* const availableMemoryAfterHeapBlockTable = static_cast<char*>(heapStart) + (m_totalBlockTableEntries * sizeof(BlockTableEntry));
+        m_pageAlignedHeapStart = reinterpret_cast<void*>(MemoryManager::alignToPage(reinterpret_cast<uint32_t>(availableMemoryAfterHeapBlockTable)));
+        dbgPrintf("[Heap] Initialized: Block Table: %p | Total Blocks: %u | Block Size: %u Bytes | Heap Start: %p\n", m_blockTableEntries, m_totalBlockTableEntries, BlockSize, m_pageAlignedHeapStart);
         m_initialized = true;
     }
 
     void* malloc(ADS::size_t size)
     {
-        ASSERT(m_initialized);
         static_assert(sizeof(uint32_t) == sizeof(ADS::size_t));
+        ASSERT(m_initialized);
 
         // Find free blocks (First-Fit)
-        const ADS::size_t requiredBlocks = MemoryManager::alignToPage(size) / MemoryManager::PAGE_SIZE;
+        const ADS::size_t requiredBlocks = MemoryManager::alignToPage(size) / BlockSize;
         ADS::size_t blockCounter = 0;
         ADS::size_t startBlock = UINT32_MAX;
         for (ADS::size_t i = 0; i < m_totalBlockTableEntries; ++i) {
@@ -130,7 +130,7 @@ public:
         }
 
         // Get pointer to memory
-        void* const ptr = reinterpret_cast<char*>(m_pageAlignedHeapStart) + (startBlock * MemoryManager::PAGE_SIZE);
+        void* const ptr = reinterpret_cast<char*>(m_pageAlignedHeapStart) + (startBlock * BlockSize);
         dbgPrintf("[Heap] Allocated Size: %u Bytes | Start Block: %u | End Block: %u | Total Blocks: %u | Ptr: %p\n", size, startBlock, endBlock, blockCounter, ptr);
         return ptr;
     }
@@ -140,7 +140,7 @@ public:
         ASSERT(m_initialized);
 
         ADS::size_t freedBlocks {};
-        const ADS::size_t blockIndex = (reinterpret_cast<char*>(ptr) - reinterpret_cast<char*>(m_pageAlignedHeapStart)) / MemoryManager::PAGE_SIZE;
+        const ADS::size_t blockIndex = (reinterpret_cast<char*>(ptr) - reinterpret_cast<char*>(m_pageAlignedHeapStart)) / BlockSize;
         for (ADS::size_t i = blockIndex; i < m_totalBlockTableEntries; ++i) {
             BlockTableEntry& entry = m_blockTableEntries[i];
             BlockTableEntry copy = entry;
@@ -181,4 +181,34 @@ void* kmalloc(ADS::size_t size)
 void kfree(void* ptr)
 {
     return Heap::s_heap.free(ptr);
+}
+
+void* operator new(ADS::size_t size)
+{
+    return kmalloc(size);
+}
+
+void* operator new[](ADS::size_t size)
+{
+    return kmalloc(size);
+}
+
+void operator delete(void* ptr)
+{
+    return kfree(ptr);
+}
+
+void operator delete[](void* ptr)
+{
+    return kfree(ptr);
+}
+
+void operator delete(void* ptr, ADS::size_t)
+{
+    return kfree(ptr);
+}
+
+void operator delete[](void* ptr, ADS::size_t)
+{
+    return kfree(ptr);
 }
