@@ -4,14 +4,14 @@
 #include "Kmalloc.h"
 #include "Assert.h"
 #include "Kprintf.h"
-#include "MemoryManager.h"
+#include "Paging.h"
 #include "StdLib.h"
 
 namespace Heap {
 
 class HeapBlockTableImpl final {
 public:
-    static constexpr const uint32_t BlockSize = MemoryManager::PAGE_SIZE;
+    static constexpr const uint32_t BlockSize = Paging::PAGE_SIZE;
 
     class BlockTableEntry final {
     public:
@@ -84,7 +84,7 @@ public:
         m_blockTableEntries = reinterpret_cast<BlockTableEntry*>(heapStart);
         memset(m_blockTableEntries, BlockTableEntry::IS_FREE_FLAG, m_totalBlockTableEntries);
         const void* const availableMemoryAfterHeapBlockTable = static_cast<char*>(heapStart) + (m_totalBlockTableEntries * sizeof(BlockTableEntry));
-        m_pageAlignedHeapStart = reinterpret_cast<void*>(MemoryManager::alignToPage(reinterpret_cast<uint32_t>(availableMemoryAfterHeapBlockTable)));
+        m_pageAlignedHeapStart = reinterpret_cast<void*>(Paging::alignToPage(reinterpret_cast<uint32_t>(availableMemoryAfterHeapBlockTable)));
         dbgPrintf("[Heap] Initialized: Block Table: %p | Total Blocks: %u | Block Size: %u Bytes | Heap Start: %p\n", m_blockTableEntries, m_totalBlockTableEntries, BlockSize, m_pageAlignedHeapStart);
         m_initialized = true;
     }
@@ -95,7 +95,7 @@ public:
         ASSERT(m_initialized);
 
         // Find free blocks (First-Fit)
-        const ADS::size_t requiredBlocks = MemoryManager::alignToPage(size) / BlockSize;
+        const ADS::size_t requiredBlocks = Paging::alignToPage(size) / BlockSize;
         ADS::size_t blockCounter = 0;
         ADS::size_t startBlock = UINT32_MAX;
         for (ADS::size_t i = 0; i < m_totalBlockTableEntries; ++i) {
@@ -131,7 +131,9 @@ public:
 
         // Get pointer to memory
         void* const ptr = reinterpret_cast<char*>(m_pageAlignedHeapStart) + (startBlock * BlockSize);
+#if 0
         dbgPrintf("[Heap] Allocated Size: %u Bytes | Start Block: %u | End Block: %u | Total Blocks: %u | Ptr: %p\n", size, startBlock, endBlock, blockCounter, ptr);
+#endif
         return ptr;
     }
 
@@ -150,7 +152,9 @@ public:
             if (!copy.hasNext())
                 break;
         }
+#if 0
         dbgPrintf("[Heap] Freed Memory: %p | Start Block Index: %u | Freed Blocks: %u\n", ptr, blockIndex, freedBlocks);
+#endif
     }
 
 private:
@@ -166,7 +170,7 @@ void initialize(void* heapStart, ADS::size_t heapSize)
 {
     ASSERT(heapStart != nullptr);
     ASSERT(heapSize > 0);
-    ASSERT(MemoryManager::isPageAligned(reinterpret_cast<uint32_t>(heapStart)));
+    ASSERT(Paging::isPageAligned(reinterpret_cast<uint32_t>(heapStart)));
 
     s_heap.create(heapStart, heapSize);
 }

@@ -6,6 +6,7 @@
 #include "Assert.h"
 #include "Kmalloc.h"
 #include "Kprintf.h"
+#include "Paging.h"
 
 namespace MemoryManager {
 
@@ -62,29 +63,20 @@ void initialize(multiboot_info_t& multibootInfo)
     ADS::size_t heapSize = {};
     if (heapSectionContainsKernel) {
         dbgPrintf("[MemoryManager] Located Kernel in Heap Section - Kernel End: %p\n", &kernelEnd);
-        const uint32_t kernelEndAligned = alignToPage(reinterpret_cast<uint32_t>(&kernelEnd));
+        const uint32_t kernelEndAligned = Paging::alignToPage(reinterpret_cast<uint32_t>(&kernelEnd));
         ASSERT(reinterpret_cast<uint32_t>(kernelEndAligned) > reinterpret_cast<uint32_t>(&kernelEnd));
         const uint32_t kernelAlignedSize = kernelEndAligned - reinterpret_cast<uint32_t>(heapMemorySection);
         heapStart = reinterpret_cast<void*>(kernelEndAligned);
         heapSize = heapMemorySectionSize - kernelAlignedSize;
     } else {
-        const uint32_t heapMemorySectionAligned = alignToPage(reinterpret_cast<uint32_t>(heapMemorySection));
+        const uint32_t heapMemorySectionAligned = Paging::alignToPage(reinterpret_cast<uint32_t>(heapMemorySection));
         ASSERT(reinterpret_cast<uint32_t>(heapMemorySectionAligned) > reinterpret_cast<uint32_t>(heapMemorySection));
         const uint32_t alignmentSizeDiff = heapMemorySectionAligned - reinterpret_cast<uint32_t>(heapMemorySection);
         heapStart = reinterpret_cast<void*>(heapMemorySectionAligned);
         heapSize = heapMemorySectionSize - alignmentSizeDiff;
     }
     Heap::initialize(heapStart, heapSize);
-}
-
-uint32_t alignToPage(uint32_t addr)
-{
-    return (addr + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
-}
-
-bool isPageAligned(uint32_t addr)
-{
-    return (addr % MemoryManager::PAGE_SIZE) == 0;
+    Paging::initialize();
 }
 
 }

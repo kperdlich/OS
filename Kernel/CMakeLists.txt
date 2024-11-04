@@ -41,6 +41,8 @@ set(SOURCES
         MemoryManager.cpp
         Kmalloc.h
         Kmalloc.cpp
+        Paging.cpp
+        Paging.h
 )
 
 set(LINKER_SCRIPT ${PROJECT_SOURCE_DIR}/linker.ld)

@@ -68,12 +68,16 @@ extern "C" [[noreturn]] void kmain(uint32_t magic, multiboot_info_t* multibootIn
 
     {
         char* charBuffer = new char[1337];
-        delete [] charBuffer;
+        delete[] charBuffer;
 
         uint32_t* intHeap = new uint32_t(42);
         ASSERT(*intHeap == 42);
         delete intHeap;
     }
+
+    // Test nullptr dereference page-fault
+    //int* test = nullptr;
+    //*test = 42;
 
 #ifdef RUN_DIVIDE_BY_ZERO_TEST
     // Force a divide-by-zero exception
