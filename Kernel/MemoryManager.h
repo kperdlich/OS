@@ -13,6 +13,6 @@ constexpr const ADS::size_t PAGE_SIZE = 4096;
 
 bool isPageAligned(uint32_t addr);
 uint32_t alignToPage(uint32_t addr);
-void Initialize(multiboot_info_t& multibootInfo);
+void initialize(multiboot_info_t& multibootInfo);
 
 }

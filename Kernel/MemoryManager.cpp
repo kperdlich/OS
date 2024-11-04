@@ -30,7 +30,7 @@ static const char* MemoryMapTypeToString(uint32_t type)
 
 extern "C" void* kernelEnd; // set by the linker
 
-void Initialize(multiboot_info_t& multibootInfo)
+void initialize(multiboot_info_t& multibootInfo)
 {
     ASSERT(multibootInfo.flags & MULTIBOOT_INFO_MEM_MAP);
 

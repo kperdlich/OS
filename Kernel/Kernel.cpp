@@ -40,7 +40,7 @@ extern "C" [[noreturn]] void kmain(uint32_t magic, multiboot_info_t* multibootIn
     IDT::initialize();
     PIT::initialize();
     Keyboard::initialize();
-    MemoryManager::Initialize(*multibootInfo);
+    MemoryManager::initialize(*multibootInfo);
     sti();
 
     kprintf("kprintf Test:\n");
