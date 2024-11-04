@@ -124,14 +124,14 @@ public:
                 entry.setIsFirstFlag();
             if (i < endBlock)
                 entry.setHasNextFlag();
-#if 0
+#ifdef TRACE_HEAP_ALLOC
             dbgPrintf("[Heap] Allocated Block Entry[%u]: 0x%x | Taken: %u | First: %u | Next: %u\n", i, entry.data(), entry.isTaken(), entry.isFirst(), entry.hasNext());
 #endif
         }
 
         // Get pointer to memory
         void* const ptr = reinterpret_cast<char*>(m_pageAlignedHeapStart) + (startBlock * BlockSize);
-#if 0
+#ifdef TRACE_HEAP_ALLOC
         dbgPrintf("[Heap] Allocated Size: %u Bytes | Start Block: %u | End Block: %u | Total Blocks: %u | Ptr: %p\n", size, startBlock, endBlock, blockCounter, ptr);
 #endif
         return ptr;
@@ -152,7 +152,7 @@ public:
             if (!copy.hasNext())
                 break;
         }
-#if 0
+#ifdef TRACE_HEAP_ALLOC
         dbgPrintf("[Heap] Freed Memory: %p | Start Block Index: %u | Freed Blocks: %u\n", ptr, blockIndex, freedBlocks);
 #endif
     }
