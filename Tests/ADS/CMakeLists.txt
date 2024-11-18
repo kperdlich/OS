@@ -6,8 +6,8 @@ add_executable(ADSTest
         TestString.cpp
         TestFunction.cpp
         TestOwnPtr.cpp
-        TestRefPtr.h
-        TestWeakPtr.h
+        TestRefPtr.cpp
+        TestWeakPtr.cpp
         TestSinglyLinkedList.cpp
         TestDoublyLinkedList.cpp
 )

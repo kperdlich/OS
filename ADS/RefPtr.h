@@ -94,7 +94,7 @@ public:
         return m_ptr;
     }
 
-    int refCount() const
+    [[nodiscard]] int refCount() const
     {
         return m_refCounter ? m_refCounter->refCount() : 0;
     }
@@ -109,7 +109,10 @@ public:
             // FIXME: add custom deleter.
             delete m_ptr;
             m_ptr = nullptr;
-            delete m_refCounter;
+
+            if (m_refCounter->weakRefCount() <= 0)
+                delete m_refCounter;
+            // Last WeakPtr will clean it up.
             m_refCounter = nullptr;
         }
     }
@@ -149,18 +152,29 @@ public:
         : m_ptr(refPtr.m_ptr)
         , m_refCounter(refPtr.m_refCounter)
     {
+        if (m_refCounter)
+            m_refCounter->addWeakRef();
     }
 
     WeakPtr(const WeakPtr& other)
         : m_ptr(other.m_ptr)
         , m_refCounter(other.m_refCounter)
     {
+        if (m_refCounter)
+            m_refCounter->addWeakRef();
     }
 
     WeakPtr(WeakPtr&& other)
+        : m_ptr(other.m_ptr)
+        , m_refCounter(other.m_refCounter)
     {
         other.m_ptr = nullptr;
         other.m_refCounter = nullptr;
+    }
+
+    ~WeakPtr()
+    {
+        clear();
     }
 
     WeakPtr& operator=(const WeakPtr& other)
@@ -169,6 +183,8 @@ public:
             clear();
             m_ptr = other.m_ptr;
             m_refCounter = other.m_refCounter;
+            if (m_refCounter)
+                m_refCounter->addWeakRef();
         }
     }
 
@@ -183,12 +199,14 @@ public:
         }
     }
 
-    bool isNull() const
+    [[nodiscard]] bool isExpired() const
     {
-        return m_ptr == nullptr;
+        if (m_refCounter)
+            return m_refCounter->refCount() <= 0;
+        return true;
     }
 
-    int refCount() const
+    [[nodiscard]] int refCount() const
     {
         return m_refCounter ? m_refCounter->refCount() : 0;
     }
@@ -200,8 +218,16 @@ public:
 
     void clear()
     {
+        if (m_refCounter) {
+            m_refCounter->releaseWeakRef();
+            // The m_ptr should always be deleted the by last RefPtr.
+            // WeakPtr should only clean up the ref counter memory.
+            if (m_refCounter->weakRefCount() <= 0 && m_refCounter->refCount() <= 0) {
+                delete m_refCounter;
+                m_refCounter = nullptr;
+            }
+        }
         m_ptr = nullptr;
-        m_refCounter = nullptr;
     }
 
 private:
@@ -211,11 +237,15 @@ private:
 
 template<typename T>
 RefPtr<T>::RefPtr(const WeakPtr<T>& weakPtr)
-    : m_ptr(weakPtr.m_ptr)
-    , m_refCounter(weakPtr.m_refCounter)
 {
-    if (m_refCounter)
+    if (weakPtr.isExpired()) {
+        m_ptr = nullptr;
+        m_refCounter = nullptr;
+    } else {
+        m_ptr = weakPtr.m_ptr;
+        m_refCounter = weakPtr.m_refCounter;
         m_refCounter->addRef();
+    }
 }
 
 }

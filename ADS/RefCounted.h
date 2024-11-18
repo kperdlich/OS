@@ -18,13 +18,29 @@ public:
         --m_refCount;
     }
 
-    int refCount() const
+    [[nodiscard]] int refCount() const
     {
         return m_refCount;
     }
 
+    void addWeakRef()
+    {
+        ++m_weakRefCount;
+    }
+
+    void releaseWeakRef()
+    {
+        --m_weakRefCount;
+    }
+
+    [[nodiscard]] int weakRefCount() const
+    {
+        return m_weakRefCount;
+    }
+
 private:
     int m_refCount { 1 };
+    int m_weakRefCount { 0 };
 };
 
 }
