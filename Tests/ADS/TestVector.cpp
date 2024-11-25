@@ -106,6 +106,12 @@ public:
     inline static ADS::size_t moveCtorCounter = 0;
     inline static ADS::size_t destructorCounter = 0;
 
+    static void ResetCounter()
+    {
+        moveCtorCounter = { 0 };
+        destructorCounter = { 0 };
+    }
+
     TestClass(int value)
         : m_value { value }
     {
@@ -127,6 +133,7 @@ public:
 
 TEST_CASE("Vector: reallocation calls move and destructor correctly", "[Vector]")
 {
+    TestClass::ResetCounter();
     ADS::Vector<TestClass> test;
     test.pushBack({ 1 });
     test.pushBack({ 2 });
@@ -151,4 +158,24 @@ TEST_CASE("Vector: reallocation calls move and destructor correctly", "[Vector]"
     // 6 objects in general and 5 should be moved + destructor call during reallocation
     REQUIRE(TestClass::moveCtorCounter == 6 + 5);
     REQUIRE(TestClass::destructorCounter == 6 + 5);
+}
+
+TEST_CASE("Vector: remove calls move and destructor correctly when shifting elements", "[Vector]")
+{
+    TestClass::ResetCounter();
+    ADS::Vector<TestClass> test;
+    test.pushBack({ 1 });
+    test.pushBack({ 2 });
+    test.pushBack({ 3 });
+
+    // Pushback with 3 tmp objects (destructor) + move
+    REQUIRE(TestClass::moveCtorCounter == 3);
+    REQUIRE(TestClass::destructorCounter == 3);
+
+    auto it = test.begin();
+    test.remove(++it);
+
+    // One object removed and one shifted (destructor + move)
+    REQUIRE(TestClass::moveCtorCounter == 3 + 1);
+    REQUIRE(TestClass::destructorCounter == 3 + 2);
 }

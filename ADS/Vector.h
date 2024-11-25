@@ -379,7 +379,8 @@ public:
 
         // Shift everything after the iterator to the left.
         for (ADS::size_t i = pos.m_index + 1; i < m_size; ++i) {
-            m_data[i - 1] = ADS::move(m_data[i]);
+            new (&m_data[i - 1]) T(ADS::move(m_data[i]));
+            m_data[i].~T();
         }
         --m_size;
     }
