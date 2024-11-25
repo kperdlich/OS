@@ -100,3 +100,55 @@ TEST_CASE("Vector: removeAll works", "[Vector]")
     CHECK(test.find(valueToRemove) == test.end());
     REQUIRE(removedElements == 2);
 }
+
+class TestClass {
+public:
+    inline static ADS::size_t moveCtorCounter = 0;
+    inline static ADS::size_t destructorCounter = 0;
+
+    TestClass(int value)
+        : m_value { value }
+    {
+    }
+
+    ~TestClass()
+    {
+        ++destructorCounter;
+    }
+
+    TestClass(TestClass&& other)
+        : m_value(ADS::move(other.m_value))
+    {
+        other.m_value = {};
+        ++moveCtorCounter;
+    }
+    int m_value {};
+};
+
+TEST_CASE("Vector: reallocation calls move and destructor correctly", "[Vector]")
+{
+    ADS::Vector<TestClass> test;
+    test.pushBack({ 1 });
+    test.pushBack({ 2 });
+    test.pushBack({ 3 });
+    test.pushBack({ 4 });
+    test.pushBack({ 5 });
+
+    // Pushback with 5 tmp objects (destructor) + move
+    REQUIRE(TestClass::moveCtorCounter == 5);
+    REQUIRE(TestClass::destructorCounter == 5);
+
+    // One more destructor + move call
+    test.pushBack({ 6 }); // should trigger reallocation
+
+    REQUIRE(test.at(0).m_value == 1);
+    REQUIRE(test.at(1).m_value == 2);
+    REQUIRE(test.at(2).m_value == 3);
+    REQUIRE(test.at(3).m_value == 4);
+    REQUIRE(test.at(4).m_value == 5);
+    REQUIRE(test.at(5).m_value == 6);
+
+    // 6 objects in general and 5 should be moved + destructor call during reallocation
+    REQUIRE(TestClass::moveCtorCounter == 6 + 5);
+    REQUIRE(TestClass::destructorCounter == 6 + 5);
+}

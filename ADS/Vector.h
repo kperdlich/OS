@@ -305,8 +305,10 @@ public:
         T* oldData = m_data;
         m_data = static_cast<T*>(ADS::malloc(newCapacity * sizeof(T)));
         if (oldData) {
-            for (ADS::size_t i = 0; i < m_size; ++i)
+            for (ADS::size_t i = 0; i < m_size; ++i) {
                 new (&m_data[i]) T(ADS::move(oldData[i]));
+                oldData[i].~T();
+            }
             ADS::free(oldData);
             oldData = nullptr;
         }
