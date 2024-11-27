@@ -295,7 +295,7 @@ public:
         return m_size;
     }
 
-    bool isEmpty() const { return m_size == 0; }
+    [[nodiscard]] bool isEmpty() const { return m_size == 0; }
 
     void reserve(ADS::size_t newCapacity)
     {
@@ -354,6 +354,16 @@ public:
             return;
 
         m_data[--m_size].~T();
+    }
+
+    template<typename... Args>
+    void emplaceBack(Args&&... args)
+    {
+        if (m_size >= m_capacity) {
+            reserve(m_capacity + s_capacityIncrement);
+        }
+
+        new (&m_data[m_size++]) T(ADS::forward<Args>(args)...);
     }
 
     ADS::size_t removeAll(const T& valueToRemove)

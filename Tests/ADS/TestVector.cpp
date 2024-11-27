@@ -5,7 +5,7 @@
 #include "Vector.h"
 #include <catch2/catch.hpp>
 
-TEST_CASE("Vector: basic operations work", "[Vector]")
+TEST_CASE("Vector: pushBack works", "[Vector]")
 {
     ADS::Vector<int> test;
     test.pushBack(10);
@@ -35,6 +35,26 @@ TEST_CASE("Vector: basic operations work", "[Vector]")
     for (auto it : vector) {
         INFO(it);
     }
+}
+
+TEST_CASE("Vector: emplaceBack works", "[Vector]")
+{
+    struct TestStruct {
+        TestStruct(int valueA, int valueB) : ValueA(valueA), ValueB(valueB) {}
+        int ValueA;
+        int ValueB;
+
+        bool operator==(const TestStruct& other) const {
+            return ValueA == other.ValueA && ValueB == other.ValueB;
+        }
+    };
+
+    ADS::Vector<TestStruct> test;
+    test.emplaceBack(10, 20);
+    test.emplaceBack(30, 40);
+    REQUIRE(test.size() == 2);
+    REQUIRE(test.at(0) == TestStruct{10, 20});
+    REQUIRE(test.at(1) == TestStruct{30, 40});
 }
 
 TEST_CASE("Vector: find works", "[Vector]")
