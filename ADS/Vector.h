@@ -249,7 +249,8 @@ public:
 
     Vector(std::initializer_list<T> list)
     {
-        for (auto& it : list) {
+        reserve(list.size());
+        for (const T& it : list) {
             pushBack(it);
         }
     };
